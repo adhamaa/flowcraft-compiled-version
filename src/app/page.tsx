@@ -1,26 +1,47 @@
 'use client';
-import { Button, ColorInput, Group, useMantineColorScheme } from "@mantine/core";
+import { Button, ColorInput, Group, Stack, Switch, useMantineColorScheme } from "@mantine/core";
 import Image from "next/image";
+import { Icon } from '@iconify-icon/react';
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
-  const { setColorScheme, clearColorScheme, colorScheme } = useMantineColorScheme({
+  const switchRef = useRef<HTMLInputElement>(null);
+  console.log('switchRef:', switchRef.current?.checked)
+  const { setColorScheme, clearColorScheme, colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
   });
-
   const isDark = colorScheme === "dark";
+  const isLight = colorScheme === "light";
 
   function cn(...classNames: string[]): string {
     return classNames.filter(Boolean).join(' ');
   }
 
+  useEffect(() => {
+    if (switchRef.current) {
+      switchRef.current.checked = isDark;
+    }
+  }
+    , [isDark]);
+
+
+
   return (
-    <main className={cn("flex min-h-screen flex-col items-center justify-between p-24", isDark ? "bg-slate-300" : "bg-orange-700")}>
-      <Group>
-        <Button onClick={() => setColorScheme('light')}>Light</Button>
-        <Button onClick={() => setColorScheme('dark')}>Dark</Button>
-        <Button onClick={() => setColorScheme('auto')}>Auto</Button>
-        <Button onClick={clearColorScheme}>Clear</Button>
-      </Group>
+    <main className={cn("flex min-h-screen flex-col items-center justify-between p-24 bg-teal-100 dark:bg-slate-600")}>
+      <Stack align="center">
+        <Group>
+          <Button onClick={() => setColorScheme('light')}>Light</Button>
+          <Button onClick={() => setColorScheme('dark')}>Dark</Button>
+          <Button onClick={() => setColorScheme('auto')}>Auto</Button>
+          <Button onClick={clearColorScheme}>Clear</Button>
+        </Group>
+        <Group>
+          <Switch
+            ref={switchRef}
+            onChange={() => toggleColorScheme()}
+            size="lg" color="dark.4" onLabel={<Icon width={20} icon="ph:sun-bold" />} offLabel={<Icon width={20} icon="ph:moon-bold" />} />
+        </Group>
+      </Stack>
 
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
