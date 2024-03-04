@@ -2,7 +2,7 @@
 import { Button, ColorInput, Group, Stack, Switch, useMantineColorScheme } from "@mantine/core";
 import Image from "next/image";
 import { Icon } from '@iconify-icon/react';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Home() {
   const switchRef = useRef<HTMLInputElement>(null);
@@ -10,7 +10,6 @@ export default function Home() {
   const { setColorScheme, clearColorScheme, colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
   });
-  const isDark = colorScheme === "dark";
   const isLight = colorScheme === "light";
 
   function cn(...classNames: string[]): string {
@@ -19,10 +18,9 @@ export default function Home() {
 
   useEffect(() => {
     if (switchRef.current) {
-      switchRef.current.checked = isDark;
+      switchRef.current.checked = isLight;
     }
-  }
-    , [isDark]);
+  }, [isLight]);
 
 
 
@@ -39,7 +37,10 @@ export default function Home() {
           <Switch
             ref={switchRef}
             onChange={() => toggleColorScheme()}
-            size="lg" color="dark.4" onLabel={<Icon width={20} icon="ph:sun-bold" />} offLabel={<Icon width={20} icon="ph:moon-bold" />} />
+            size="lg"
+            color={isLight ? "cyan" : "dark.4"}
+            onLabel={<Icon width={24} icon="line-md:moon-to-sunny-outline-loop-transition" style={{ color: "#eee83f" }} />}
+            offLabel={<Icon width={24} icon="line-md:sunny-outline-to-moon-loop-transition" style={{ color: "#f4f4f4" }} />} />
         </Group>
       </Stack>
 
