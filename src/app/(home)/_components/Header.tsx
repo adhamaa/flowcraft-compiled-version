@@ -6,6 +6,7 @@ import * as React from 'react'
 
 function Header() {
   const [activeTab, setActiveTab] = React.useState<string | null>('cycle');
+  console.log('activeTab:', activeTab)
   const switchRef = React.useRef<HTMLInputElement>(null);
   const { setColorScheme, clearColorScheme, colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
@@ -26,7 +27,9 @@ function Header() {
     <header className='flex border-b-2 items-center col-span-full p-4'>
       <h1 className="text-2xl">Flowcraft</h1>
       <Tabs classNames={{
-        tab: "py-[1.55rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-orange-500 data-[active=true]:dark:border-orange-500",
+        root: "mr-auto",
+        tab: "py-[1.55rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#9747FF] data-[active=true]:dark:border-[#9747FF]",
+        tabLabel: "text-[#9747FF]",
       }} value={activeTab} onChange={setActiveTab}>
         <Tabs.List>
           <Tabs.Tab value="cycle">Cycle</Tabs.Tab>
@@ -34,17 +37,6 @@ function Header() {
           <Tabs.Tab value="documentaion">Documentation</Tabs.Tab>
         </Tabs.List>
       </Tabs>
-      {/* <ul className='flex space-x-8 ml-8 mr-auto'>
-        <li>
-          <h3 className="text-sm">Cycle</h3>
-        </li>
-        <li>
-          <h3 className="text-sm">About</h3>
-        </li>
-        <li>
-          <h3 className="text-sm">Documentation</h3>
-        </li>
-      </ul> */}
       <Switch
         ref={switchRef}
         classNames={{
