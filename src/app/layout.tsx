@@ -1,3 +1,4 @@
+import ColapsableMenu from '@/app/(home)/_components/ColapsableMenu';
 import '@/styles/globals.css';
 
 import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
@@ -28,7 +29,9 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body className={inter.className}>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          {children}
+        </MantineProvider>
       </body>
     </html>
   );

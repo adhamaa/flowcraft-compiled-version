@@ -7,6 +7,8 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@import "./color.css";
+
 .kotak {
   background-color: #f5f5f5;
   border-radius: 10px;

@@ -1,0 +1,20 @@
+:root {
+  /* App Theme / Brand */
+  --primary-color: #9747ff;
+  --secondary-color: #007bff
+  --primary-border-color: #d1d1d1; ;
+  --primary-hover-color: ;
+
+  /* Typography */
+  --font-family: "Open Sans", sans-serif;
+  --font-size: 16px;
+
+  /* Spacing */
+  --spacing: 1rem;
+
+  /* Breakpoints */
+  --breakpoint-small: 576px;
+  --breakpoint-medium: 768px;
+  --breakpoint-large: 992px;
+  --breakpoint-extra-large: 1200px;
+}

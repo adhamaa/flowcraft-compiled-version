@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Icon } from '@iconify-icon/react';
 import { useEffect, useRef } from "react";
 
-export default function Home() {
+export default function HomeContent() {
   const switchRef = useRef<HTMLInputElement>(null);
   console.log('switchRef:', switchRef.current?.checked)
   const { setColorScheme, clearColorScheme, colorScheme, toggleColorScheme } = useMantineColorScheme({
@@ -25,7 +25,7 @@ export default function Home() {
 
 
   return (
-    <main className={cn("flex min-h-screen flex-col items-center justify-between p-24 bg-teal-100 dark:bg-slate-600")}>
+    <section className={cn("flex min-h-screen flex-col items-center justify-between p-24 bg-[var(--primary-color)] dark:bg-slate-600")}>
       <Stack align="center">
         <Group>
           <Button onClick={() => setColorScheme('light')}>Light</Button>
@@ -164,6 +164,6 @@ export default function Home() {
           </p>
         </a>
       </div>
-    </main>
+    </section>
   );
 }
