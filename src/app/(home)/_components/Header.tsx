@@ -41,13 +41,16 @@ function Header() {
         ref={switchRef}
         classNames={{
           thumb: "cursor-pointer",
-          track: "cursor-pointer"
+          track: "cursor-pointer",
+          trackLabel: "text-[#eee83f] dark:text-[#f4f4f4]",
         }}
         onChange={() => toggleColorScheme()}
         size="lg"
         color={isLight ? "cyan" : "dark.4"}
-        onLabel={<Icon width={24} icon="line-md:moon-to-sunny-outline-loop-transition" style={{ color: "#eee83f" }} />}
-        offLabel={<Icon width={24} icon="line-md:sunny-outline-to-moon-loop-transition" style={{ color: "#f4f4f4" }} />} />
+        onLabel={<Icon width={24} icon="line-md:moon-to-sunny-outline-loop-transition" />}
+        offLabel={<Icon width={24} icon="line-md:sunny-outline-to-moon-loop-transition" />}
+
+      />
     </header>
   )
 }
