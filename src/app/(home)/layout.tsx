@@ -9,7 +9,7 @@ function Layout() {
   const { layoutColSpan } = useSideMenu();
 
   return (
-    <div className='grid grid-rows-[4rem_auto] h-screen transition-all duration-300'
+    <div className='grid grid-rows-[4rem_auto] h-screen transition-all duration-300 overflow-hidden'
       style={{ gridTemplateColumns: `${layoutColSpan}rem auto` }}
     >
       <Header />
