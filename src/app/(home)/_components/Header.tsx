@@ -10,7 +10,7 @@ function Header() {
 
   const [activeTab, setActiveTab] = React.useState<string | null>('cycle');
   const switchRef = React.useRef<HTMLInputElement>(null);
-  const { setColorScheme, clearColorScheme, colorScheme, toggleColorScheme } = useMantineColorScheme({
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
   });
   const isLight = colorScheme === "light";
