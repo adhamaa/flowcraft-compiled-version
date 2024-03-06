@@ -3,10 +3,12 @@ import { Button, ColorInput, Group, Stack, Switch, Tabs, useMantineColorScheme }
 import Image from "next/image";
 import { Icon } from '@iconify-icon/react';
 import * as React from 'react'
+import { useSideMenu } from "@/hooks/useSideMenu";
 
 function Header() {
+  const { sideMenu, setSideMenu } = useSideMenu();
+
   const [activeTab, setActiveTab] = React.useState<string | null>('cycle');
-  console.log('activeTab:', activeTab)
   const switchRef = React.useRef<HTMLInputElement>(null);
   const { setColorScheme, clearColorScheme, colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
@@ -16,6 +18,8 @@ function Header() {
   function cn(...classNames: string[]): string {
     return classNames.filter(Boolean).join(' ');
   }
+
+  const toggleSideMenu = () => setSideMenu(sideMenu === 0 ? 10 : 0);
 
   React.useEffect(() => {
     if (switchRef.current) {
@@ -27,7 +31,7 @@ function Header() {
     <header className='flex border-b-2 items-center col-span-full p-4'>
       <h1 className="text-2xl">Flowcraft</h1>
       <Tabs classNames={{
-        root: "mr-auto",
+        // root: "mr-auto",
         tab: "py-[1.55rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#9747FF] data-[active=true]:dark:border-[#9747FF]",
         tabLabel: "text-[#9747FF]",
       }} value={activeTab} onChange={setActiveTab}>
@@ -37,6 +41,12 @@ function Header() {
           <Tabs.Tab value="documentaion">Documentation</Tabs.Tab>
         </Tabs.List>
       </Tabs>
+      <button
+        className="bg-blue-500 text-white p-2 rounded-lg w-10 hover:bg-blue-700 mr-auto"
+        onClick={toggleSideMenu}
+      >
+        {sideMenu !== 20 ? ">" : "<"}
+      </button>
       <Switch
         ref={switchRef}
         classNames={{

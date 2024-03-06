@@ -1,4 +1,5 @@
 import ColapsableMenu from '@/app/(home)/_components/ColapsableMenu';
+import { SideMenuProvider } from '@/hooks/useSideMenu';
 import '@/styles/globals.css';
 
 import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
@@ -30,7 +31,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <MantineProvider theme={theme}>
-          {children}
+          <SideMenuProvider>
+            {children}
+          </SideMenuProvider>
         </MantineProvider>
       </body>
     </html>
