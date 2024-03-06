@@ -6,11 +6,11 @@ import Header from "./_components/Header";
 import { useSideMenu } from "@/hooks/useSideMenu";
 
 function Layout() {
-  const { sideMenu } = useSideMenu();
+  const { layoutColSpan } = useSideMenu();
 
   return (
     <div className='grid grid-rows-[4rem_auto] h-screen transition-all duration-300'
-      style={{ gridTemplateColumns: `${sideMenu}rem auto` }}
+      style={{ gridTemplateColumns: `${layoutColSpan}rem auto` }}
     >
       <Header />
       <ColapsableMenu />

@@ -6,7 +6,7 @@ import * as React from 'react'
 import { useSideMenu } from "@/hooks/useSideMenu";
 
 function Header() {
-  const { sideMenu, setSideMenu } = useSideMenu();
+  const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
 
   const [activeTab, setActiveTab] = React.useState<string | null>('cycle');
   const switchRef = React.useRef<HTMLInputElement>(null);
@@ -15,11 +15,10 @@ function Header() {
   });
   const isLight = colorScheme === "light";
 
-  function cn(...classNames: string[]): string {
-    return classNames.filter(Boolean).join(' ');
-  }
-
-  const toggleSideMenu = () => setSideMenu(sideMenu === 0 ? 10 : 0);
+  const toggleSideMenu = () => {
+    setLayoutColSpan(layoutColSpan === 0 ? 10 : 0)
+    setSideMenuColSpan(sideMenuColSpan === 0 ? 1 : 0)
+  };
 
   React.useEffect(() => {
     if (switchRef.current) {
@@ -45,7 +44,7 @@ function Header() {
         className="bg-blue-500 text-white p-2 rounded-lg w-10 hover:bg-blue-700 mr-auto"
         onClick={toggleSideMenu}
       >
-        {sideMenu !== 20 ? ">" : "<"}
+        {layoutColSpan !== 20 ? ">" : "<"}
       </button>
       <Switch
         ref={switchRef}
