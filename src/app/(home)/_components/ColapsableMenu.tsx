@@ -9,9 +9,6 @@ import { cn } from '@/lib/utils';
 
 export default function ColapsableMenu() {
   const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
-  console.log({ layoutColSpan, sideMenuColSpan })
-
-
 
   return (
     <aside
@@ -21,7 +18,7 @@ export default function ColapsableMenu() {
       )}
     // style={{ gridTemplateColumns: `repeat(${sideMenuColSpan}, 10rem)` }}
     >
-      <SideMenuComponent menuItems={menuItems} />
+      {/* <SideMenuComponent menuItems={menuItems} /> */}
       {/* <motion.nav
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
@@ -88,7 +85,6 @@ const menuItems = [
 
 export const SideMenuComponent = ({ menuItems, menuItem }: { menuItems?: MenuItem[]; menuItem?: MenuItem }) => {
   const [activeTab, setActiveTab] = React.useState<string | null>();
-  console.log('activeTab:', activeTab)
 
   return (
     <motion.div
@@ -124,42 +120,3 @@ export const SideMenuComponent = ({ menuItems, menuItem }: { menuItems?: MenuIte
   );
 };
 
-const MenuItemComponent: React.FC<{ item: MenuItem; index: number }> = ({ item, index }) => {
-  const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
-
-  const currMenuColSpan = index + 1;
-  const nextMenuColSpan = index + 1 + 1;
-
-  const currLayoutColSpan = currMenuColSpan * 10;
-  const nextLayoutColSpan = nextMenuColSpan * 10;
-
-  const handleClick = () => {
-    // Handle menu item click here
-  };
-
-  return sideMenuColSpan > index && (
-    <motion.nav
-      initial={{ opacity: 0, x: -100 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{
-        duration: 0.5,
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        ease: "easeInOut"
-      }}
-      exit={{ opacity: 0, x: -100 }}
-
-      className='border border-t-0 flex flex-col'>
-      <ul className='p-6 space-y-4'>
-        {menuItems.map((item, i) => (
-          <li key={item.id} className='hover:bg-gray-200 p-2 rounded-md' onClick={() => {
-            setLayoutColSpan(layoutColSpan === currLayoutColSpan ? nextLayoutColSpan : currLayoutColSpan)
-            setSideMenuColSpan(sideMenuColSpan === currMenuColSpan ? nextMenuColSpan : currMenuColSpan)
-          }}>
-            {item.label}
-          </li>
-
-        ))}
-      </ul>
-    </motion.nav >
-  );
-};
