@@ -1,12 +1,17 @@
 
+import { useSideMenu } from '@/hooks/useSideMenu';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 export default function HomeContent() {
-  
-
-
+  const { layoutColSpan } = useSideMenu();
 
   return (
-    <section className='w-full p-4'>
+    <section
+      className={cn('p-4 overflow-y-auto',
+        // ' border border-dashed border-green-500',
+        layoutColSpan === 0 ? 'w-screen' : 'w-full'
+      )}>
       <div>
         <h2>Business Process Cycle</h2>
         <p>The business process cycle is a series of steps that organizations follow to achieve their business goals. It involves the identification, design, implementation, and improvement of business processes.</p>
@@ -19,6 +24,7 @@ export default function HomeContent() {
           <li>Monitoring: The implemented process is monitored to ensure it is running smoothly and meeting the desired outcomes.</li>
           <li>Optimization: Continuous improvement is done by identifying bottlenecks and making necessary adjustments to enhance efficiency.</li>
         </ol>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi molestias molestiae sapiente ipsam nisi voluptas quis reprehenderit inventore mollitia reiciendis fugiat voluptate rem, accusamus illum soluta laudantium quisquam itaque veniam?</p>
       </div>
     </section>
   );
