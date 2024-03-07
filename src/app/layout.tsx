@@ -31,7 +31,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <MantineProvider theme={theme}>
-          <SideMenuProvider>
+          <SideMenuProvider >
             {children}
           </SideMenuProvider>
         </MantineProvider>
