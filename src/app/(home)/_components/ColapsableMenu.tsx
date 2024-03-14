@@ -5,12 +5,15 @@ import { Tabs, rem } from '@mantine/core';
 import { MenuItem, useSideMenu } from '@/hooks/useSideMenu';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
+import { useSearchParams } from 'next/navigation';
 
 
 export default function ColapsableMenu() {
+  const searchParams = useSearchParams();
+  const cycle_id = searchParams.get('cycle_id');
   const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
 
-  return (
+  return cycle_id && (
     <aside
       className={clsx(
         'flex',
@@ -19,7 +22,7 @@ export default function ColapsableMenu() {
     // style={{ gridTemplateColumns: `repeat(${sideMenuColSpan}, 10rem)` }}
     >
       {/* <SideMenuComponent menuItems={menuItems} /> */}
-      {/* <motion.nav
+      <motion.nav
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{
@@ -35,7 +38,7 @@ export default function ColapsableMenu() {
             <li key={item.id}><button className='p-4 hover:border rounded-lg' onClick={() => { }}>{item.label}</button></li>
           ))}
         </ul>
-      </motion.nav > */}
+      </motion.nav >
 
 
     </aside>

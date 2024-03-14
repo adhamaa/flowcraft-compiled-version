@@ -55,7 +55,6 @@ function Header({ darkmode = false }) {
           placeholder="Search"
           radius="md"
           classNames={{
-
             input: '!rounded-lg !border-none p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#9747FF] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5]',
           }}
         />

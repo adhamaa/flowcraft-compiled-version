@@ -30,7 +30,7 @@ export default function HomeContent() {
   const searchParams = useSearchParams();
   const cycle_id = searchParams.get('cycle_id');
   const { layoutColSpan } = useSideMenu();
-  const [opened, { toggle }] = useDisclosure(false);
+  const [opened, { toggle }] = useDisclosure(true);
 
 
   return cycle_id ? (
