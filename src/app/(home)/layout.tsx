@@ -3,7 +3,7 @@ import ColapsableMenu from "./_components/ColapsableMenu";
 import HomeContent from "./_components/Content";
 import Header from "./_components/Header";
 import { useSideMenu } from "@/hooks/useSideMenu";
-import { cn } from "@/lib/utils";
+import clsx from "clsx";
 
 export default async function Layout({
   children,
@@ -13,7 +13,7 @@ export default async function Layout({
   // const { layoutColSpan } = useSideMenu();
 
   return (
-    <div className={cn('grid grid-rows-[4rem_auto] h-screen transition-all duration-300 overflow-hidden')}
+    <div className={clsx('grid grid-rows-[4rem_auto] h-screen transition-all duration-300 overflow-hidden')}
     // style={{ gridTemplateColumns: `${layoutColSpan}rem auto` }}
     >
       <Header />

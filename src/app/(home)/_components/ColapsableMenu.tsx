@@ -4,7 +4,7 @@ import { Icon } from '@iconify-icon/react';
 import { Tabs, rem } from '@mantine/core';
 import { MenuItem, useSideMenu } from '@/hooks/useSideMenu';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import clsx from 'clsx';
 
 
 export default function ColapsableMenu() {
@@ -12,7 +12,7 @@ export default function ColapsableMenu() {
 
   return (
     <aside
-      className={cn(
+      className={clsx(
         'flex',
         // 'border border-dashed border-red-500'
       )}

@@ -4,11 +4,15 @@ import Image from "next/image";
 import { Icon } from '@iconify-icon/react';
 import * as React from 'react'
 import { useSideMenu } from "@/hooks/useSideMenu";
+import { usePathname, useRouter } from "next/navigation";
 
 function Header({ darkmode = false }) {
+  const router = useRouter();
+  const pathNname = usePathname();
+
   const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
 
-  const [activeTab, setActiveTab] = React.useState<string | null>('cycle');
+  const [activeTab, setActiveTab] = React.useState<string | null>("/");
   const switchRef = React.useRef<HTMLInputElement>(null);
   const { colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
@@ -29,24 +33,31 @@ function Header({ darkmode = false }) {
   return (
     <header className='flex border-b-2 border-[#EBEAEA] items-center col-span-full p-8 gap-4'>
       <h1 className="text-2xl font-bold">Flowcraft</h1>
-      <Tabs classNames={{
-        root: "mr-auto",
-        tab: "py-[1.60rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#9747FF] data-[active=true]:dark:border-[#9747FF] data-[active=true]:text-[#9747FF]",
-      }} value={activeTab} onChange={setActiveTab}>
+      <Tabs
+        classNames={{
+          root: "mr-auto",
+          tab: "!py-[1.60rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#9747FF] data-[active=true]:dark:border-[#9747FF] data-[active=true]:text-[#9747FF]",
+        }}
+        value={activeTab as string}
+        onChange={(value) => router.push(`/${value}`)}>
         <Tabs.List>
-          <Tabs.Tab value="cycle">Cycle</Tabs.Tab>
+          <Tabs.Tab value="/" >Cycle</Tabs.Tab>
           <Tabs.Tab value="about">About</Tabs.Tab>
-          <Tabs.Tab value="documentaion">Documentation</Tabs.Tab>
+          <Tabs.Tab value="documentation">Documentation</Tabs.Tab>
         </Tabs.List>
       </Tabs>
-     
+
       <div className="flex items-center gap-4">
         <Input
           type="search"
           leftSectionPointerEvents="auto"
-          leftSection={<Icon icon="mingcute:search-line" width={20} onClick={() => console.log("clicked search")} className="hover:text-[#9747FF] cursor-pointer"/>}
+          leftSection={<Icon icon="mingcute:search-line" width={20} onClick={() => console.log("clicked search")} className="hover:text-[#9747FF] cursor-pointer" />}
           placeholder="Search"
           radius="md"
+          classNames={{
+
+            input: '!rounded-lg !border-none p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#9747FF] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5]',
+          }}
         />
         {darkmode && <Switch
           ref={switchRef}
