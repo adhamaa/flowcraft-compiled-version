@@ -5,7 +5,7 @@ import { useSideMenu } from '@/hooks/useSideMenu';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import AppListConst from '@/appList.json';
-import { Collapse, UnstyledButton } from '@mantine/core';
+import { Collapse, ScrollArea, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Fragment, useMemo } from 'react';
 import { Icon } from '@iconify-icon/react';
@@ -24,18 +24,14 @@ import {
 } from 'mantine-react-table';
 import { Flex, Stack, Table } from '@mantine/core';
 import clsx from 'clsx';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function HomeContent() {
-  const searchParams = useSearchParams();
-  const cycle_id = searchParams.get('cycle_id');
   const { layoutColSpan } = useSideMenu();
   const [opened, { toggle }] = useDisclosure(true);
 
 
-  return cycle_id ? (
-    <div>cycle_id: {cycle_id}</div>
-  ) : (
+  return (
     <div
       className={clsx('overflow-y-auto',
         // ' border border-dashed border-green-500',
@@ -64,6 +60,7 @@ const ApplicationSection = ({ opened, toggle }: { opened: boolean, toggle: () =>
 
   return (
     <section className='px-20 py-1 border bg-[#EBEAEA]'>
+
       <div className="p-4">
         <div className={clsx("flex items-center")}>
           <h2 className='font-bold text-lg'>Appplications</h2>
@@ -79,10 +76,10 @@ const ApplicationSection = ({ opened, toggle }: { opened: boolean, toggle: () =>
             {listApps.map((app, index) => (
               <Fragment key={app.uuid}>
                 <div className='shadow-lg w-44 h-48 rounded-xl flex flex-col p-4 items-center justify-center gap-2 bg-white'>
-                  <div className='bg-[#9747FF] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
+                  <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
                     <p className='w-20'>FREE DEMO</p>
                   </div>
-                  <p className='truncate text-sm text-[#9747FF]'>{app.name}</p>
+                  <p className='truncate text-sm text-[#895CF3]'>{app.name}</p>
                 </div>
               </Fragment>
             ))}
@@ -194,77 +191,79 @@ const TabularSection = ({ opened }: { opened: boolean }) => {
     setTableData(ListOfCycle);
   }, []);
 
-  return (<section className='flex flex-col items-center'>
-    {tableData.length ? <>
-      <Stack className='w-full py-20'>
-        {/* <Title order={4}>My Custom Headless Table</Title> */}
-        {/**
+  return (
+    <section className='flex flex-col items-center'>
+      {tableData.length ? <>
+        <Stack className='w-full py-20'>
+          {/* <Title order={4}>My Custom Headless Table</Title> */}
+          {/**
          * Use MRT components along side your own markup.
          * They just need the `table` instance passed as a prop to work!
          */}
-        <Flex justify="end" align="center" classNames={{
-          root: 'px-20',
-        }}>
-          <MRT_GlobalFilterTextInput table={table}
-            classNames={{
-              input: '!rounded-lg border border-gray-300 p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#9747FF] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5]',
-            }} />
-          {/* <MRT_TablePagination table={table} /> */}
-        </Flex>
-        {/* Using Vanilla Mantine Table component here */}
-        <Table
-          captionSide="top"
-          fz="md"
-          highlightOnHover
-          horizontalSpacing={85}
-          // striped
-          verticalSpacing="xs"
-          // withTableBorder
-          // withColumnBorders
-          withRowBorders={false}
-          m="0"
-        >
-          {/* Use your own markup or stock Mantine components, customize however you want using the power of TanStack Table */}
-          <Table.Thead classNames={{
-            thead: 'border-b'
+          <Flex justify="end" align="center" classNames={{
+            root: 'px-20',
           }}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Tr key={headerGroup.id} >
-                {headerGroup.headers.map((header) => (
-                  <Table.Th key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                        header.column.columnDef.Header ??
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                  </Table.Th>
-                ))}
-              </Table.Tr>
-            ))}
-          </Table.Thead>
-          <Table.Tbody>
-            {table.getRowModel().rows.map((row) => (
-              <Table.Tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <Table.Td key={cell.id}>
-                    <MRT_TableBodyCellValue cell={cell} table={table} />
-                  </Table.Td>
-                ))}
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-        <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
-      </Stack>
-    </> : <div className={clsx('p-20 text-center', !opened && 'text-xl')}>
-      <Image src='/process-pana.svg' width={opened ? 400 : 600} height={opened ? 500 : 700} className={clsx('object-cover',
-        // 'transition-all duration-300 ease-in-out'
-      )} alt='process illustration' />
-      <span>Explore business process cycles by clicking on the application</span>
-    </div>}
-  </section>)
+            <MRT_GlobalFilterTextInput table={table}
+              classNames={{
+                input: '!rounded-lg border border-gray-300 p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5]',
+              }} />
+            {/* <MRT_TablePagination table={table} /> */}
+          </Flex>
+          {/* Using Vanilla Mantine Table component here */}
+          <Table
+            captionSide="top"
+            fz="md"
+            highlightOnHover
+            horizontalSpacing={85}
+            // striped
+            verticalSpacing="xs"
+            // withTableBorder
+            // withColumnBorders
+            withRowBorders={false}
+            m="0"
+          >
+            {/* Use your own markup or stock Mantine components, customize however you want using the power of TanStack Table */}
+            <Table.Thead classNames={{
+              thead: 'border-b'
+            }}>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <Table.Tr key={headerGroup.id} >
+                  {headerGroup.headers.map((header) => (
+                    <Table.Th key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                          header.column.columnDef.Header ??
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                    </Table.Th>
+                  ))}
+                </Table.Tr>
+              ))}
+            </Table.Thead>
+            <Table.Tbody>
+              {table.getRowModel().rows.map((row) => (
+                <Table.Tr key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <Table.Td key={cell.id}>
+                      <MRT_TableBodyCellValue cell={cell} table={table} />
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+          <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
+        </Stack>
+      </> : <div className={clsx('p-20 text-center', !opened && 'text-xl')}>
+        <Image src='/process-pana.svg' width={opened ? 400 : 600} height={opened ? 500 : 700} className={clsx('object-cover',
+          // 'transition-all duration-300 ease-in-out'
+        )} alt='process illustration' />
+        <span>Explore business process cycles by clicking on the application</span>
+      </div>}
+    </section>
+  )
 }
 
 

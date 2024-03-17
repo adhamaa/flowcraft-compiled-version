@@ -1,17 +1,20 @@
 'use client';
 import * as React from 'react';
 import { Icon } from '@iconify-icon/react';
-import { Tabs, rem } from '@mantine/core';
+import { Accordion, Tabs, rem } from '@mantine/core';
 import { MenuItem, useSideMenu } from '@/hooks/useSideMenu';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { useSearchParams } from 'next/navigation';
+import FormEdit from './FormEdit';
 
 
 export default function ColapsableMenu() {
   const searchParams = useSearchParams();
   const cycle_id = searchParams.get('cycle_id');
   const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
+
+
 
   return cycle_id && (
     <aside
@@ -22,7 +25,7 @@ export default function ColapsableMenu() {
     // style={{ gridTemplateColumns: `repeat(${sideMenuColSpan}, 10rem)` }}
     >
       {/* <SideMenuComponent menuItems={menuItems} /> */}
-      <motion.nav
+      {/* <motion.nav
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{
@@ -38,7 +41,86 @@ export default function ColapsableMenu() {
             <li key={item.id}><button className='p-4 hover:border rounded-lg' onClick={() => { }}>{item.label}</button></li>
           ))}
         </ul>
-      </motion.nav >
+      </motion.nav > */}
+
+
+
+      <Tabs defaultValue="cycle" orientation="vertical" classNames={{
+        root: 'h-full w-screen',
+        tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+        tabLabel: 'text-lg',
+        panel: ''
+      }}>
+        <Tabs.List>
+          <Tabs.Tab value="cycle" className=''>Cycle</Tabs.Tab>
+
+          <Icon icon="tabler:chevron-down" width="3rem" rotate={45} className='text-[#895CF3] mt-auto hover:!drop-shadow-sm cursor-pointer flex justify-end border-t' />
+
+        </Tabs.List>
+        <Tabs.Panel value="cycle">
+          <Tabs defaultValue="general" orientation="vertical" classNames={{
+            root: 'h-full',
+            tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+            tabLabel: 'text-lg',
+            panel: ''
+          }}>
+            <Tabs.List>
+              <Tabs.Tab value="general">General Information</Tabs.Tab>
+              <Tabs.Tab value="stages">Stages</Tabs.Tab>
+
+              <Icon icon="tabler:chevron-down" width="3rem" rotate={45} className='text-[#895CF3] mt-auto hover:!drop-shadow-sm cursor-pointer flex justify-end border-t' />
+
+            </Tabs.List>
+            <Tabs.Panel value="general">
+              <FormEdit />
+            </Tabs.Panel>
+            <Tabs.Panel value="stages">
+              <Tabs defaultValue="stage_1" orientation="vertical" classNames={{
+                root: 'h-full',
+                tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                tabLabel: 'text-lg',
+                panel: ''
+
+              }}>
+                <Tabs.List>
+                  <Tabs.Tab value="stage_1">Stage 1</Tabs.Tab>
+                  <Tabs.Tab value="stage_2">Stage 2</Tabs.Tab>
+                  <Tabs.Tab value="stage_3">Stage 3</Tabs.Tab>
+                  <Tabs.Tab value="stage_4">Stage 4</Tabs.Tab>
+                  <Tabs.Tab value="stage_5">Stage 5</Tabs.Tab>
+                  <Tabs.Tab value="stage_6">Stage 6</Tabs.Tab>
+                  <Tabs.Tab value="stage_7">Stage 7</Tabs.Tab>
+                  <Tabs.Tab value="stage_8">Stage 8</Tabs.Tab>
+
+                  <Icon icon="tabler:chevron-down" width="3rem" rotate={45} className='text-[#895CF3] mt-auto hover:!drop-shadow-sm cursor-pointer flex justify-end border-t' />
+
+                </Tabs.List>
+                <Tabs.Panel value="stage_1">
+                  <Tabs defaultValue="next_stage" orientation="vertical" classNames={{
+                    root: 'h-full',
+                    tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                    tabLabel: 'text-lg',
+                    panel: ''
+                  }}>
+                    <Tabs.List>
+                      <Tabs.Tab value="next_stage">Next Stage</Tabs.Tab>
+                      <Tabs.Tab value="prev_stage">Previous Stage</Tabs.Tab>
+
+                      <Icon icon="tabler:chevron-down" width="3rem" rotate={45} className='text-[#895CF3] mt-auto hover:!drop-shadow-sm cursor-pointer flex justify-end border-t' />
+
+                    </Tabs.List>
+
+                    <Tabs.Panel value="next_stage">
+                      {/* <FormEdit /> */}<></>
+                    </Tabs.Panel>
+                    <Tabs.Panel value="prev_stage">Previous Stage</Tabs.Panel>
+                  </Tabs>
+                </Tabs.Panel>
+              </Tabs>
+            </Tabs.Panel>
+          </Tabs>
+        </Tabs.Panel>
+      </Tabs>
 
 
     </aside>
