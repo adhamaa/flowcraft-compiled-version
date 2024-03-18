@@ -1,5 +1,6 @@
 import ColapsableMenu from '@/app/(home)/_components/ColapsableMenu';
 import { SideMenuProvider } from '@/hooks/useSideMenu';
+import Providers from '@/provider';
 import '@/styles/globals.css';
 
 import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
@@ -15,10 +16,6 @@ export const metadata: Metadata = {
   description: 'Internal business process user interface for Safwa',
 };
 
-const theme = createTheme({
-  fontFamily: 'inherit',
-});
-
 export default function RootLayout({
   children,
 }: {
@@ -30,11 +27,7 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body className={inter.className}>
-        <MantineProvider theme={theme}>
-          <SideMenuProvider >
-            {children}
-          </SideMenuProvider>
-        </MantineProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

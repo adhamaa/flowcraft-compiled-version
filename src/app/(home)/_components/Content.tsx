@@ -2,12 +2,10 @@
 'use client';
 import * as React from 'react';
 import { useSideMenu } from '@/hooks/useSideMenu';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import AppListConst from '@/appList.json';
-import { Collapse, ScrollArea, UnstyledButton } from '@mantine/core';
+import { Button, Collapse, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Fragment, useMemo } from 'react';
 import { Icon } from '@iconify-icon/react';
 
 import '@mantine/core/styles.css';
@@ -25,17 +23,14 @@ import {
 import { Flex, Stack, Table } from '@mantine/core';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
-import { title } from 'process';
 
 export default function HomeContent() {
   const { layoutColSpan } = useSideMenu();
-  const [opened, { toggle }] = useDisclosure(true);
-
+  const [opened, { toggle }] = useDisclosure(false);
 
   return (
     <div
       className={clsx('overflow-y-auto',
-        // ' border border-dashed border-green-500',
         'w-full'
       )}>
       <TitleSection title='Business Process Cycle' />
@@ -52,7 +47,6 @@ export const TitleSection = ({ title }: { title: string }) => {
     </section>
   )
 };
-
 
 const ApplicationSection = ({ opened, toggle }: { opened: boolean, toggle: () => void }) => {
   const listApps = AppListConst[
@@ -75,14 +69,19 @@ const ApplicationSection = ({ opened, toggle }: { opened: boolean, toggle: () =>
         <Collapse in={opened}>
           <div className="flex gap-7 pt-7">
             {listApps.map((app, index) => (
-              <Fragment key={app.uuid}>
-                <div className='shadow-lg w-44 h-48 rounded-xl flex flex-col p-4 items-center justify-center gap-2 bg-white'>
-                  <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
-                    <p className='w-20'>FREE DEMO</p>
-                  </div>
-                  <p className='truncate text-sm text-[#895CF3]'>{app.name}</p>
+              <Button
+                key={app.uuid}
+                variant='default'
+                classNames={{
+                  root: '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none',
+                  label: 'flex flex-col items-center justify-center gap-2',
+                }}
+              >
+                <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
+                  <p className='w-20 whitespace-pre-wrap'>FREE DEMO</p>
                 </div>
-              </Fragment>
+                <p className='truncate text-sm text-[#895CF3]'>{app.name}</p>
+              </Button>
             ))}
           </div>
         </Collapse>
@@ -90,7 +89,6 @@ const ApplicationSection = ({ opened, toggle }: { opened: boolean, toggle: () =>
     </section>
   )
 };
-
 
 const ListOfCycle = [
   {
@@ -126,10 +124,7 @@ const ListOfCycle = [
     status: 'Active'
   },
 ]
-
-
-
-const TabularSection = ({ opened }: { opened: boolean }) => {
+const TabularSection = ({ opened, isPagination }: { opened: boolean; isPagination?: boolean }) => {
   const router = useRouter();
   const columns: MRT_ColumnDef<typeof ListOfCycle[0]>[] = [
     {
@@ -196,21 +191,63 @@ const TabularSection = ({ opened }: { opened: boolean }) => {
     <section className='flex flex-col items-center'>
       {tableData.length ? <>
         <Stack className='w-full py-20'>
-          {/* <Title order={4}>My Custom Headless Table</Title> */}
-          {/**
-         * Use MRT components along side your own markup.
-         * They just need the `table` instance passed as a prop to work!
-         */}
           <Flex justify="end" align="center" classNames={{
             root: 'px-20',
           }}>
-            <MRT_GlobalFilterTextInput table={table}
+            <MRT_GlobalFilterTextInput
+              table={table}
+              placeholder='Search Cycle'
+              leftSection={
+                <Icon
+                  icon="mingcute:search-line"
+                  width={20}
+                  onClick={() => console.log("clicked search")}
+                  className="hover:text-[#895CF3] cursor-pointer" />
+              }
               classNames={{
-                input: '!rounded-lg border border-gray-300 p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5]',
+                input: '!rounded-lg border border-gray-300 p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white',
               }} />
-            {/* <MRT_TablePagination table={table} /> */}
+            {isPagination && <MRT_TablePagination table={table} />}
+
+            <div className='flex ml-4 gap-4'>
+              <Button
+                leftSection={
+                  <Icon
+                    icon="mi:filter"
+                    width="1.125rem"
+                    height="1.125rem"
+                    className=''
+                  />
+                }
+                variant="default"
+                radius="md"
+                classNames={{
+                  root: '!border-2 !border-[#895CF3]',
+                  label: 'font-normal'
+                }}
+              >
+                Filter
+              </Button>
+              <Button
+                leftSection={
+                  <Icon
+                    icon="mi:sort"
+                    width="1.125rem"
+                    height="1.125rem"
+                    className=''
+                  />
+                }
+                variant="default"
+                radius="md"
+                classNames={{
+                  root: '!border-2 !border-[#895CF3]',
+                  label: 'font-normal'
+                }}
+              >
+                Sort
+              </Button>
+            </div>
           </Flex>
-          {/* Using Vanilla Mantine Table component here */}
           <Table
             captionSide="top"
             fz="md"
@@ -223,7 +260,6 @@ const TabularSection = ({ opened }: { opened: boolean }) => {
             withRowBorders={false}
             m="0"
           >
-            {/* Use your own markup or stock Mantine components, customize however you want using the power of TanStack Table */}
             <Table.Thead classNames={{
               thead: 'border-b'
             }}>

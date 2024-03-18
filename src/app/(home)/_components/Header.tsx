@@ -54,11 +54,15 @@ function Header({ darkmode = false }) {
         <Input
           type="search"
           leftSectionPointerEvents="auto"
-          leftSection={<Icon icon="mingcute:search-line" width={20} onClick={() => console.log("clicked search")} className="hover:text-[#895CF3] cursor-pointer" />}
+          leftSection={
+            <Icon
+              icon="mingcute:search-line"
+              width={20}
+              onClick={() => console.log("clicked search")} className="hover:text-[#895CF3] cursor-pointer" />}
           placeholder="Search"
           radius="md"
           classNames={{
-            input: '!rounded-lg !border-none p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5]',
+            input: '!rounded-lg !border-none p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent focus:!bg-white transition-all duration-300 ease-in-out !bg-[#F1F4F5]',
           }}
         />
         {darkmode && <Switch
