@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { TitleSection } from '../(home)/_components/Content'
 
 const AboutPage = () => {
   return (
-    <div className='grid place-items-center h-screen'>AboutPage</div>
+    <div className=''><TitleSection title='About Flowcraft' /></div>
   )
 }
 

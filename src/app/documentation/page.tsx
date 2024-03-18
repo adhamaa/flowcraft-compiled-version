@@ -1,8 +1,9 @@
 import * as React from 'react'
+import { TitleSection } from '../(home)/_components/Content'
 
 const DocumentationPage = () => {
   return (
-    <div className='grid place-items-center h-screen'>DocumentationPage</div>
+    <div className=''><TitleSection title='Documentation' /></div>
   )
 }
 

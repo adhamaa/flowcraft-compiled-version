@@ -25,6 +25,7 @@ import {
 import { Flex, Stack, Table } from '@mantine/core';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
+import { title } from 'process';
 
 export default function HomeContent() {
   const { layoutColSpan } = useSideMenu();
@@ -37,17 +38,17 @@ export default function HomeContent() {
         // ' border border-dashed border-green-500',
         'w-full'
       )}>
-      <TitleSection />
+      <TitleSection title='Business Process Cycle' />
       <ApplicationSection {...{ opened, toggle }} />
       <TabularSection {...{ opened }} />
     </div>
   );
 }
 
-const TitleSection = () => {
+export const TitleSection = ({ title }: { title: string }) => {
   return (
     <section className='px-20 py-10 border'>
-      <h1 className='font-bold text-xl'>Business Process Cycle</h1>
+      <h1 className='font-bold text-xl'>{title}</h1>
     </section>
   )
 };
