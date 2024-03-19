@@ -1,6 +1,6 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Button, Input, Textarea } from '@mantine/core';
+import { Button, Input, ScrollArea, Textarea } from '@mantine/core';
 import { useFullscreen } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
@@ -23,36 +23,38 @@ const EditForm = () => {
   const toggleEdit = () => setIsEdit(!isEdit);
 
   return (
-    <div className='space-y-4'>
-      <HeaderForm {...{ toggleEdit, isEdit }} />
-      {InputList.map((label, index) => ['Stage name', 'Sub-stage name'].includes(label) ? (
-        <Input.Wrapper key={index} label={label} classNames={{
-          root: 'px-14',
-          label: '!text-sm !font-semibold',
-        }}>
-          <Input
-            disabled={!isEdit}
-            classNames={{
-              input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent mt-4',
-            }} />
-          {isEdit && <ActionButtons />}
-        </Input.Wrapper>
-      ) : (
-        <Input.Wrapper key={index} label={label} classNames={{
-          root: 'px-14',
-          label: '!text-sm !font-semibold',
-        }}>
-          <TextareaHeader />
-          <Textarea
-            disabled={!isEdit}
-            classNames={{
-              input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-            }}
-          />
-          {isEdit && <ActionButtons />}
-        </Input.Wrapper>
-      ))}
-    </div >
+    <ScrollArea.Autosize mah={768}>
+      <div className='space-y-4'>
+        <HeaderForm {...{ toggleEdit, isEdit }} />
+        {InputList.map((label, index) => ['Stage name', 'Sub-stage name'].includes(label) ? (
+          <Input.Wrapper key={index} label={label} classNames={{
+            root: 'px-14',
+            label: '!text-sm !font-semibold',
+          }}>
+            <Input
+              disabled={!isEdit}
+              classNames={{
+                input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent mt-4',
+              }} />
+            {isEdit && <ActionButtons />}
+          </Input.Wrapper>
+        ) : (
+          <Input.Wrapper key={index} label={label} classNames={{
+            root: 'px-14',
+            label: '!text-sm !font-semibold',
+          }}>
+            <TextareaHeader />
+            <Textarea
+              disabled={!isEdit}
+              classNames={{
+                input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+              }}
+            />
+            {isEdit && <ActionButtons />}
+          </Input.Wrapper>
+        ))}
+      </div >
+    </ScrollArea.Autosize>
   )
 }
 
