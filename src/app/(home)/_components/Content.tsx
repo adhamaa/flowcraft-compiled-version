@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useSideMenu } from '@/hooks/useSideMenu';
 import Image from 'next/image';
 import AppListConst from '@/appList.json';
-import { Button, Collapse, UnstyledButton } from '@mantine/core';
+import { Button, Collapse, ScrollArea, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Icon } from '@iconify-icon/react';
 
@@ -22,11 +22,42 @@ import {
 } from 'mantine-react-table';
 import { Flex, Stack, Table } from '@mantine/core';
 import clsx from 'clsx';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { format } from 'url';
 
-export default function HomeContent() {
+export type ApplicationData<T extends string> = {
+  [key in T]: {
+    apps_label: string;
+    cycle_descriptions: string;
+    cycle_id: string;
+  }[];
+};
+
+export type CycleData = {
+  app_label: string;
+  app_name: string;
+  app_sys_code: string;
+  app_uuid: string;
+  cycle_active: number;
+  cycle_created: string;
+  cycle_description: string;
+  cycle_id: number;
+  cycle_name: string;
+  cycle_updated: string;
+  cycle_uuid: string;
+  no_of_stages: number;
+}
+
+export default function HomeContent({
+  applicationData,
+  cycleData
+}: {
+  applicationData: ApplicationData<string>;
+  cycleData: CycleData[]
+}) {
   const { layoutColSpan } = useSideMenu();
-  const [opened, { toggle }] = useDisclosure(false);
+  const [opened, { toggle }] = useDisclosure(true);
+
 
   return (
     <div
@@ -34,8 +65,8 @@ export default function HomeContent() {
         'w-full'
       )}>
       <TitleSection title='Business Process Cycle' />
-      <ApplicationSection {...{ opened, toggle }} />
-      <TabularSection {...{ opened }} />
+      <ApplicationSection {...{ opened, toggle, applicationData, cycleData }} />
+      <TabularSection {...{ opened, cycleData }} />
     </div>
   );
 }
@@ -48,14 +79,26 @@ export const TitleSection = ({ title }: { title: string }) => {
   )
 };
 
-const ApplicationSection = ({ opened, toggle }: { opened: boolean, toggle: () => void }) => {
-  const listApps = AppListConst[
-    'qa' as keyof typeof AppListConst
-  ];
+const ApplicationSection = ({
+  opened,
+  toggle,
+  applicationData,
+  cycleData,
+}: {
+  opened: boolean;
+  toggle: () => void;
+  applicationData: ApplicationData<string>;
+  cycleData: CycleData[];
+}) => {
+  const router = useRouter();
+  const [isPending, startTransition] = React.useTransition();
+  // const listApps = AppListConst[
+  //   'qa' as keyof typeof AppListConst
+  // ];
+  const listApps = applicationData
 
   return (
     <section className='px-20 py-1 border bg-[#EBEAEA]'>
-
       <div className="p-4">
         <div className={clsx("flex items-center")}>
           <h2 className='font-bold text-lg'>Appplications</h2>
@@ -68,21 +111,26 @@ const ApplicationSection = ({ opened, toggle }: { opened: boolean, toggle: () =>
         </div>
         <Collapse in={opened}>
           <div className="flex gap-7 pt-7">
-            {listApps.map((app, index) => (
-              <Button
-                key={app.uuid}
-                variant='default'
-                classNames={{
-                  root: '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none',
-                  label: 'flex flex-col items-center justify-center gap-2',
-                }}
-              >
-                <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
-                  <p className='w-20 whitespace-pre-wrap'>FREE DEMO</p>
-                </div>
-                <p className='truncate text-sm text-[#895CF3]'>{app.name}</p>
-              </Button>
-            ))}
+            {Object.keys(listApps).map((app, index) => {
+              const selected_app = listApps[app][0].apps_label;
+              const handleAppClick = () => router.push(`/?selected_app=${selected_app}`);
+              return (
+                <Button
+                  key={index}
+                  variant='default'
+                  classNames={{
+                    root: '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none',
+                    label: 'flex flex-col items-center justify-center gap-2',
+                  }}
+                  onClick={handleAppClick}
+                >
+                  <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
+                    <p className='w-20 whitespace-pre-wrap'>FREE DEMO</p>
+                  </div>
+                  <p className='truncate text-sm text-[#895CF3]'>{app}</p>
+                </Button>
+              )
+            })}
           </div>
         </Collapse>
       </div>
@@ -90,49 +138,106 @@ const ApplicationSection = ({ opened, toggle }: { opened: boolean, toggle: () =>
   )
 };
 
-const ListOfCycle = [
-  {
-    cycle_name: 'Cycle 1',
-    cycle_id: '00010',
-    applications: 'E-claims',
-    date_created: '2021-10-10',
-    no_of_stages: 5,
-    status: 'Active'
-  },
-  {
-    cycle_name: 'Cycle 2',
-    cycle_id: '00011',
-    applications: 'E-claims',
-    date_created: '2021-10-10',
-    no_of_stages: 5,
-    status: 'Active'
-  },
-  {
-    cycle_name: 'Cycle 3',
-    cycle_id: '00012',
-    applications: 'E-claims',
-    date_created: '2021-10-10',
-    no_of_stages: 5,
-    status: 'Active'
-  },
-  {
-    cycle_name: 'Cycle 4',
-    cycle_id: '00013',
-    applications: 'E-claims',
-    date_created: '2021-10-10',
-    no_of_stages: 5,
-    status: 'Active'
-  },
-]
-const TabularSection = ({ opened, isPagination }: { opened: boolean; isPagination?: boolean }) => {
+// const ListOfCycle = [
+//   {
+//     cycle_name: 'Cycle 1',
+//     cycle_id: '00010',
+//     applications: 'E-claims',
+//     date_created: '2021-10-10',
+//     no_of_stages: 5,
+//     status: 'Active'
+//   },
+//   {
+//     cycle_name: 'Cycle 2',
+//     cycle_id: '00011',
+//     applications: 'E-claims',
+//     date_created: '2021-10-10',
+//     no_of_stages: 5,
+//     status: 'Active'
+//   },
+//   {
+//     cycle_name: 'Cycle 3',
+//     cycle_id: '00012',
+//     applications: 'E-claims',
+//     date_created: '2021-10-10',
+//     no_of_stages: 5,
+//     status: 'Active'
+//   },
+//   {
+//     cycle_name: 'Cycle 4',
+//     cycle_id: '00013',
+//     applications: 'E-claims',
+//     date_created: '2021-10-10',
+//     no_of_stages: 5,
+//     status: 'Active'
+//   },
+//   {
+//     cycle_name: 'Cycle 1',
+//     cycle_id: '00010',
+//     applications: 'E-claims',
+//     date_created: '2021-10-10',
+//     no_of_stages: 5,
+//     status: 'Active'
+//   },
+//   {
+//     cycle_name: 'Cycle 2',
+//     cycle_id: '00011',
+//     applications: 'E-claims',
+//     date_created: '2021-10-10',
+//     no_of_stages: 5,
+//     status: 'Active'
+//   },
+//   {
+//     cycle_name: 'Cycle 3',
+//     cycle_id: '00012',
+//     applications: 'E-claims',
+//     date_created: '2021-10-10',
+//     no_of_stages: 5,
+//     status: 'Active'
+//   },
+//   {
+//     cycle_name: 'Cycle 4',
+//     cycle_id: '00013',
+//     applications: 'E-claims',
+//     date_created: '2021-10-10',
+//     no_of_stages: 5,
+//     status: 'Active'
+//   },
+// ]
+
+const TabularSection = ({ opened,
+  statusIndicator,
+  isPagination,
+  cycleData,
+}: {
+  opened: boolean;
+  statusIndicator?: boolean;
+  isPagination?: boolean;
+  cycleData: CycleData[];
+}) => {
+  const [tableData, setTableData] = React.useState<CycleData[]>([]);
   const router = useRouter();
-  const columns: MRT_ColumnDef<typeof ListOfCycle[0]>[] = [
+  const pathname = usePathname();
+  const searchParams = useSearchParams().toString();
+
+  const createQueryString = React.useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(name, value)
+
+      return params.toString()
+    },
+    [searchParams]
+  )
+
+  const columns: MRT_ColumnDef<CycleData>[] = [
     {
       header: 'Cycle Name',
       accessorFn: (originalRow) => originalRow.cycle_name,
       Cell: ({ cell, row }) => {
+        const handleClick = () => router.push(pathname + '?' + createQueryString('cycle_id', (row.original.cycle_id).toString()));
         return (
-          <div className='flex gap-2 items-center cursor-pointer' onClick={() => router.push(`/?cycle_id=${row.original.cycle_id}`)}>
+          <div className='flex gap-2 items-center cursor-pointer' onClick={handleClick}>
             <span className='hover:underline'>{cell.getValue() as string}</span>
           </div>
         )
@@ -141,14 +246,22 @@ const TabularSection = ({ opened, isPagination }: { opened: boolean; isPaginatio
     {
       header: 'Cycle ID',
       accessorFn: (originalRow) => originalRow.cycle_id,
+      Cell: ({ cell, row }) => {
+        const handleClick = () => router.push(pathname + '?' + createQueryString('cycle_id', (row.original.cycle_id).toString()));
+        return (
+          <div className='flex gap-2 items-center cursor-pointer' onClick={handleClick}>
+            <p className='hover:underline'>{cell.getValue() as string}</p>
+          </div>
+        )
+      },
     },
     {
       header: 'Applications',
-      accessorFn: (originalRow) => originalRow.applications,
+      accessorFn: (originalRow) => originalRow.app_name,
     },
     {
       header: 'Date Created',
-      accessorFn: (originalRow) => originalRow.date_created,
+      accessorFn: (originalRow) => originalRow.cycle_created,
     },
     {
       header: 'No of Stages',
@@ -156,13 +269,12 @@ const TabularSection = ({ opened, isPagination }: { opened: boolean; isPaginatio
     },
     {
       header: 'Status',
-      accessorFn: (originalRow) => originalRow.status,
+      accessorFn: (originalRow) => originalRow.cycle_active,
     },
   ];
-  const [tableData, setTableData] = React.useState<typeof ListOfCycle[0][]>([]);
   const table = useMantineReactTable({
     columns,
-    data: React.useMemo(() => ListOfCycle, []),
+    data: React.useMemo(() => tableData, [tableData]),
     // enableRowSelection: true,
     initialState: {
       pagination: { pageSize: 5, pageIndex: 0 },
@@ -184,121 +296,127 @@ const TabularSection = ({ opened, isPagination }: { opened: boolean; isPaginatio
   });
 
   React.useEffect(() => {
-    setTableData(ListOfCycle);
-  }, []);
+    setTableData(cycleData);
+  }, [cycleData]);
 
   return (
     <section className='flex flex-col items-center'>
-      {tableData.length ? <>
-        <Stack className='w-full py-20'>
-          <Flex justify="end" align="center" classNames={{
-            root: 'px-20',
-          }}>
-            <MRT_GlobalFilterTextInput
-              table={table}
-              placeholder='Search Cycle'
-              leftSection={
-                <Icon
-                  icon="mingcute:search-line"
-                  width={20}
-                  onClick={() => console.log("clicked search")}
-                  className="hover:text-[#895CF3] cursor-pointer" />
-              }
-              classNames={{
-                input: '!rounded-lg border border-gray-300 p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white',
-              }} />
-            {isPagination && <MRT_TablePagination table={table} />}
-
-            <div className='flex ml-4 gap-4'>
-              <Button
-                leftSection={
-                  <Icon
-                    icon="mi:filter"
-                    width="1.125rem"
-                    height="1.125rem"
-                    className=''
-                  />
-                }
-                variant="default"
-                radius="md"
-                classNames={{
-                  root: '!border-2 !border-[#895CF3]',
-                  label: 'font-normal'
-                }}
-              >
-                Filter
-              </Button>
-              <Button
-                leftSection={
-                  <Icon
-                    icon="mi:sort"
-                    width="1.125rem"
-                    height="1.125rem"
-                    className=''
-                  />
-                }
-                variant="default"
-                radius="md"
-                classNames={{
-                  root: '!border-2 !border-[#895CF3]',
-                  label: 'font-normal'
-                }}
-              >
-                Sort
-              </Button>
-            </div>
-          </Flex>
-          <Table
-            captionSide="top"
-            fz="md"
-            highlightOnHover
-            horizontalSpacing={85}
-            // striped
-            verticalSpacing="xs"
-            // withTableBorder
-            // withColumnBorders
-            withRowBorders={false}
-            m="0"
-          >
-            <Table.Thead classNames={{
-              thead: 'border-b'
+      {tableData.length ? (
+        <>
+          <Stack className='w-full py-20'>
+            <Flex justify="end" align="center" classNames={{
+              root: 'px-20',
             }}>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <Table.Tr key={headerGroup.id} >
-                  {headerGroup.headers.map((header) => (
-                    <Table.Th key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.Header ??
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                    </Table.Th>
+              <MRT_GlobalFilterTextInput
+                table={table}
+                placeholder='Search Cycle'
+                leftSection={
+                  <Icon
+                    icon="mingcute:search-line"
+                    width={20}
+                    onClick={() => console.log("clicked search")}
+                    className="hover:text-[#895CF3] cursor-pointer" />
+                }
+                classNames={{
+                  input: '!rounded-lg border border-gray-300 p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white',
+                }} />
+              {isPagination && <MRT_TablePagination table={table} />}
+
+              <div className='flex ml-4 gap-4'>
+                <Button
+                  leftSection={
+                    <Icon
+                      icon="mi:filter"
+                      width="1.125rem"
+                      height="1.125rem"
+                      className=''
+                    />
+                  }
+                  variant="default"
+                  radius="md"
+                  classNames={{
+                    root: '!border-2 !border-[#895CF3]',
+                    label: 'font-normal'
+                  }}
+                >
+                  Filter
+                </Button>
+                <Button
+                  leftSection={
+                    <Icon
+                      icon="mi:sort"
+                      width="1.125rem"
+                      height="1.125rem"
+                      className=''
+                    />
+                  }
+                  variant="default"
+                  radius="md"
+                  classNames={{
+                    root: '!border-2 !border-[#895CF3]',
+                    label: 'font-normal'
+                  }}
+                >
+                  Sort
+                </Button>
+              </div>
+            </Flex>
+            <div className="overflow-auto w-screen">
+              <Table
+                captionSide="top"
+                fz="md"
+                highlightOnHover
+                horizontalSpacing={85}
+                // striped
+                verticalSpacing="xs"
+                // withTableBorder
+                // withColumnBorders
+                withRowBorders={false}
+                m="0"
+              >
+                <Table.Thead classNames={{
+                  thead: 'border-b'
+                }}>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <Table.Tr key={headerGroup.id} >
+                      {headerGroup.headers.map((header) => (
+                        <Table.Th key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                              header.column.columnDef.Header ??
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                        </Table.Th>
+                      ))}
+                    </Table.Tr>
                   ))}
-                </Table.Tr>
-              ))}
-            </Table.Thead>
-            <Table.Tbody>
-              {table.getRowModel().rows.map((row) => (
-                <Table.Tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <Table.Td key={cell.id}>
-                      <MRT_TableBodyCellValue cell={cell} table={table} />
-                    </Table.Td>
+                </Table.Thead>
+                <Table.Tbody>
+                  {table.getRowModel().rows.map((row) => (
+                    <Table.Tr key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <Table.Td key={cell.id}>
+                          <MRT_TableBodyCellValue cell={cell} table={table} />
+                        </Table.Td>
+                      ))}
+                    </Table.Tr>
                   ))}
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-          <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
-        </Stack>
-      </> : <div className={clsx('p-20 text-center', !opened && 'text-xl')}>
-        <Image src='/process-pana.svg' width={opened ? 400 : 600} height={opened ? 500 : 700} className={clsx('object-cover',
-          // 'transition-all duration-300 ease-in-out'
-        )} alt='process illustration' />
-        <span>Explore business process cycles by clicking on the application</span>
-      </div>}
+                </Table.Tbody>
+              </Table>
+            </div>
+            <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
+          </Stack>
+        </>
+      ) : (
+        <div className={clsx('p-20 text-center', !opened && 'text-xl')}>
+          <Image src='/process-pana.svg' width={opened ? 400 : 600} height={opened ? 500 : 700} className={clsx('object-cover',
+            // 'transition-all duration-300 ease-in-out'
+          )} alt='process illustration' />
+          <span>Explore business process cycles by clicking on the application</span>
+        </div>
+      )}
     </section>
   )
 }

@@ -4,9 +4,10 @@ import HomeContent from "./_components/Content";
 import Header from "./_components/Header";
 import { useSideMenu } from "@/hooks/useSideMenu";
 import clsx from "clsx";
+import Shell from "./_components/Shell";
 
 export default async function Layout({
-  children,
+  children
 }: {
   children: React.ReactNode;
 }) {
@@ -17,10 +18,10 @@ export default async function Layout({
     // style={{ gridTemplateColumns: `${layoutColSpan}rem auto` }}
     >
       <Header />
-      <div className="flex">
-        <ColapsableMenu />
-        {children}
-      </div>
+      {children}
     </div>
+
+
+    // <Shell>{children}</Shell>
   );
 }

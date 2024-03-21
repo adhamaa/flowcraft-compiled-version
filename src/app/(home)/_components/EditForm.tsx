@@ -1,7 +1,7 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Button, Input, ScrollArea, Textarea } from '@mantine/core';
-import { useFullscreen } from '@mantine/hooks';
+import { Button, Input, Modal, ScrollArea, Textarea } from '@mantine/core';
+import { useDisclosure, useFullscreen } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
@@ -18,14 +18,37 @@ const InputList = [
 const EditForm = () => {
   const cycle_id = useSearchParams().get('cycle_id');
   const [isEdit, setIsEdit] = React.useState(false);
-  const { ref, toggle, fullscreen } = useFullscreen();
+  const [opened, { open, close, toggle }] = useDisclosure(false);
 
   const toggleEdit = () => setIsEdit(!isEdit);
 
+  return opened ? (
+    <Modal
+      opened={opened}
+      onClose={close}
+      fullScreen
+      radius={0}
+      transitionProps={{ transition: 'fade', duration: 200 }}
+      withCloseButton={false}
+    >
+      <EditFormContent {...{ toggleEdit, isEdit, open, close, toggle }} />
+    </Modal>
+  ) : (
+    <EditFormContent {...{ toggleEdit, isEdit, open, close, toggle }} />
+  )
+}
+
+export default EditForm
+
+const EditFormContent = ({ toggleEdit, isEdit, toggle: toggleExpand }: {
+  toggleEdit: () => void;
+  isEdit: boolean;
+  toggle: () => void;
+}) => {
   return (
     <ScrollArea.Autosize mah={768}>
       <div className='space-y-4'>
-        <HeaderForm {...{ toggleEdit, isEdit }} />
+        <HeaderForm {...{ toggleEdit, isEdit, toggleExpand }} />
         {InputList.map((label, index) => ['Stage name', 'Sub-stage name'].includes(label) ? (
           <Input.Wrapper key={index} label={label} classNames={{
             root: 'px-14',
@@ -58,20 +81,21 @@ const EditForm = () => {
   )
 }
 
-export default EditForm
-
-const HeaderForm = ({ toggleEdit, isEdit }: {
-  toggleEdit: () => void;
-  isEdit: boolean;
+export const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, diagramToggle }: {
+  toggleExpand: () => void;
+  diagramToggle?: () => void;
+  toggleEdit?: () => void;
+  isEdit?: boolean;
 }) => {
   return (
     <div className='flex px-14 py-6 items-center'>
       <Button color='#895CF3' radius='md' classNames={{
         root: '!p-2 mr-auto'
-      }}>
+      }} onClick={toggleExpand}>
         <Icon icon="solar:maximize-outline" width="1rem" height="1rem" />
       </Button>
-      <Button color={!isEdit ? '#007BFF' : '#DC3545'} radius='md' onClick={toggleEdit}>{!isEdit ? 'Edit' : 'Close'}</Button>
+      {toggleEdit && <Button color={!isEdit ? '#007BFF' : '#DC3545'} radius='md' onClick={toggleEdit}>{!isEdit ? 'Edit' : 'Close'}</Button>}
+      {diagramToggle && <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button>}
     </div>
   )
 }

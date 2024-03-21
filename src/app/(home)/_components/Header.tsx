@@ -5,8 +5,9 @@ import { Icon } from '@iconify-icon/react';
 import * as React from 'react'
 import { useSideMenu } from "@/hooks/useSideMenu";
 import { usePathname, useRouter } from "next/navigation";
+import clsx from "clsx";
 
-function Header({ darkmode = false }) {
+function Header({ darkmode = false, className }: { darkmode?: boolean; className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -31,7 +32,7 @@ function Header({ darkmode = false }) {
   }, [isLight]);
 
   return (
-    <header className='flex border-b-2 border-[#EBEAEA] items-center col-span-full p-8 gap-4'>
+    <header className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-8 gap-4 w-screen', className)}>
       <h1
         className="text-2xl font-bold cursor-pointer transition-all duration-300 ease-in-out hover:text-[#895CF3] dark:hover:text-[#895CF3]"
         onClick={() => router.push("/")}
@@ -39,7 +40,7 @@ function Header({ darkmode = false }) {
       <Tabs
         classNames={{
           root: "mr-auto",
-          tab: "!py-[1.60rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:text-[#895CF3] data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:font-semibold",
+          tab: "!py-[1.6rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:text-[#895CF3] data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:font-semibold",
         }}
         value={activeTab as string}
         onChange={(value) => router.push(`/${value}`)}>

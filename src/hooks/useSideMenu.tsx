@@ -20,7 +20,8 @@ const SideMenuContext = React.createContext<SideMenuContextType | undefined>(und
 export const SideMenuProvider = ({ children, menuItems = [] }: { children: React.ReactNode, menuItems?: MenuItem[] }) => {
   const [layoutColSpan, setLayoutColSpan] = React.useState(10);
   const [sideMenuColSpan, setSideMenuColSpan] = React.useState(1);
-  const value = { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan, menuItems };
+  const [appLabel, setAppLabel] = React.useState('');
+  const value = { appLabel, setAppLabel, layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan, menuItems };
   return (
     <SideMenuContext.Provider value={value}>
       {children}

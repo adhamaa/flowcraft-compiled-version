@@ -1,10 +1,13 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Button, Input, Modal } from '@mantine/core'
+import { Button, Input, Modal, ScrollArea } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation'
 import * as React from 'react'
+import { HeaderForm } from './EditForm';
+import Header from './Header';
+import { CycleData } from './Content';
 
 const InputList = [
   'Cycle name',
@@ -15,11 +18,9 @@ const InputList = [
   'Status'
 ];
 
-const GeneralForm = () => {
+const GeneralForm = ({ data }: { data: CycleData }) => {
   const cycle_id = useSearchParams().get('cycle_id')
   const [opened, { open, close, toggle }] = useDisclosure(false);
-
-
 
   return opened ? (
     <Modal
@@ -28,34 +29,33 @@ const GeneralForm = () => {
       fullScreen
       radius={0}
       transitionProps={{ transition: 'fade', duration: 200 }}
-      // closeButtonProps={{
-      //   p: 'md',
-      //   radius: 'md',
-      //   icon: <Icon icon="solar:maximize-outline" width="1rem" height="1rem" className='text-white' />,
-      //   'aria-label': 'Close modal',
-      //   bg: '#895CF3',
-      //   color: 'white',
-      // }}
       withCloseButton={false}
     >
-      <GeneralFormContent {...{ open, close, toggle }} />
+      <GeneralFormContent {...{ data, open, close, toggle }} />
     </Modal>
   ) : (
-    <GeneralFormContent {...{ open, close, toggle }} />
+    <GeneralFormContent {...{ data, open, close, toggle }} />
   )
 }
 
 export default GeneralForm
 
-const GeneralFormContent = ({ open, close, toggle }: {
+const GeneralFormContent = ({
+  data,
+  open,
+  close,
+  toggle: toggleExpand
+}: {
+  data: CycleData;
   open: () => void;
   close: () => void;
   toggle: () => void;
 }) => {
   const [diagramOpened, { open: diagramOpen, close: diagramClose, toggle: diagramToggle }] = useDisclosure(false);
+  console.log('data from general form:', data)
 
   return (
-    <React.Fragment>
+    <ScrollArea.Autosize mah={768}>
       <Modal
         centered
         opened={diagramOpened}
@@ -70,21 +70,16 @@ const GeneralFormContent = ({ open, close, toggle }: {
         <Image src='/Diagram.png' width={1000} height={1000} alt='diagram' className='object-cover' />
       </Modal>
       <div className='space-y-4'>
-        <div className='flex px-14 py-6 items-center'>
-          <Button color='#895CF3' radius='md' classNames={{
-            root: '!p-2 mr-auto'
-          }} onClick={toggle}>
-            <Icon icon="solar:maximize-outline" width="1rem" height="1rem" />
-          </Button>
-          <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button>
-        </div>
+        <HeaderForm {...{ toggleExpand, diagramToggle }} />
         <Input.Wrapper label="Cycle name" classNames={{
           root: 'px-14 space-y-4',
           label: '!text-sm !font-semibold',
         }}>
           <Input disabled classNames={{
             input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-          }} />
+          }}
+            value={data?.cycle_name}
+          />
         </Input.Wrapper>
         <Input.Wrapper label="Cycle id" classNames={{
           root: 'px-14 space-y-4',
@@ -92,7 +87,9 @@ const GeneralFormContent = ({ open, close, toggle }: {
         }}>
           <Input disabled classNames={{
             input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-          }} />
+          }}
+            value={data?.cycle_id}
+          />
         </Input.Wrapper>
         <Input.Wrapper label="Applications" classNames={{
           root: 'px-14 space-y-4',
@@ -100,7 +97,9 @@ const GeneralFormContent = ({ open, close, toggle }: {
         }}>
           <Input disabled classNames={{
             input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-          }} />
+          }}
+            value={data?.app_name}
+          />
         </Input.Wrapper>
         <Input.Wrapper label="Date Created" classNames={{
           root: 'px-14 space-y-4',
@@ -108,7 +107,9 @@ const GeneralFormContent = ({ open, close, toggle }: {
         }}>
           <Input disabled classNames={{
             input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-          }} />
+          }}
+            value={data?.cycle_created}
+          />
         </Input.Wrapper>
         <Input.Wrapper label="No of stage" classNames={{
           root: 'px-14 space-y-4',
@@ -116,7 +117,9 @@ const GeneralFormContent = ({ open, close, toggle }: {
         }}>
           <Input disabled classNames={{
             input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-          }} />
+          }}
+            value={data?.no_of_stages}
+          />
         </Input.Wrapper>
         <Input.Wrapper label="Status" classNames={{
           root: 'px-14 space-y-4',
@@ -124,7 +127,9 @@ const GeneralFormContent = ({ open, close, toggle }: {
         }}>
           <Input disabled classNames={{
             input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-          }} />
+          }}
+            value={data?.cycle_active}
+          />
         </Input.Wrapper>
         <Input.Wrapper label="Description" classNames={{
           root: 'px-14 space-y-4',
@@ -132,9 +137,11 @@ const GeneralFormContent = ({ open, close, toggle }: {
         }}>
           <Input disabled classNames={{
             input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-          }} />
+          }}
+            value={data?.cycle_description}
+          />
         </Input.Wrapper>
       </div>
-    </React.Fragment>
+    </ScrollArea.Autosize>
   )
 };

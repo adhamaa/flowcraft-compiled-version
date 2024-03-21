@@ -1,16 +1,17 @@
 'use client';
 import * as React from 'react';
 import { Icon } from '@iconify-icon/react';
-import { Accordion, Tabs, Transition, rem } from '@mantine/core';
+import { Accordion, Button, ScrollArea, Tabs, Transition, rem } from '@mantine/core';
 import { MenuItem, useSideMenu } from '@/hooks/useSideMenu';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { useSearchParams } from 'next/navigation';
 import EditForm from './EditForm';
 import GeneralForm from './GeneralForm';
+import { CycleData } from './Content';
 
 
-export default function ColapsableMenu() {
+export default function ColapsableMenu({ data }: { data: CycleData }) {
   const searchParams = useSearchParams();
   const cycle_id = searchParams.get('cycle_id');
   const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
@@ -42,97 +43,86 @@ export default function ColapsableMenu() {
         </ul>
       </motion.nav > */}
 
+      <Tabs component='div' defaultValue="cycle" orientation="vertical" classNames={{
+        root: 'h-full w-screen',
+        tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+        tabLabel: 'text-lg',
+        panel: ''
+      }}>
+        <Tabs.List>
+          <Tabs.Tab value="cycle" className=''>Cycle</Tabs.Tab>
 
-      <Transition
-        mounted={true}
-        transition="fade"
-        duration={400}
-        timingFunction="ease"
-      >
-        {(styles) => <Tabs defaultValue="cycle" orientation="vertical" classNames={{
-          root: 'h-full w-screen',
-          tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-          tabLabel: 'text-lg',
-          panel: ''
-        }}>
-          <Tabs.List>
-            <Tabs.Tab value="cycle" className=''>Cycle</Tabs.Tab>
+          <CollapseButton onClick={() => { }} />
 
-            <Icon icon="tabler:chevron-down" width="3rem" rotate={45} className='text-[#895CF3] mt-auto hover:!drop-shadow-sm cursor-pointer flex justify-end border-t' />
+        </Tabs.List>
+        <Tabs.Panel value="cycle">
+          <Tabs defaultValue="general" orientation="vertical" classNames={{
+            root: 'h-full',
+            tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+            tabLabel: 'text-lg',
+            panel: ''
+          }}>
+            <Tabs.List>
+              <Tabs.Tab value="general">General Information</Tabs.Tab>
+              <Tabs.Tab value="stages">Stages</Tabs.Tab>
 
-          </Tabs.List>
-          <Tabs.Panel value="cycle">
-            <Tabs defaultValue="general" orientation="vertical" classNames={{
-              root: 'h-full',
-              tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-              tabLabel: 'text-lg',
-              panel: ''
-            }}>
-              <Tabs.List>
-                <Tabs.Tab value="general">General Information</Tabs.Tab>
-                <Tabs.Tab value="stages">Stages</Tabs.Tab>
+              <CollapseButton onClick={() => { }} />
 
-                <Icon icon="tabler:chevron-down" width="3rem" rotate={45} className='text-[#895CF3] mt-auto hover:!drop-shadow-sm cursor-pointer flex justify-end border-t' />
+            </Tabs.List>
+            <Tabs.Panel value="general">
+              <GeneralForm data={data} />
+            </Tabs.Panel>
+            <Tabs.Panel value="stages">
+              <Tabs defaultValue="stage_1" orientation="vertical" classNames={{
+                root: 'h-full',
+                tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                tabLabel: 'text-lg',
+                panel: ''
 
-              </Tabs.List>
-              <Tabs.Panel value="general">
-                <GeneralForm />
-              </Tabs.Panel>
-              <Tabs.Panel value="stages">
-                <Tabs defaultValue="stage_1" orientation="vertical" classNames={{
-                  root: 'h-full',
-                  tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-                  tabLabel: 'text-lg',
-                  panel: ''
+              }}>
+                <Tabs.List>
+                  <Tabs.Tab value="stage_1">Stage 1</Tabs.Tab>
+                  <Tabs.Tab value="stage_2">Stage 2</Tabs.Tab>
+                  <Tabs.Tab value="stage_3">Stage 3</Tabs.Tab>
+                  <Tabs.Tab value="stage_4">Stage 4</Tabs.Tab>
+                  <Tabs.Tab value="stage_5">Stage 5</Tabs.Tab>
+                  <Tabs.Tab value="stage_6">Stage 6</Tabs.Tab>
+                  <Tabs.Tab value="stage_7">Stage 7</Tabs.Tab>
+                  <Tabs.Tab value="stage_8">Stage 8</Tabs.Tab>
 
-                }}>
-                  <Tabs.List>
-                    <Tabs.Tab value="stage_1">Stage 1</Tabs.Tab>
-                    <Tabs.Tab value="stage_2">Stage 2</Tabs.Tab>
-                    <Tabs.Tab value="stage_3">Stage 3</Tabs.Tab>
-                    <Tabs.Tab value="stage_4">Stage 4</Tabs.Tab>
-                    <Tabs.Tab value="stage_5">Stage 5</Tabs.Tab>
-                    <Tabs.Tab value="stage_6">Stage 6</Tabs.Tab>
-                    <Tabs.Tab value="stage_7">Stage 7</Tabs.Tab>
-                    <Tabs.Tab value="stage_8">Stage 8</Tabs.Tab>
+                  <CollapseButton onClick={() => { }} />
 
-                    <Icon icon="tabler:chevron-down" width="3rem" rotate={45} className='text-[#895CF3] mt-auto hover:!drop-shadow-sm cursor-pointer flex justify-end border-t' />
+                </Tabs.List>
+                <Tabs.Panel value="stage_1">
+                  <Tabs defaultValue="next_stage" orientation="vertical" classNames={{
+                    root: 'h-full',
+                    tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                    tabLabel: 'text-lg',
+                    panel: ''
+                  }}>
+                    <Tabs.List>
+                      <Tabs.Tab value="next_stage">Next Stage</Tabs.Tab>
+                      <Tabs.Tab value="prev_stage">Previous Stage</Tabs.Tab>
 
-                  </Tabs.List>
-                  <Tabs.Panel value="stage_1">
-                    <Tabs defaultValue="next_stage" orientation="vertical" classNames={{
-                      root: 'h-full',
-                      tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-                      tabLabel: 'text-lg',
-                      panel: ''
-                    }}>
-                      <Tabs.List>
-                        <Tabs.Tab value="next_stage">Next Stage</Tabs.Tab>
-                        <Tabs.Tab value="prev_stage">Previous Stage</Tabs.Tab>
+                      <CollapseButton onClick={() => { }} />
 
-                        <Icon icon="tabler:chevron-down" width="3rem" rotate={45} className='text-[#895CF3] mt-auto hover:!drop-shadow-sm cursor-pointer flex justify-end border-t' />
+                    </Tabs.List>
 
-                      </Tabs.List>
-
-                      <Tabs.Panel value="next_stage">
-                        <EditForm />
-                      </Tabs.Panel>
-                      <Tabs.Panel value="prev_stage">Previous Stage</Tabs.Panel>
-                    </Tabs>
-                  </Tabs.Panel>
-                  <Tabs.Panel value="stage_2">
-                    <EditForm />
-                  </Tabs.Panel>
-                </Tabs>
-              </Tabs.Panel>
-            </Tabs>
-          </Tabs.Panel>
-        </Tabs>}
-      </Transition>
-
-
-
-    </aside>
+                    <Tabs.Panel value="next_stage">
+                      <EditForm />
+                    </Tabs.Panel>
+                    <Tabs.Panel value="prev_stage">Previous Stage</Tabs.Panel>
+                  </Tabs>
+                </Tabs.Panel>
+                <Tabs.Panel value="stage_2">
+                  <EditForm />
+                </Tabs.Panel>
+              </Tabs>
+            </Tabs.Panel>
+          </Tabs>
+        </Tabs.Panel>
+      </Tabs>
+    </aside >
   );
 }
 
@@ -214,3 +204,22 @@ export const SideMenuComponent = ({ menuItems, menuItem }: { menuItems?: MenuIte
   );
 };
 
+const CollapseButton = ({ onClick }: { onClick: () => void }) => {
+  return (
+    <div className="flex items-end justify-end mt-auto p-2 border-t">
+      <Button
+        variant='default'
+        classNames={{
+          root: '!border-0 !bg-transparent cursor-pointer !px-0',
+        }}
+        onClick={onClick}
+      >
+        <Icon
+          icon="tabler:chevron-down"
+          width="3rem"
+          rotate={45}
+          className='text-[#895CF3]' />
+      </Button>
+    </div>
+  );
+}
