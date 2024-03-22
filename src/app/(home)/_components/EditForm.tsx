@@ -46,7 +46,7 @@ const EditFormContent = ({ toggleEdit, isEdit, toggle: toggleExpand }: {
   toggle: () => void;
 }) => {
   return (
-    <ScrollArea.Autosize mah={768}>
+    <ScrollArea.Autosize mah={640}>
       <div className='space-y-4'>
         <HeaderForm {...{ toggleEdit, isEdit, toggleExpand }} />
         {InputList.map((label, index) => ['Stage name', 'Sub-stage name'].includes(label) ? (

@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation'
 import * as React from 'react'
 import { HeaderForm } from './EditForm';
-import Header from './Header';
 import { CycleData } from './Content';
 
 const InputList = [
@@ -55,7 +54,7 @@ const GeneralFormContent = ({
   console.log('data from general form:', data)
 
   return (
-    <ScrollArea.Autosize mah={768}>
+    <ScrollArea.Autosize mah={640}>
       <Modal
         centered
         opened={diagramOpened}

@@ -81,17 +81,18 @@ export default function ColapsableMenu({ data }: { data: CycleData }) {
 
               }}>
                 <Tabs.List>
-                  <Tabs.Tab value="stage_1">Stage 1</Tabs.Tab>
-                  <Tabs.Tab value="stage_2">Stage 2</Tabs.Tab>
-                  <Tabs.Tab value="stage_3">Stage 3</Tabs.Tab>
-                  <Tabs.Tab value="stage_4">Stage 4</Tabs.Tab>
-                  <Tabs.Tab value="stage_5">Stage 5</Tabs.Tab>
-                  <Tabs.Tab value="stage_6">Stage 6</Tabs.Tab>
-                  <Tabs.Tab value="stage_7">Stage 7</Tabs.Tab>
-                  <Tabs.Tab value="stage_8">Stage 8</Tabs.Tab>
+                  <ScrollArea.Autosize mah={640}>
+                    <Tabs.Tab value="stage_1">Stage 1</Tabs.Tab>
+                    <Tabs.Tab value="stage_2">Stage 2</Tabs.Tab>
+                    <Tabs.Tab value="stage_3">Stage 3</Tabs.Tab>
+                    <Tabs.Tab value="stage_4">Stage 4</Tabs.Tab>
+                    <Tabs.Tab value="stage_5">Stage 5</Tabs.Tab>
+                    <Tabs.Tab value="stage_6">Stage 6</Tabs.Tab>
+                    <Tabs.Tab value="stage_7">Stage 7</Tabs.Tab>
+                    <Tabs.Tab value="stage_8">Stage 8</Tabs.Tab>
+                  </ScrollArea.Autosize>
 
                   <CollapseButton onClick={() => { }} />
-
                 </Tabs.List>
                 <Tabs.Panel value="stage_1">
                   <Tabs defaultValue="next_stage" orientation="vertical" classNames={{
