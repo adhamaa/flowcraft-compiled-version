@@ -48,6 +48,66 @@ export type CycleData = {
   no_of_stages: number;
 }
 
+export type StageData = {
+  stage_name: string;
+  stage_uuid: string;
+
+}
+
+export type StageInfoData = {
+  created_datetime: string;
+  listNextStagesUuid: string[];
+  listPrevStagesUuid: string[];
+  list_action: {
+    can_edit: string[];
+    can_view: string[];
+    can_view_exception: string[];
+    can_view_exclusion: string[];
+    checkrole_by: string[];
+    checkuser_by: string[];
+    insert_cop_date: string[];
+    notify_role: string[];
+    percentage: string[];
+    revert: string[];
+    revert_mode: string[];
+    revert_stage: string[];
+    select_role: string[];
+  };
+  list_entry_condition: {
+    pbt_id: string[];
+  };
+  list_exit_condition: {
+    checkrole_by: string[];
+    checkuser_by: string[];
+    chk_doc: string[];
+  };
+  list_next_stage: {
+    created_datetime: string;
+    process_stage_name: string;
+  }[];
+  list_pbt: {
+    pbt_id: string[];
+  };
+  list_previous: {
+    created_datetime: string;
+    process_stage_name: string;
+  }[];
+  list_requirement: {
+    upload_doc: string[];
+  };
+  list_role: {
+    "*": string[];
+    check_roles: string[];
+  };
+  list_user: {
+    user_id: string[];
+  };
+  process_stage_name: string;
+  updated_datetime: string;
+  uuid: string;
+}
+
+
 export default function HomeContent({
   applicationData,
   cycleData
@@ -218,7 +278,7 @@ const TabularSection = ({ opened,
   const [tableData, setTableData] = React.useState<CycleData[]>([]);
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams().toString();
+  const searchParams = useSearchParams();
 
   const createQueryString = React.useCallback(
     (name: string, value: string) => {

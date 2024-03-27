@@ -12,6 +12,9 @@ export const getApplicationList = async () => {
     },
     next: { tags: ['applist'] }
   });
+  if (response.status === 404) {
+    return [];
+  }
   if (!response.ok) {
     throw new Error('Failed to fetch application list.');
   }
@@ -41,6 +44,9 @@ export const getCycleList = async ({
     },
     next: { tags: ['cyclelist'] }
   });
+  if (response.status === 404) {
+    return [];
+  }
   if (!response.ok) {
     throw new Error('Failed to fetch cycle list.');
   }
@@ -71,7 +77,6 @@ export const getCycleList = async ({
       cycle_id: (item.cycle_id).toString(),
     }));
 
-  console.log('stringifyObjectValues:', stringifyObjectValues)
   return stringifyObjectValues;
 };
 
@@ -93,3 +98,66 @@ export const getCycleList = async ({
 //   const data = await response.json();
 //   return data.result;
 // };
+
+export const getStageList = async ({
+  cycle_id,
+  apps_label
+}: {
+  cycle_id: number | undefined;
+  apps_label: string;
+}) => {
+  if (!cycle_id) return [];
+  if (!apps_label) return [];
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const endpoint = `/businessProcessTmp/mAllStage?cycle_id=${cycle_id}&app_type=${apps_label}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['stagelist'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch stage list.');
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const getStageInfo = async ({
+  stage_id,
+  cycle_id,
+  apps_label
+}: {
+  stage_id: string;
+  cycle_id: string;
+  apps_label: string;
+}) => {
+  if (!stage_id) return {};
+  if (!cycle_id) return {};
+  if (!apps_label) return {};
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const endpoint = `/businessProcessTmp/mCurrentStage?process_stage_uuid=${stage_id}&cycle_id=${cycle_id}&app_type=${apps_label}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['stageinfo'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch stage info.');
+  }
+  const data = await response.json();
+  return data;
+};

@@ -5,16 +5,36 @@ import { Accordion, Button, ScrollArea, Tabs, Transition, rem } from '@mantine/c
 import { MenuItem, useSideMenu } from '@/hooks/useSideMenu';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
-import { useSearchParams } from 'next/navigation';
-import EditForm from './EditForm';
-import GeneralForm from './GeneralForm';
-import { CycleData } from './Content';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import EditForm from './Forms/EditForm';
+import GeneralForm from './Forms/GeneralForm';
+import { CycleData, StageData, StageInfoData } from './Content';
 
 
-export default function ColapsableMenu({ data }: { data: CycleData }) {
+export default function ColapsableMenu({
+  cycleData,
+  stageData,
+  stageInfoData
+}: {
+  cycleData: CycleData;
+  stageData: StageData[];
+  stageInfoData: StageInfoData;
+}) {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const cycle_id = searchParams.get('cycle_id');
   const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
+
+  const createQueryString = React.useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(name, value)
+
+      return params.toString()
+    },
+    [searchParams]
+  )
 
   return cycle_id && (
     <aside
@@ -70,54 +90,39 @@ export default function ColapsableMenu({ data }: { data: CycleData }) {
 
             </Tabs.List>
             <Tabs.Panel value="general">
-              <GeneralForm data={data} />
+              <GeneralForm data={cycleData} />
             </Tabs.Panel>
             <Tabs.Panel value="stages">
-              <Tabs defaultValue="stage_1" orientation="vertical" classNames={{
-                root: 'h-full',
-                tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-                tabLabel: 'text-lg',
-                panel: ''
-
-              }}>
+              <Tabs
+                defaultValue="stage_1"
+                orientation="vertical"
+                classNames={{
+                  root: 'h-full',
+                  tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                  tabLabel: 'text-lg',
+                  panel: ''
+                }}
+                onChange={(value) => router.push(pathname + '?' + createQueryString('process_stage_uuid', value as string))}
+              >
                 <Tabs.List>
                   <ScrollArea.Autosize mah={640}>
-                    <Tabs.Tab value="stage_1">Stage 1</Tabs.Tab>
-                    <Tabs.Tab value="stage_2">Stage 2</Tabs.Tab>
-                    <Tabs.Tab value="stage_3">Stage 3</Tabs.Tab>
-                    <Tabs.Tab value="stage_4">Stage 4</Tabs.Tab>
-                    <Tabs.Tab value="stage_5">Stage 5</Tabs.Tab>
-                    <Tabs.Tab value="stage_6">Stage 6</Tabs.Tab>
-                    <Tabs.Tab value="stage_7">Stage 7</Tabs.Tab>
-                    <Tabs.Tab value="stage_8">Stage 8</Tabs.Tab>
+                    {stageData?.map((stage) => (
+                      <Tabs.Tab
+                        key={stage.stage_uuid}
+                        value={stage.stage_uuid}>
+                        {stage.stage_name}
+                      </Tabs.Tab>
+                    ))}
+
                   </ScrollArea.Autosize>
 
                   <CollapseButton onClick={() => { }} />
                 </Tabs.List>
-                <Tabs.Panel value="stage_1">
-                  <Tabs defaultValue="next_stage" orientation="vertical" classNames={{
-                    root: 'h-full',
-                    tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-                    tabLabel: 'text-lg',
-                    panel: ''
-                  }}>
-                    <Tabs.List>
-                      <Tabs.Tab value="next_stage">Next Stage</Tabs.Tab>
-                      <Tabs.Tab value="prev_stage">Previous Stage</Tabs.Tab>
-
-                      <CollapseButton onClick={() => { }} />
-
-                    </Tabs.List>
-
-                    <Tabs.Panel value="next_stage">
-                      <EditForm />
-                    </Tabs.Panel>
-                    <Tabs.Panel value="prev_stage">Previous Stage</Tabs.Panel>
-                  </Tabs>
-                </Tabs.Panel>
-                <Tabs.Panel value="stage_2">
-                  <EditForm />
-                </Tabs.Panel>
+                {stageData?.map((stage) => (
+                  <Tabs.Panel key={stage.stage_uuid} value={stage.stage_uuid}>
+                    <EditForm data={stageInfoData} />
+                  </Tabs.Panel>
+                ))}
               </Tabs>
             </Tabs.Panel>
           </Tabs>
