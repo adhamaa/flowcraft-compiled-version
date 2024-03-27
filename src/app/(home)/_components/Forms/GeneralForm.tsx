@@ -94,8 +94,6 @@ const GeneralFormContent = ({
         <div className="flex justify-end py-2 px-14">{diagramToggle && <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button>}</div>
 
         {InputList.map(({ name, label, value, disabled }, index) => ['Status'].includes(label) ? (
-          console.log('value:', value.toString()),
-
           <Input.Wrapper key={index} label={label} classNames={{
             root: 'px-14 space-y-4',
             label: '!text-sm !font-semibold',
