@@ -1,14 +1,14 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Button, Group, Input, Modal, Radio, ScrollArea } from '@mantine/core'
+import { Button, Group, Input, Modal, ScrollArea } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation'
 import * as React from 'react'
 import { CycleData } from '../Content';
 import HeaderForm from './HeaderForm';
-import { Form, useForm } from "react-hook-form";
-import { Checkbox } from 'react-hook-form-mantine';
+import { useForm } from "react-hook-form";
+import { Radio, TextInput } from 'react-hook-form-mantine';
 import { setConsoleLog } from '@/lib/services';
 
 
@@ -53,18 +53,23 @@ const GeneralFormContent = ({
   toggle: () => void;
 }) => {
   const InputList = [
-    { name: 'Cycle name', value: data.cycle_name, disabled: true },
-    { name: 'Cycle id', value: data.cycle_id, disabled: true },
-    { name: 'Applications', value: data.app_name, disabled: true },
-    { name: 'Date Created', value: data.cycle_created, disabled: true },
-    { name: 'Last edited date', value: data.cycle_updated, disabled: true },
-    { name: 'No of stage', value: data.no_of_stages, disabled: true },
-    { name: 'Status', value: data.cycle_active, disabled: !isEdit },
-    { name: 'Description', value: data.cycle_description, disabled: !isEdit },
+    { name: 'cycle_name', label: 'Cycle name', value: data.cycle_name, disabled: true },
+    { name: "cycle_id", label: 'Cycle id', value: data.cycle_id, disabled: true },
+    { name: "app_name", label: 'Applications', value: data.app_name, disabled: true },
+    { name: "cycle_created", label: 'Date Created', value: data.cycle_created, disabled: true },
+    { name: "cycle_updated", label: 'Last edited date', value: data.cycle_updated, disabled: true },
+    { name: "no_of_stages", label: 'No of stage', value: data.no_of_stages, disabled: true },
+    { name: "cycle_active", label: 'Status', value: data.cycle_active, disabled: !isEdit },
+    { name: "cycle_description", label: 'Description', value: data.cycle_description, disabled: !isEdit },
   ];
   const [diagramOpened, { open: diagramOpen, close: diagramClose, toggle: diagramToggle }] = useDisclosure(false);
-  const [status, setStatus] = React.useState<number | string>(data?.cycle_active);
   const { control, handleSubmit } = useForm();
+
+  const onSubmit = async (data: any) => {
+    console.log(data);
+    await setConsoleLog(data);
+  }
+
   return (
     <ScrollArea.Autosize mah={768}>
       <Modal
@@ -82,51 +87,43 @@ const GeneralFormContent = ({
       </Modal>
       <form
         className='space-y-4 py-4'
-        onSubmit={handleSubmit(async (data) => {
-          console.log(data);
-          await setConsoleLog(data);
-        })}
+        onSubmit={handleSubmit(onSubmit)}
         onError={(e) => console.log(e)}
       >
-        <Checkbox
-          name="checkbox"
-          value="Test"
-          control={control}
-          label="I agree to sell my privacy"
-        />
-        <Button type='submit'>CLICK ME</Button>
         <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
         <div className="flex justify-end py-2 px-14">{diagramToggle && <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button>}</div>
-        {InputList.map(({ name, value, disabled }, index) => ['Status'].includes(name) ? (
-          <Input.Wrapper key={index} label="Status" classNames={{
+
+        {InputList.map(({ name, label, value, disabled }, index) => ['Status'].includes(label) ? (
+          console.log('value:', value.toString()),
+
+          <Input.Wrapper key={index} label={label} classNames={{
             root: 'px-14 space-y-4',
             label: '!text-sm !font-semibold',
           }}>
             <Radio.Group
-              name="Status"
-              value={status as string}
-              onChange={(value) => {
-                setStatus(+value) // convert to number
-              }}
+              name={name}
+              control={control}
+              defaultValue={value.toString()}
             >
               <Group>
-                <Radio disabled={disabled} value={1} label="Active" />
-                <Radio disabled={disabled} value={0} label="Inactive" />
+                <Radio.Item disabled={disabled} value="1" label="Active" />
+                <Radio.Item disabled={disabled} value="0" label="Inactive" />
               </Group>
             </Radio.Group>
           </Input.Wrapper>
         ) : (
-          <Input.Wrapper key={index} label={name} classNames={{
+          <Input.Wrapper key={index} label={label} classNames={{
             root: 'px-14 space-y-4',
             label: '!text-sm !font-semibold',
           }}>
-            <Input
+            <TextInput
+              name={name}
+              defaultValue={value}
+              control={control}
               disabled={disabled}
               classNames={{
                 input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-              }}
-              value={value}
-            />
+              }} />
           </Input.Wrapper>
         ))}
       </form>

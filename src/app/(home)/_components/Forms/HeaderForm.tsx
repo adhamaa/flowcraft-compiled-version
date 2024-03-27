@@ -18,7 +18,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type }: {
       </Button>
       {toggleEdit && <div className='flex gap-4'>
         <Button color={!isEdit ? '#007BFF' : '#DC3545'} radius='md' onClick={toggleEdit}>{!isEdit ? 'Edit' : 'Close'}</Button>
-        {type === 'general' && <Button color={!isEdit ? '#28A745' : '#28A745'} display={!isEdit ? 'none' : 'block'} radius='md' onClick={toggleEdit}>{!isEdit ? '' : 'Save'}</Button>}
+        {type === 'general' && <Button type='submit' color={!isEdit ? '#28A745' : '#28A745'} display={!isEdit ? 'none' : 'block'} radius='md' onClick={toggleEdit}>{!isEdit ? '' : 'Save'}</Button>}
       </div>}
     </div >
   )
