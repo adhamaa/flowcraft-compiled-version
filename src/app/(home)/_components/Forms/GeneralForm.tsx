@@ -7,7 +7,9 @@ import { useSearchParams } from 'next/navigation'
 import * as React from 'react'
 import { CycleData } from '../Content';
 import HeaderForm from './HeaderForm';
-
+import { Form, useForm } from "react-hook-form";
+import { Checkbox } from 'react-hook-form-mantine';
+import { setConsoleLog } from '@/lib/services';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
@@ -62,7 +64,7 @@ const GeneralFormContent = ({
   ];
   const [diagramOpened, { open: diagramOpen, close: diagramClose, toggle: diagramToggle }] = useDisclosure(false);
   const [status, setStatus] = React.useState<number | string>(data?.cycle_active);
-
+  const { control, handleSubmit } = useForm();
   return (
     <ScrollArea.Autosize mah={768}>
       <Modal
@@ -78,7 +80,21 @@ const GeneralFormContent = ({
       >
         <Image src='/Diagram.png' width={1000} height={1000} alt='diagram' className='object-cover' />
       </Modal>
-      <div className='space-y-4 py-4'>
+      <form
+        className='space-y-4 py-4'
+        onSubmit={handleSubmit(async (data) => {
+          console.log(data);
+          await setConsoleLog(data);
+        })}
+        onError={(e) => console.log(e)}
+      >
+        <Checkbox
+          name="checkbox"
+          value="Test"
+          control={control}
+          label="I agree to sell my privacy"
+        />
+        <Button type='submit'>CLICK ME</Button>
         <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
         <div className="flex justify-end py-2 px-14">{diagramToggle && <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button>}</div>
         {InputList.map(({ name, value, disabled }, index) => ['Status'].includes(name) ? (
@@ -113,7 +129,7 @@ const GeneralFormContent = ({
             />
           </Input.Wrapper>
         ))}
-      </div>
+      </form>
     </ScrollArea.Autosize >
   )
 };

@@ -53,17 +53,6 @@ export const getCycleList = async ({
   const data = await response.json();
 
   const stringifyObjectValues = cycle_id ?
-    // data.result.map((item: any) => ({
-    //   ...item,
-    //   cycle_created: new Date(item.cycle_created).toDateString(),
-    //   cycle_updated: new Date(item.cycle_updated).toDateString(),
-    //   app_label: item.app_label ?? 'N/A',
-    //   app_name: item.app_name ?? 'N/A',
-    //   cycle_name: item.cycle_name ?? 'N/A',
-    //   no_of_stages: (item.no_of_stages).toString() ?? 'N/A',
-    //   cycle_active: (item.cycle_active).toString() ? 'Active' : 'Inactive',
-    //   cycle_id: (item.cycle_id).toString(),
-    // }))
     data.result.find((item: any) => item.cycle_id === cycle_id) :
     data.result.map((item: any) => ({
       ...item,
@@ -79,25 +68,6 @@ export const getCycleList = async ({
 
   return stringifyObjectValues;
 };
-
-// const getCycleInfo = async ({ cycle_id }: { cycle_id: string }) => {
-//   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-//   const endpoint = `/businessProcess/getCycleProcess?cycle_id=${cycle_id}`;
-//   const url = `${baseUrl}${endpoint}`;
-//   const response = await fetch(url, {
-//     method: 'GET',
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
-//     },
-//     next: { tags: ['cycleinfo'] }
-//   });
-//   if (!response.ok) {
-//     throw new Error('Failed to fetch cycle info.');
-//   }
-//   const data = await response.json();
-//   return data.result;
-// };
 
 export const getStageList = async ({
   cycle_id,
@@ -130,19 +100,19 @@ export const getStageList = async ({
 };
 
 export const getStageInfo = async ({
-  stage_id,
+  stage_uuid,
   cycle_id,
   apps_label
 }: {
-  stage_id: string;
+  stage_uuid: string;
   cycle_id: string;
   apps_label: string;
 }) => {
-  if (!stage_id) return {};
+  if (!stage_uuid) return {};
   if (!cycle_id) return {};
   if (!apps_label) return {};
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint = `/businessProcessTmp/mCurrentStage?process_stage_uuid=${stage_id}&cycle_id=${cycle_id}&app_type=${apps_label}`;
+  const endpoint = `/businessProcessTmp/mCurrentStage?process_stage_uuid=${stage_uuid}&cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'GET',
@@ -153,7 +123,7 @@ export const getStageInfo = async ({
     next: { tags: ['stageinfo'] }
   });
   if (response.status === 404) {
-    return [];
+    return {};
   }
   if (!response.ok) {
     throw new Error('Failed to fetch stage info.');
@@ -161,3 +131,70 @@ export const getStageInfo = async ({
   const data = await response.json();
   return data;
 };
+
+export const updateCycle = async ({
+  cycle_uuid,
+  field_name
+}: {
+  cycle_uuid: string;
+  field_name: string;
+}) => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const endpoint = `/businessProcess/updateCycle?field_name=${field_name}&cycle_uuid=${cycle_uuid}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    // example body data
+    // { "value": "test" }
+    // {cycle_active: 1} or {cycle_active: 0} = status
+    // {cycle_description: "test"} = description
+    body: JSON.stringify({ cycle_uuid, field_name }),
+    next: { tags: ['updatecycle'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to update cycle.');
+  }
+  return response;
+};
+
+export const updateStage = async ({
+  stage_uuid,
+  field_name
+}: {
+  stage_uuid: string;
+  field_name: string;
+}) => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const endpoint = `/businessProcess/update?field_name=${field_name}&stage_uuid=${stage_uuid}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    // example body data
+    // { "value": "{'key': '[value1, value2]'}" }
+    
+    body: JSON.stringify({ stage_uuid, field_name }),
+    next: { tags: ['updatestage'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to update stage.');
+  }
+  return response;
+};
+
+export const setConsoleLog = async (data: any) => {
+  console.log(data);
+}

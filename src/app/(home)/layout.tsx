@@ -20,8 +20,5 @@ export default async function Layout({
       <Header />
       {children}
     </div>
-
-
-    // <Shell>{children}</Shell>
   );
 }

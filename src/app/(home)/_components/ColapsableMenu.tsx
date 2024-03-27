@@ -102,7 +102,7 @@ export default function ColapsableMenu({
                   tabLabel: 'text-lg',
                   panel: ''
                 }}
-                onChange={(value) => router.push(pathname + '?' + createQueryString('process_stage_uuid', value as string))}
+                onChange={(value) => router.push(pathname + '?' + createQueryString('stage_uuid', value as string))}
               >
                 {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
                 {!!stageData.length && <Tabs.List>
