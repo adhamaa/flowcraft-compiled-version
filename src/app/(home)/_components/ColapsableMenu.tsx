@@ -104,8 +104,9 @@ export default function ColapsableMenu({
                 }}
                 onChange={(value) => router.push(pathname + '?' + createQueryString('process_stage_uuid', value as string))}
               >
-                <Tabs.List>
-                  <ScrollArea.Autosize mah={640}>
+                {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
+                {!!stageData.length && <Tabs.List>
+                  <ScrollArea.Autosize mah={768}>
                     {stageData?.map((stage) => (
                       <Tabs.Tab
                         key={stage.stage_uuid}
@@ -117,7 +118,7 @@ export default function ColapsableMenu({
                   </ScrollArea.Autosize>
 
                   <CollapseButton onClick={() => { }} />
-                </Tabs.List>
+                </Tabs.List>}
                 {stageData?.map((stage) => (
                   <Tabs.Panel key={stage.stage_uuid} value={stage.stage_uuid}>
                     <EditForm data={stageInfoData} />

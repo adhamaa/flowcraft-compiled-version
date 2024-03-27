@@ -64,7 +64,7 @@ const GeneralFormContent = ({
   const [status, setStatus] = React.useState<number | string>(data?.cycle_active);
 
   return (
-    <ScrollArea.Autosize mah={640}>
+    <ScrollArea.Autosize mah={768}>
       <Modal
         centered
         opened={diagramOpened}

@@ -61,7 +61,7 @@ const EditFormContent = ({
     { name: 'Exit condition', value: data?.list_exit_condition, disabled: !isEdit }
   ] : [];
   return (
-    <ScrollArea.Autosize mah={640}>
+    <ScrollArea.Autosize mah={768}>
       <div className='space-y-4 py-4'>
         <HeaderForm type='edit' {...{ toggleEdit, isEdit, toggleExpand }} />
         {InputList.map(({ name, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(name) ? (
