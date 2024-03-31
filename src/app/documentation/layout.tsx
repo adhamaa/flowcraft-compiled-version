@@ -1,6 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
-import Header from "../(home)/_components/Header";
+import Header from "../cycle/_components/Header";
 
 export default async function Layout({
   children,

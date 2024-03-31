@@ -45,7 +45,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
         value={activeTab as string}
         onChange={(value) => router.push(`/${value}`)}>
         <Tabs.List>
-          <Tabs.Tab value="/" >Cycle</Tabs.Tab>
+          <Tabs.Tab value="cycle" >Cycle</Tabs.Tab>
           <Tabs.Tab value="about">About</Tabs.Tab>
           <Tabs.Tab value="documentation">Documentation</Tabs.Tab>
         </Tabs.List>

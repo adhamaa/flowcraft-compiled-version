@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useSideMenu } from '@/hooks/useSideMenu';
 import Image from 'next/image';
 import AppListConst from '@/appList.json';
-import { Button, Collapse, ScrollArea, UnstyledButton } from '@mantine/core';
+import { Button, Collapse, Menu, ScrollArea, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Icon } from '@iconify-icon/react';
 
@@ -150,11 +150,22 @@ const ApplicationSection = ({
   applicationData: ApplicationData<string>;
   cycleData: CycleData[];
 }) => {
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const createQueryString = React.useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (name !== '' && value !== '') {
+        params.set(name, value)
+      }
+
+      return params.toString()
+    },
+    [searchParams]
+  )
   const [isPending, startTransition] = React.useTransition();
-  // const listApps = AppListConst[
-  //   'qa' as keyof typeof AppListConst
-  // ];
+
   const listApps = applicationData
 
   return (
@@ -173,7 +184,7 @@ const ApplicationSection = ({
           <div className="flex gap-7 pt-7">
             {Object.keys(listApps).map((app, index) => {
               const selected_app = listApps[app][0].apps_label;
-              const handleAppClick = () => router.push(`/?selected_app=${selected_app}`);
+              const handleAppClick = () => router.push(pathname + "?" + createQueryString('selected_app', selected_app));
               return (
                 <Button
                   key={index}
@@ -198,73 +209,6 @@ const ApplicationSection = ({
   )
 };
 
-// const ListOfCycle = [
-//   {
-//     cycle_name: 'Cycle 1',
-//     cycle_id: '00010',
-//     applications: 'E-claims',
-//     date_created: '2021-10-10',
-//     no_of_stages: 5,
-//     status: 'Active'
-//   },
-//   {
-//     cycle_name: 'Cycle 2',
-//     cycle_id: '00011',
-//     applications: 'E-claims',
-//     date_created: '2021-10-10',
-//     no_of_stages: 5,
-//     status: 'Active'
-//   },
-//   {
-//     cycle_name: 'Cycle 3',
-//     cycle_id: '00012',
-//     applications: 'E-claims',
-//     date_created: '2021-10-10',
-//     no_of_stages: 5,
-//     status: 'Active'
-//   },
-//   {
-//     cycle_name: 'Cycle 4',
-//     cycle_id: '00013',
-//     applications: 'E-claims',
-//     date_created: '2021-10-10',
-//     no_of_stages: 5,
-//     status: 'Active'
-//   },
-//   {
-//     cycle_name: 'Cycle 1',
-//     cycle_id: '00010',
-//     applications: 'E-claims',
-//     date_created: '2021-10-10',
-//     no_of_stages: 5,
-//     status: 'Active'
-//   },
-//   {
-//     cycle_name: 'Cycle 2',
-//     cycle_id: '00011',
-//     applications: 'E-claims',
-//     date_created: '2021-10-10',
-//     no_of_stages: 5,
-//     status: 'Active'
-//   },
-//   {
-//     cycle_name: 'Cycle 3',
-//     cycle_id: '00012',
-//     applications: 'E-claims',
-//     date_created: '2021-10-10',
-//     no_of_stages: 5,
-//     status: 'Active'
-//   },
-//   {
-//     cycle_name: 'Cycle 4',
-//     cycle_id: '00013',
-//     applications: 'E-claims',
-//     date_created: '2021-10-10',
-//     no_of_stages: 5,
-//     status: 'Active'
-//   },
-// ]
-
 const TabularSection = ({ opened,
   statusIndicator,
   isPagination,
@@ -278,12 +222,15 @@ const TabularSection = ({ opened,
   const [tableData, setTableData] = React.useState<CycleData[]>([]);
   const router = useRouter();
   const pathname = usePathname();
+  console.log('pathname:', pathname)
   const searchParams = useSearchParams();
 
   const createQueryString = React.useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
-      params.set(name, value)
+      if (name !== '' && value !== '') {
+        params.set(name, value)
+      }
 
       return params.toString()
     },
@@ -295,7 +242,7 @@ const TabularSection = ({ opened,
       header: 'Cycle Name',
       accessorFn: (originalRow) => originalRow.cycle_name,
       Cell: ({ cell, row }) => {
-        const handleClick = () => router.push(pathname + '?' + createQueryString('cycle_id', (row.original.cycle_id).toString()));
+        const handleClick = () => router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''));
         return (
           <div className='flex gap-2 items-center cursor-pointer' onClick={handleClick}>
             <span className='hover:underline'>{cell.getValue() as string}</span>
@@ -307,7 +254,7 @@ const TabularSection = ({ opened,
       header: 'Cycle ID',
       accessorFn: (originalRow) => originalRow.cycle_id,
       Cell: ({ cell, row }) => {
-        const handleClick = () => router.push(pathname + '?' + createQueryString('cycle_id', (row.original.cycle_id).toString()));
+        const handleClick = () => router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''));
         return (
           <div className='flex gap-2 items-center cursor-pointer' onClick={handleClick}>
             <p className='hover:underline'>{cell.getValue() as string}</p>
@@ -340,6 +287,20 @@ const TabularSection = ({ opened,
       pagination: { pageSize: 5, pageIndex: 0 },
       showGlobalFilter: true,
     },
+    enableRowActions: true,
+    positionActionsColumn: 'last',
+    displayColumnDefOptions: {
+      'mrt-row-actions': {
+        header: '', //change header text
+        size: 5, //make actions column wider
+      },
+    },
+    renderRowActionMenuItems: ({ row }) => (
+      <>
+        <Menu.Item onClick={() => console.info('reload')}>Reload</Menu.Item>
+        <Menu.Item onClick={() => console.info('Delete')}>Delete</Menu.Item>
+      </>
+    ),
     //customize the MRT components
     mantinePaginationProps: {
       rowsPerPageOptions: ['5', '10', '15'],

@@ -5,63 +5,48 @@ import { Accordion, Button, ScrollArea, Tabs, Transition, rem } from '@mantine/c
 import { MenuItem, useSideMenu } from '@/hooks/useSideMenu';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import EditForm from './Forms/EditForm';
 import GeneralForm from './Forms/GeneralForm';
 import { CycleData, StageData, StageInfoData } from './Content';
+import { getStageInfo } from '@/lib/services';
 
 export default function ColapsableMenu({
   cycleData,
   stageData,
-  stageInfoData
+  // stageInfoData
 }: {
   cycleData: CycleData;
   stageData: StageData[];
-  stageInfoData: StageInfoData;
+  // stageInfoData: StageInfoData;
 }) {
+  const [stageInfo, setStageInfo] = React.useState<StageInfoData>()
   const searchParams = useSearchParams();
+  const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
-  const cycle_id = searchParams.get('cycle_id');
-  const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
+  const selected_app = searchParams.get('selected_app');
+  const stage_uuid = searchParams.get('stage_uuid');
+  const cycle_id = params.cycle_id;
 
   const createQueryString = React.useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
-      params.set(name, value)
+      if (name !== '' && value !== '') {
+        params.set(name, value)
+      }
 
       return params.toString()
     },
     [searchParams]
   )
 
-  return cycle_id && (
+  return (
     <aside
       className={clsx(
         'flex',
-        // 'border border-dashed border-red-500'
       )}
-    // style={{ gridTemplateColumns: `repeat(${sideMenuColSpan}, 10rem)` }}
     >
-      {/* <SideMenuComponent menuItems={menuItems} /> */}
-      {/* <motion.nav
-        initial={{ opacity: 0, x: -100 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{
-          duration: 0.5,
-          x: { type: "spring", stiffness: 300, damping: 30 },
-          ease: "easeInOut"
-        }}
-        exit={{ opacity: 0, x: -100 }}
-
-        className='border-r flex flex-col'>
-        <ul className='p-6 space-y-4'>
-          {menuItems.map((item, index) => (
-            <li key={item.id}><button className='p-4 hover:border rounded-lg' onClick={() => { }}>{item.label}</button></li>
-          ))}
-        </ul>
-      </motion.nav > */}
-
       <Tabs component='div' defaultValue="cycle" orientation="vertical" classNames={{
         root: 'h-full w-screen',
         tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
@@ -69,6 +54,7 @@ export default function ColapsableMenu({
         panel: ''
       }}>
         <Tabs.List>
+          <></>
           <Tabs.Tab value="cycle" className=''>Cycle</Tabs.Tab>
 
           <CollapseButton onClick={() => { }} />
@@ -82,8 +68,21 @@ export default function ColapsableMenu({
             panel: ''
           }}>
             <Tabs.List>
+              <></>
               <Tabs.Tab value="general">General Information</Tabs.Tab>
-              <Tabs.Tab value="stages" >Stages</Tabs.Tab>
+              <Tabs.Tab value="stages"
+                onClick={
+                  async () => {
+                    router.push(pathname + '?' + createQueryString('stage_uuid', stageData[0]?.stage_uuid as string));
+                    const stageInfoRes = await getStageInfo({
+                      stage_uuid: stageData[0]?.stage_uuid as string,
+                      cycle_id: parseInt(cycle_id as string),
+                      apps_label: selected_app as string
+                    });
+                    setStageInfo(stageInfoRes)
+                  }
+                }
+              >Stages</Tabs.Tab>
 
               <CollapseButton onClick={() => { }} />
 
@@ -91,9 +90,10 @@ export default function ColapsableMenu({
             <Tabs.Panel value="general">
               <GeneralForm data={cycleData} />
             </Tabs.Panel>
-            <Tabs.Panel value="stages">
+            <Tabs.Panel value="stages" >
               <Tabs
-                defaultValue="stage_1"
+                // keepMounted={false}
+                defaultValue={stageData[0]?.stage_uuid ?? ''}
                 orientation="vertical"
                 classNames={{
                   root: 'h-full',
@@ -101,10 +101,19 @@ export default function ColapsableMenu({
                   tabLabel: 'text-lg',
                   panel: ''
                 }}
-                onChange={(value) => router.push(pathname + '?' + createQueryString('stage_uuid', value as string))}
+                onChange={async (value) => {
+                  router.push(pathname + '?' + createQueryString('stage_uuid', value as string));
+                  const stageInfoRes = await getStageInfo({
+                    stage_uuid: value as string,
+                    cycle_id: parseInt(cycle_id as string),
+                    apps_label: selected_app as string
+                  });
+                  setStageInfo(stageInfoRes)
+                }}
               >
                 {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
                 {!!stageData.length && <Tabs.List>
+                  <></>
                   <ScrollArea.Autosize mah={768}>
                     {stageData?.map((stage) => (
                       <Tabs.Tab
@@ -120,7 +129,7 @@ export default function ColapsableMenu({
                 </Tabs.List>}
                 {stageData?.map((stage) => (
                   <Tabs.Panel key={stage.stage_uuid} value={stage.stage_uuid}>
-                    <EditForm data={stageInfoData} />
+                    <EditForm data={stageInfo as StageInfoData} />
                   </Tabs.Panel>
                 ))}
               </Tabs>

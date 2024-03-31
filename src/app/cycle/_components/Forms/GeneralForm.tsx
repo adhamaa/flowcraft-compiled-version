@@ -62,14 +62,7 @@ const GeneralFormContent = ({
     { name: "cycle_active", label: 'Status', value: data.cycle_active, disabled: !isEdit },
     { name: "cycle_description", label: 'Description', value: data.cycle_description, disabled: !isEdit },
   ];
-  //   name: 'cycle_name',
-  // name: "cycle_id",
-  // name: "app_name",
-  // name: "cycle_created",
-  // name: "cycle_updated",
-  // name: "no_of_stages",
-  // name: "cycle_active",
-  // name: "cycle_description",
+
   const [diagramOpened, { open: diagramOpen, close: diagramClose, toggle: diagramToggle }] = useDisclosure(false);
   const { control, handleSubmit } = useForm();
 

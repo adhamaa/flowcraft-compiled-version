@@ -1,4 +1,3 @@
-import ColapsableMenu from '@/app/(home)/_components/ColapsableMenu';
 import { SideMenuProvider } from '@/hooks/useSideMenu';
 import Providers from '@/provider';
 import '@/styles/globals.css';
@@ -27,7 +26,9 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
