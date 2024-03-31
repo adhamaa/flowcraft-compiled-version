@@ -7,8 +7,8 @@ import * as React from 'react';
 import HeaderForm from './HeaderForm';
 import { StageInfoData } from '../Content';
 import { useForm } from 'react-hook-form';
-import { setConsoleLog } from '@/lib/services';
-import { TextInput, Textarea } from 'react-hook-form-mantine';
+import { setConsoleLog, updateStage } from '@/lib/services';
+import { JsonInput, TextInput, Textarea } from 'react-hook-form-mantine';
 
 
 const EditForm = ({
@@ -51,6 +51,8 @@ const EditFormContent = ({
   isEdit: boolean;
   toggle: () => void;
 }) => {
+  console.log('data:', data)
+
   const InputList = data ? [
     { name: 'process_stage_name', label: 'Stage name', value: data?.process_stage_name, disabled: !isEdit }, // this is a string
     { name: 'updated_datetime', label: 'Last edited date', value: data?.updated_datetime, disabled: true }, // this is a date string
@@ -103,12 +105,25 @@ const EditFormContent = ({
               label: '!text-sm !font-semibold',
             }}>
             <TextareaHeader />
-            <Textarea
+            {/* <Textarea
               name={name}
               defaultValue={value}
               disabled={disabled}
               control={control}
               classNames={{
+                input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+              }}
+            /> */}
+            <JsonInput
+              name={name}
+              defaultValue={JSON.stringify(value, null, 2)}
+              control={control}
+              disabled={disabled}
+              formatOnBlur
+              autosize
+              minRows={4}
+              classNames={{
+
                 input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
               }}
             />
@@ -140,7 +155,11 @@ const ActionButtons = ({
     <Button color='#DC3545' radius='md' className="!font-normal" onClick={() => { }}>Cancel</Button>
     <Button type='submit' color='#28A745' radius='md' className="!font-normal" onClick={async (e) => {
       e.preventDefault();
-      await setConsoleLog({ name, value });
+      await updateStage({
+        stage_uuid: '328f3d0e-1005-11ee-99e0-02467045bd9a', // draft
+        field_name: "list_user",
+        body: { value: value as string }
+      })
     }}>Save</Button>
     <Button color='#1C1454' radius='md' className="!font-normal" onClick={() => { }}>Verify syntax</Button>
     <Button color='#FF6347' radius='md' className="!font-normal" onClick={() => { }}>Evaluate semantics</Button>

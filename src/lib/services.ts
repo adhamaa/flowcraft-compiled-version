@@ -1,5 +1,7 @@
 'use server';
 
+import { revalidatePath, revalidateTag } from "next/cache";
+
 export const getApplicationList = async () => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = '/businessProcess/listAppsBizProcess';
@@ -105,7 +107,7 @@ export const getStageInfo = async ({
   apps_label
 }: {
   stage_uuid: string;
-  cycle_id: string;
+  cycle_id: number | undefined;
   apps_label: string;
 }) => {
   if (!stage_uuid) return {};
@@ -134,13 +136,15 @@ export const getStageInfo = async ({
 
 export const updateCycle = async ({
   cycle_uuid,
-  field_name
+  body
 }: {
   cycle_uuid: string;
-  field_name: string;
+  body: { cycle_active: number; cycle_description: string };
 }) => {
+  console.log('cycle_uuid:', cycle_uuid)
+  console.log('body:', body)
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint = `/businessProcess/updateCycle?field_name=${field_name}&cycle_uuid=${cycle_uuid}`;
+  const endpoint = `/businessProcess/updateCycle?cycle_uuid=${cycle_uuid}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'POST',
@@ -148,29 +152,29 @@ export const updateCycle = async ({
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    // example body data
-    // { "value": "test" }
-    // {cycle_active: 1} or {cycle_active: 0} = status
-    // {cycle_description: "test"} = description
-    body: JSON.stringify({ cycle_uuid, field_name }),
+    body: (JSON.stringify({ active: body.cycle_active, descriptions: body.cycle_description })),
     next: { tags: ['updatecycle'] }
   });
   if (response.status === 404) {
     return [];
   }
-  if (!response.ok) {
-    throw new Error('Failed to update cycle.');
-  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to update cycle.');
+  // }
+  revalidateTag('cyclelist');
   return response;
 };
 
 export const updateStage = async ({
   stage_uuid,
-  field_name
+  field_name,
+  body
 }: {
   stage_uuid: string;
   field_name: string;
+  body: { value: string };
 }) => {
+  console.log('body:', body)
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/businessProcess/update?field_name=${field_name}&stage_uuid=${stage_uuid}`;
   const url = `${baseUrl}${endpoint}`;
@@ -180,21 +184,22 @@ export const updateStage = async ({
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    // example body data
-    // { "value": "{'key': '[value1, value2]'}" }
-    
-    body: JSON.stringify({ stage_uuid, field_name }),
+    body: JSON.stringify({ value: body.value }),
     next: { tags: ['updatestage'] }
   });
   if (response.status === 404) {
     return [];
   }
-  if (!response.ok) {
-    throw new Error('Failed to update stage.');
-  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to update stage.');
+  // }
   return response;
 };
 
 export const setConsoleLog = async (data: any) => {
-  console.log(data);
+  console.log(JSON.stringify(data));
 }
+
+export const revalidateStageInfo = async () => {
+  revalidateTag('stageinfo');
+} 

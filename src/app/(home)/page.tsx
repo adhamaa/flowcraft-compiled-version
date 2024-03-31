@@ -13,7 +13,7 @@ async function HomePage({
   const stageData = await getStageList({ cycle_id: cycle_id ? parseInt(cycle_id) : undefined, apps_label: selected_app });
   const stageInfoData = await getStageInfo({
     stage_uuid: stage_uuid,
-    cycle_id: cycle_id,
+    cycle_id: parseInt(cycle_id),
     apps_label: selected_app
   });
 

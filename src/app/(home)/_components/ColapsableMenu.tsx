@@ -10,7 +10,6 @@ import EditForm from './Forms/EditForm';
 import GeneralForm from './Forms/GeneralForm';
 import { CycleData, StageData, StageInfoData } from './Content';
 
-
 export default function ColapsableMenu({
   cycleData,
   stageData,
@@ -84,7 +83,7 @@ export default function ColapsableMenu({
           }}>
             <Tabs.List>
               <Tabs.Tab value="general">General Information</Tabs.Tab>
-              <Tabs.Tab value="stages">Stages</Tabs.Tab>
+              <Tabs.Tab value="stages" >Stages</Tabs.Tab>
 
               <CollapseButton onClick={() => { }} />
 
@@ -128,7 +127,7 @@ export default function ColapsableMenu({
             </Tabs.Panel>
           </Tabs>
         </Tabs.Panel>
-      </Tabs>
+      </Tabs >
     </aside >
   );
 }
