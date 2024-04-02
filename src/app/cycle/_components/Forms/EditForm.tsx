@@ -1,6 +1,6 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Button, Input, Modal, ScrollArea } from '@mantine/core';
+import { Box, Button, Flex, Input, Menu, Modal, ScrollArea, Stack, Table } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
@@ -9,6 +9,8 @@ import { StageInfoData } from '../Content';
 import { useForm } from 'react-hook-form';
 import { updateStage } from '@/lib/services';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
+import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from 'mantine-react-table';
+import clsx from 'clsx';
 
 
 const EditForm = ({
@@ -95,6 +97,53 @@ const EditFormContent = ({
     }
   }, [data, setValue])
 
+  const [tableData, setTableData] = React.useState<{ process_stage_name: string; created_datetime: string; }[]>([{
+    "created_datetime": "2023-06-07 06:45:16",
+    "process_stage_name": "RGO-01-01-Contract-Executive"
+  }, {
+    "created_datetime": "2023-06-07 06:45:16",
+    "process_stage_name": "RGO-01-01-Contract-Executive"
+  }, {
+    "created_datetime": "2023-06-07 06:45:16",
+    "process_stage_name": "RGO-01-01-Contract-Executive"
+  }, {
+    "created_datetime": "2023-06-07 06:45:16",
+    "process_stage_name": "RGO-01-01-Contract-Executive"
+  }, {
+    "created_datetime": "2023-06-07 06:45:16",
+    "process_stage_name": "RGO-01-01-Contract-Executive"
+  }]);
+
+  const columns: MRT_ColumnDef<{ process_stage_name: string; created_datetime: string; }>[] = [
+    {
+      header: 'Stage Name',
+      accessorFn: (originalRow) => originalRow.process_stage_name,
+    },
+    {
+      header: 'Date created',
+      accessorFn: (originalRow) => originalRow.created_datetime,
+    },
+  ];
+  const table = useMantineReactTable({
+    columns,
+    data: React.useMemo(() => tableData, [tableData]),
+    // initialState: {
+    //   pagination: { pageSize: 5, pageIndex: 0 },
+    // },
+    // enableStickyHeader: true,
+    // mantineTableContainerProps: {
+    //   mah: '40'
+    // },
+    mantinePaginationProps: {
+      rowsPerPageOptions: ['5', '10', '15'],
+      showRowsPerPage: false,
+    },
+    paginationDisplayMode: 'pages',
+  });
+
+  // React.useEffect(() => {
+  //   setTableData();
+  // }, []);
 
   return (
     <ScrollArea.Autosize mah={768}>
@@ -118,6 +167,64 @@ const EditFormContent = ({
               }} />
             {!disabled && <ActionButtons {...{ name, value, toggleEdit }} />}
           </Input.Wrapper>
+        ) : ['List of previous stage', 'List of next stage'].includes(label) ? (
+          <Input.Wrapper key={index} label={label} classNames={{
+            root: 'px-14',
+            label: '!text-sm !font-semibold',
+          }}>
+            <Stack>
+              <TextareaHeader isTable {...{ table }} />
+              <Table
+                captionSide="top"
+                fz="md"
+                highlightOnHover
+                horizontalSpacing='xl'
+                verticalSpacing="xs"
+                withRowBorders={false}
+                m="0"
+                classNames={{
+                  table: 'bg-[#F1F4F5]',
+                  // thead: 'sticky bg-[#F1F4F5]/95',
+                  th: 'border-b border-[#E0E0E0]',
+                }}
+              >
+                <ScrollArea.Autosize mah={150} classNames={{
+                  thumb: '!bg-[#BDBDBD] z-10',
+                }}>
+                  <Table.Thead>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <Table.Tr key={headerGroup.id} >
+                        {headerGroup.headers.map((header) => (
+                          <Table.Th key={header.id}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                header.column.columnDef.Header ??
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                          </Table.Th>
+                        ))}
+                      </Table.Tr>
+                    ))}
+                  </Table.Thead>
+
+                  <Table.Tbody>
+                    {table.getRowModel().rows.map((row) => (
+                      <Table.Tr key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                          <Table.Td key={cell.id}>
+                            <MRT_TableBodyCellValue cell={cell} table={table} />
+                          </Table.Td>
+                        ))}
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </ScrollArea.Autosize>
+              </Table>
+              <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
+            </Stack>
+          </Input.Wrapper>
         ) : (
           <Input.Wrapper
             key={index}
@@ -136,7 +243,6 @@ const EditFormContent = ({
               autosize
               minRows={4}
               classNames={{
-
                 input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
               }}
             />
@@ -148,13 +254,21 @@ const EditFormContent = ({
   )
 }
 
-export const TextareaHeader = () => (
-  <div className='flex bg-[#D9D9D9] mt-4 rounded-t-lg'>
-    <div className="flex ml-auto p-1">
-      <Icon icon="tabler:chevron-down" width="1rem" height="1rem" rotate={45} className='cursor-pointer hover:text-black/70' />
-      <Icon icon="tabler:chevron-down" width="1rem" height="1rem" rotate={-45} className='cursor-pointer hover:text-black/70' />
-    </div>
-  </div>
+export const TextareaHeader = ({ isTable, table }: {
+  isTable?: boolean;
+  table?: any;
+}) => (
+  <div className={clsx('flex bg-[#D9D9D9] rounded-t-lg mt-4', !isTable && 'min-h-10', isTable && ' -mb-4')}>
+    <Flex justify="space-between" align="center" classNames={{
+      root: 'py-1 px-2 pr-4 w-full',
+    }}>
+      {isTable && <MRT_TablePagination table={table} classNames={{
+        root: '',
+        control: 'bg-transparent border-none text-sm text-black/60 font-semibold hover:bg-[#895CF3] hover:text-white/90',
+      }} />}
+      {!isTable && <Icon icon="ph:code-bold" width="1.2rem" height="1.2rem" className='ml-auto cursor-pointer text-black/70 hover:text-black/50' />}
+    </Flex>
+  </div >
 )
 
 const ActionButtons = ({
@@ -169,15 +283,6 @@ const ActionButtons = ({
   <div className="text-right ml-auto space-x-4 mt-4" >
     <Button color='#DC3545' radius='md' className="!font-normal" onClick={toggleEdit}>Cancel</Button>
     <Button key={name} id={name} type='submit' color='#28A745' radius='md' className="!font-normal"
-    // onClick={async (e) => {
-    //   e.preventDefault();
-    //   console.log('value:', value)
-    //   // await updateStage({
-    //   //   stage_uuid: '328f3d0e-1005-11ee-99e0-02467045bd9a', // draft
-    //   //   field_name: "list_user",
-    //   //   body: { value: value as string }
-    //   // })
-    // }}
     >Save</Button>
     <Button color='#1C1454' radius='md' className="!font-normal" onClick={() => { }}>Verify syntax</Button>
     <Button color='#FF6347' radius='md' className="!font-normal" onClick={() => { }}>Evaluate semantics</Button>

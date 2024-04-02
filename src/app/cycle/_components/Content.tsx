@@ -222,7 +222,7 @@ const TabularSection = ({ opened,
   const [tableData, setTableData] = React.useState<CycleData[]>([]);
   const router = useRouter();
   const pathname = usePathname();
-  console.log('pathname:', pathname)
+ 
   const searchParams = useSearchParams();
 
   const createQueryString = React.useCallback(
