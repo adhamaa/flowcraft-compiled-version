@@ -1,11 +1,12 @@
 'use client';
-import { Button, ColorInput, Group, Input, Stack, Switch, Tabs, useMantineColorScheme } from "@mantine/core";
+import { Anchor, Avatar, Button, ColorInput, Group, Input, Stack, Switch, Tabs, useMantineColorScheme } from "@mantine/core";
 import Image from "next/image";
 import { Icon } from '@iconify-icon/react';
 import * as React from 'react'
 import { useSideMenu } from "@/hooks/useSideMenu";
 import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
+import Link from "next/link";
 
 function Header({ darkmode = false, className }: { darkmode?: boolean; className?: string }) {
   const router = useRouter();
@@ -19,6 +20,8 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
     keepTransitions: true,
   });
   const isLight = colorScheme === "light";
+
+  const profileImg = true;
 
   const toggleSideMenu = () => {
     setLayoutColSpan(layoutColSpan === 0 ? 10 : 0)
@@ -48,10 +51,23 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
           <Tabs.Tab value="cycle" >Cycle</Tabs.Tab>
           <Tabs.Tab value="about">About</Tabs.Tab>
           <Tabs.Tab value="documentation">Documentation</Tabs.Tab>
+          <Tabs.Tab value="maintenance">Maintenance</Tabs.Tab>
         </Tabs.List>
       </Tabs>
 
       <div className="flex items-center gap-4">
+        <Anchor
+          component="button"
+          disabled
+          // href="#"
+          // target="_blank"
+          onClick={() => console.log("clicked")}
+          underline="hover"
+          c="#895CF3"
+          className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[#895CF3] dark:hover:text-[#895CF3] transition-all duration-300 ease-in-out"
+        >
+          How To Use?
+        </Anchor>
         <Input
           type="search"
           leftSectionPointerEvents="auto"
@@ -66,6 +82,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
             input: '!rounded-lg !border-none p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent focus:!bg-white transition-all duration-300 ease-in-out !bg-[#F1F4F5]',
           }}
         />
+        {profileImg ? <Avatar src="/profile_image.png" alt="it's me" /> : <Avatar color="#895CF3" radius="xl">AA</Avatar>}
         {darkmode && <Switch
           ref={switchRef}
           classNames={{

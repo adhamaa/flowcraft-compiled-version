@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useSideMenu } from '@/hooks/useSideMenu';
 import Image from 'next/image';
 import AppListConst from '@/appList.json';
-import { Button, Collapse, Menu, ScrollArea, UnstyledButton } from '@mantine/core';
+import { ActionIcon, Box, Button, Collapse, Menu, MenuItem, ScrollArea, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Icon } from '@iconify-icon/react';
 
@@ -133,7 +133,7 @@ export default function HomeContent({
 
 export const TitleSection = ({ title }: { title: string }) => {
   return (
-    <section className='px-20 py-10 border'>
+    <section className='px-20 py-10'>
       <h1 className='font-bold text-xl'>{title}</h1>
     </section>
   )
@@ -151,6 +151,7 @@ const ApplicationSection = ({
   cycleData: CycleData[];
 }) => {
   const searchParams = useSearchParams();
+  const selected_app_param = searchParams.get('selected_app');
   const router = useRouter();
   const pathname = usePathname();
   const createQueryString = React.useCallback(
@@ -164,18 +165,17 @@ const ApplicationSection = ({
     },
     [searchParams]
   )
-  const [isPending, startTransition] = React.useTransition();
 
   const listApps = applicationData
 
   return (
-    <section className='px-20 py-1 border bg-[#EBEAEA]'>
+    <section className='px-20 py-1 bg-[#F1F5F9] shadow-[inset_4px_4px_10px_0_rgb(203_213_225_/_0.25)]'> {/* #CBD5E140 */}
       <div className="p-4">
         <div className={clsx("flex items-center")}>
           <h2 className='font-bold text-lg'>Appplications</h2>
           <UnstyledButton className='ml-auto text-sm' onClick={toggle} color='blue'>
-            <span className='flex items-center gap-2'>
-              Hide
+            <span className='flex items-center gap-2 text-[#895CF3]'>
+              {opened ? 'Hide' : 'Unhide'}
               <Icon icon="tabler:chevron-down" width="1rem" height="1rem" rotate={opened ? 90 : 0} />
             </span>
           </UnstyledButton>
@@ -185,20 +185,23 @@ const ApplicationSection = ({
             {Object.keys(listApps).map((app, index) => {
               const selected_app = listApps[app][0].apps_label;
               const handleAppClick = () => router.push(pathname + "?" + createQueryString('selected_app', selected_app));
+              const logoImg = "/claims_logo.svg";
               return (
                 <Button
                   key={index}
                   variant='default'
                   classNames={{
-                    root: '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none',
+                    root: selected_app != selected_app_param ? '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none' : '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none shadow-[#895CF3]/30',
                     label: 'flex flex-col items-center justify-center gap-2',
                   }}
                   onClick={handleAppClick}
                 >
-                  <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
-                    <p className='w-20 whitespace-pre-wrap'>FREE DEMO</p>
-                  </div>
-                  <p className='truncate text-sm text-[#895CF3]'>{app}</p>
+                  {logoImg ? <Image src={logoImg} width={opened ? 400 : 600} height={opened ? 500 : 700} className={clsx('object-cover',
+                  )} alt='process illustration' /> :
+                    <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
+                      <p className='w-20 whitespace-pre-wrap'>FREE DEMO</p>
+                    </div>}
+                  <p className='truncate text-sm text-[#4F4F4F]'>{app}</p>
                 </Button>
               )
             })}
@@ -222,7 +225,7 @@ const TabularSection = ({ opened,
   const [tableData, setTableData] = React.useState<CycleData[]>([]);
   const router = useRouter();
   const pathname = usePathname();
- 
+
   const searchParams = useSearchParams();
 
   const createQueryString = React.useCallback(
@@ -277,7 +280,7 @@ const TabularSection = ({ opened,
     {
       header: 'Status',
       accessorFn: (originalRow) => originalRow.cycle_active,
-    },
+    }
   ];
   const table = useMantineReactTable({
     columns,
@@ -293,13 +296,35 @@ const TabularSection = ({ opened,
       'mrt-row-actions': {
         header: '', //change header text
         size: 5, //make actions column wider
+
       },
     },
-    renderRowActionMenuItems: ({ row }) => (
-      <>
-        <Menu.Item onClick={() => console.info('reload')}>Reload</Menu.Item>
-        <Menu.Item onClick={() => console.info('Delete')}>Delete</Menu.Item>
-      </>
+    renderRowActions: ({ row }) => (
+      <Menu classNames={{
+        item: 'hover:bg-[#FBFAFC] hover:text-[#895CF3] hover:!border-r-2 border-[#895CF3] ring-0',
+        dropdown: '!p-0 ring-0',
+      }}>
+        <Menu.Target>
+          <ActionIcon variant="transparent" color="black" size="lg" radius="md" aria-label="Settings">
+            <Icon className='cursor-pointer rounded' icon="tabler:dots" width="1.25rem" height="1.25rem" />
+          </ActionIcon>
+        </Menu.Target>
+
+        <Menu.Dropdown>
+          <div className="border-r-[3px] hover:border-[#895CF3]">
+            <Menu.Item onClick={() => console.info('reload')}>Add new cycle</Menu.Item>
+          </div>
+          <div className="border-r-[3px] hover:border-[#895CF3]">
+            <Menu.Item onClick={() => console.info('Delete')}>Delete cycle</Menu.Item>          </div>
+          <div className="border-r-[3px] hover:border-[#895CF3]">
+            <Menu.Item onClick={() => console.info('Delete')}>Duplicate cycle</Menu.Item>
+          </div>
+          <Menu.Divider className='!m-0' />
+          <div className="border-r-[3px] hover:border-[#895CF3]">
+            <Menu.Item onClick={() => console.info('Delete')}>Reload Business Process</Menu.Item>
+          </div>
+        </Menu.Dropdown>
+      </Menu>
     ),
     //customize the MRT components
     mantinePaginationProps: {
@@ -343,44 +368,18 @@ const TabularSection = ({ opened,
                 }} />
               {isPagination && <MRT_TablePagination table={table} />}
 
-              <div className='flex ml-4 gap-4'>
-                <Button
-                  leftSection={
-                    <Icon
-                      icon="mi:filter"
-                      width="1.125rem"
-                      height="1.125rem"
-                      className=''
-                    />
-                  }
-                  variant="default"
-                  radius="md"
-                  classNames={{
-                    root: '!border-2 !border-[#895CF3]',
-                    label: 'font-normal'
-                  }}
-                >
-                  Filter
-                </Button>
-                <Button
-                  leftSection={
-                    <Icon
-                      icon="mi:sort"
-                      width="1.125rem"
-                      height="1.125rem"
-                      className=''
-                    />
-                  }
-                  variant="default"
-                  radius="md"
-                  classNames={{
-                    root: '!border-2 !border-[#895CF3]',
-                    label: 'font-normal'
-                  }}
-                >
-                  Sort
-                </Button>
+              <div className='flex ml-2 gap-4'>
+                <ActionIcon variant="light" color="gray" size="lg" radius="md" aria-label="Settings">
+                  <Icon icon="heroicons-outline:refresh" width="1rem" height="1rem" />
+                </ActionIcon>
+                <ActionIcon variant="light" color="gray" size="lg" radius="md" aria-label="Settings">
+                  <Icon icon="heroicons-outline:adjustments" width="1rem" height="1rem" />
+                </ActionIcon>
+                <ActionIcon variant="light" color="gray" size="lg" radius="md" aria-label="Settings">
+                  <Icon icon="heroicons-outline:switch-vertical" width="1rem" height="1rem" />
+                </ActionIcon>
               </div>
+
             </Flex>
             <div className="overflow-auto w-screen">
               <Table
