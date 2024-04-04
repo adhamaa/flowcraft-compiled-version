@@ -25,6 +25,7 @@ import clsx from 'clsx';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'url';
 import { useGlobalState } from '@/hooks/useGlobalState';
+import { useData } from '@/hooks/useData';
 
 export type ApplicationData = {
   apps_label: string;
@@ -149,7 +150,6 @@ const ApplicationSection = ({
   applicationData: ApplicationData[];
   cycleData: CycleData[];
 }) => {
-  console.log('applicationData:', applicationData)
   const { selectedApp, setSelectedApp } = useGlobalState();
   const searchParams = useSearchParams();
   const selected_app_param = searchParams.get('selected_app');
@@ -167,7 +167,8 @@ const ApplicationSection = ({
     [searchParams]
   )
 
-  const listApps = applicationData
+  const listApps = useData().get.applications();
+  console.log('listApps:', listApps)
 
   return (
     <section className='px-20 py-1 bg-[#F1F5F9] shadow-[inset_4px_4px_10px_0_rgb(203_213_225_/_0.25)]'> {/* #CBD5E140 */}
@@ -183,7 +184,7 @@ const ApplicationSection = ({
         </div>
         <Collapse in={opened}>
           <div className="flex gap-7 pt-7">
-            {listApps.map(({ apps_label, apps_name }, index) => {
+            {applicationData.map(({ apps_label, apps_name }, index) => {
               const handleAppClick = () => {
                 setSelectedApp(apps_name);
                 router.push(pathname + "?" + createQueryString('selected_app', apps_label))

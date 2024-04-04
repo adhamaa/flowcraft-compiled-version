@@ -8,7 +8,7 @@ export const useData = () => {
       applications: async () => {
         return useQuery({
           queryKey: ["applications"],
-          queryFn: async () => getApplicationList(),
+          queryFn: () => getApplicationList(),
         });
       }
     },

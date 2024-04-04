@@ -20,6 +20,7 @@ export default function ColapsableMenu({
   stageData: StageData[];
   // stageInfoData: StageInfoData;
 }) {
+  console.log('stageData:', stageData)
   const [stageInfo, setStageInfo] = React.useState<StageInfoData>()
   const searchParams = useSearchParams();
   const params = useParams();
@@ -141,46 +142,6 @@ export default function ColapsableMenu({
   );
 }
 
-const menuItems = [
-  {
-    id: '1',
-    label: 'Menu 1',
-    children: [
-      {
-        id: '1-1',
-        label: 'Submenu 1-1',
-        children: [
-          {
-            id: '1-1-1',
-            label: 'Submenu 1-1-1'
-          },
-          {
-            id: '1-1-2',
-            label: 'Submenu 1-1-2'
-          }
-        ]
-      },
-      {
-        id: '1-2',
-        label: 'Submenu 1-2'
-      }
-    ]
-  },
-  {
-    id: '2',
-    label: 'Menu 2'
-  },
-  {
-    id: '3',
-    label: 'Menu 3',
-    children: [
-      {
-        id: '3-1',
-        label: 'Submenu 3-1'
-      }
-    ]
-  },
-];
 
 export const SideMenuComponent = ({ menuItems, menuItem }: { menuItems?: MenuItem[]; menuItem?: MenuItem }) => {
   const [activeTab, setActiveTab] = React.useState<string | null>();

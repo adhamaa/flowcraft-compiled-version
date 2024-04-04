@@ -15,7 +15,7 @@ async function HomePage({
 
   return (
     <div className="flex h-[calc(100vh-66px)]">
-      <HomeContent applicationData={applicationData} cycleData={cycleData} />
+      <HomeContent {...{ applicationData, cycleData }} />
     </div>
   )
 }

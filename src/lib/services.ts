@@ -1,4 +1,4 @@
-'use server';
+// 'use server';
 
 import { revalidatePath, revalidateTag } from "next/cache";
 
@@ -191,7 +191,7 @@ export const updateStage = async ({
   // if (!response.ok) {
   //   throw new Error('Failed to update stage.');
   // }
-  revalidateTag('stageinfo');
+  // revalidateTag('stageinfo');
   return response;
 };
 
