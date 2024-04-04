@@ -1,3 +1,4 @@
+import { GlobalStateProvider } from '@/hooks/useGlobalState';
 import { SideMenuProvider } from '@/hooks/useSideMenu'
 import { MantineProvider, createTheme } from '@mantine/core'
 import * as React from 'react'
@@ -14,7 +15,9 @@ const Providers = ({
   return (
     <MantineProvider theme={theme}>
       <SideMenuProvider >
-        {children}
+        <GlobalStateProvider>
+          {children}
+        </GlobalStateProvider>
       </SideMenuProvider>
     </MantineProvider>
   )

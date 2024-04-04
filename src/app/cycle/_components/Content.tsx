@@ -24,6 +24,7 @@ import { Flex, Stack, Table } from '@mantine/core';
 import clsx from 'clsx';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'url';
+import { useGlobalState } from '@/hooks/useGlobalState';
 
 export type ApplicationData<T extends string> = {
   [key in T]: {
@@ -150,6 +151,8 @@ const ApplicationSection = ({
   applicationData: ApplicationData<string>;
   cycleData: CycleData[];
 }) => {
+  const { selectedApp, setSelectedApp } = useGlobalState();
+  console.log('selectedApp:', selectedApp)
   const searchParams = useSearchParams();
   const selected_app_param = searchParams.get('selected_app');
   const router = useRouter();
@@ -172,7 +175,7 @@ const ApplicationSection = ({
     <section className='px-20 py-1 bg-[#F1F5F9] shadow-[inset_4px_4px_10px_0_rgb(203_213_225_/_0.25)]'> {/* #CBD5E140 */}
       <div className="p-4">
         <div className={clsx("flex items-center")}>
-          <h2 className='font-bold text-lg'>Appplications</h2>
+          <h2 className='font-bold text-lg'>Appplications</h2>&nbsp;{selectedApp && <span>{`(${selectedApp})`}</span>}
           <UnstyledButton className='ml-auto text-sm' onClick={toggle} color='blue'>
             <span className='flex items-center gap-2 text-[#895CF3]'>
               {opened ? 'Hide' : 'Unhide'}
@@ -184,8 +187,12 @@ const ApplicationSection = ({
           <div className="flex gap-7 pt-7">
             {Object.keys(listApps).map((app, index) => {
               const selected_app = listApps[app][0].apps_label;
-              const handleAppClick = () => router.push(pathname + "?" + createQueryString('selected_app', selected_app));
+              const handleAppClick = () => {
+                setSelectedApp(app);
+                router.push(pathname + "?" + createQueryString('selected_app', selected_app))
+              };
               const logoImg = "/claims_logo.svg";
+
               return (
                 <Button
                   key={index}

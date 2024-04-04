@@ -7,11 +7,12 @@ import { useSideMenu } from "@/hooks/useSideMenu";
 import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
 import Link from "next/link";
+import { useGlobalState } from "@/hooks/useGlobalState";
 
 function Header({ darkmode = false, className }: { darkmode?: boolean; className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
-
+  const { selectedApp, setSelectedApp } = useGlobalState();
   const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
 
   const [activeTab, setActiveTab] = React.useState<string | null>(pathname.split('/')[1] || '/');
@@ -38,7 +39,10 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
     <header className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-8 gap-4 w-screen', className)}>
       <h1
         className="text-2xl font-bold cursor-pointer transition-all duration-300 ease-in-out hover:text-[#895CF3] dark:hover:text-[#895CF3]"
-        onClick={() => router.push("/")}
+        onClick={() => {
+          setSelectedApp('');
+          router.push("/")
+        }}
       >Flowcraft</h1>
       <Tabs
         classNames={{
