@@ -78,11 +78,12 @@ const EditFormContent = ({
 
   const onSubmit = async (data: any, e: any) => {
     const target_id = e.nativeEvent.submitter.id
+    const value = target_id === 'process_stage_name' ? data[target_id] : JSON.parse(data[target_id]);
 
     await updateStage({
       stage_uuid: stage_uuid as string,
       field_name: target_id,
-      body: { value: JSON.parse(data[target_id]) }
+      body: { value }
     })
   }
 

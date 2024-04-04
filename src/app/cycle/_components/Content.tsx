@@ -26,12 +26,10 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'url';
 import { useGlobalState } from '@/hooks/useGlobalState';
 
-export type ApplicationData<T extends string> = {
-  [key in T]: {
-    apps_label: string;
-    cycle_descriptions: string;
-    cycle_id: string;
-  }[];
+export type ApplicationData = {
+  apps_label: string;
+  apps_name: string;
+  cycle: CycleData[];
 };
 
 export type CycleData = {
@@ -113,7 +111,7 @@ export default function HomeContent({
   applicationData,
   cycleData
 }: {
-  applicationData: ApplicationData<string>;
+  applicationData: ApplicationData[];
   cycleData: CycleData[]
 }) {
   const { layoutColSpan } = useSideMenu();
@@ -148,11 +146,11 @@ const ApplicationSection = ({
 }: {
   opened: boolean;
   toggle: () => void;
-  applicationData: ApplicationData<string>;
+  applicationData: ApplicationData[];
   cycleData: CycleData[];
 }) => {
+  console.log('applicationData:', applicationData)
   const { selectedApp, setSelectedApp } = useGlobalState();
-  console.log('selectedApp:', selectedApp)
   const searchParams = useSearchParams();
   const selected_app_param = searchParams.get('selected_app');
   const router = useRouter();
@@ -185,11 +183,10 @@ const ApplicationSection = ({
         </div>
         <Collapse in={opened}>
           <div className="flex gap-7 pt-7">
-            {Object.keys(listApps).map((app, index) => {
-              const selected_app = listApps[app][0].apps_label;
+            {listApps.map(({ apps_label, apps_name }, index) => {
               const handleAppClick = () => {
-                setSelectedApp(app);
-                router.push(pathname + "?" + createQueryString('selected_app', selected_app))
+                setSelectedApp(apps_name);
+                router.push(pathname + "?" + createQueryString('selected_app', apps_label))
               };
               const logoImg = "/claims_logo.svg";
 
@@ -198,7 +195,7 @@ const ApplicationSection = ({
                   key={index}
                   variant='default'
                   classNames={{
-                    root: selected_app != selected_app_param ? '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none' : '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none shadow-[#895CF3]/30',
+                    root: apps_label != selected_app_param ? '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none' : '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none shadow-[#895CF3]/30',
                     label: 'flex flex-col items-center justify-center gap-2',
                   }}
                   onClick={handleAppClick}
@@ -208,7 +205,7 @@ const ApplicationSection = ({
                     <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
                       <p className='w-20 whitespace-pre-wrap'>FREE DEMO</p>
                     </div>}
-                  <p className='truncate text-sm text-[#4F4F4F]'>{app}</p>
+                  <p className='truncate text-sm text-[#4F4F4F]'>{apps_name}</p>
                 </Button>
               )
             })}

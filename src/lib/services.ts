@@ -122,8 +122,8 @@ export const getStageInfo = async ({
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    // next: { tags: ['stageinfo', stage_uuid] },
-    cache: 'no-store'
+    next: { tags: ['stageinfo', stage_uuid] },
+    // cache: 'no-store'
   });
   if (response.status === 404) {
     return {};

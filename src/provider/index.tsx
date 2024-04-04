@@ -1,11 +1,15 @@
+"use client";
+import * as React from 'react'
 import { GlobalStateProvider } from '@/hooks/useGlobalState';
 import { SideMenuProvider } from '@/hooks/useSideMenu'
 import { MantineProvider, createTheme } from '@mantine/core'
-import * as React from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const theme = createTheme({
   fontFamily: 'inherit',
 });
+
+const queryClient = new QueryClient()
 
 const Providers = ({
   children,
@@ -14,11 +18,13 @@ const Providers = ({
 }) => {
   return (
     <MantineProvider theme={theme}>
-      <SideMenuProvider >
-        <GlobalStateProvider>
-          {children}
-        </GlobalStateProvider>
-      </SideMenuProvider>
+      <QueryClientProvider client={queryClient}>.
+        <SideMenuProvider >
+          <GlobalStateProvider>
+            {children}
+          </GlobalStateProvider>
+        </SideMenuProvider>
+      </QueryClientProvider>
     </MantineProvider>
   )
 }
