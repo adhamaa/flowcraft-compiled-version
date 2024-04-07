@@ -1,6 +1,8 @@
+'use client';
+
 /* eslint-disable react-hooks/rules-of-hooks */
 import { getApplicationList } from "@/lib/services";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 export const useData = () => {
   return {

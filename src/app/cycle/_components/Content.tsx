@@ -26,6 +26,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { format } from 'url';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import { useData } from '@/hooks/useData';
+import { useQuery } from '@tanstack/react-query';
 
 export type ApplicationData = {
   apps_label: string;
@@ -167,14 +168,29 @@ const ApplicationSection = ({
     [searchParams]
   )
 
-  const listApps = useData().get.applications();
-  console.log('listApps:', listApps)
+  // const listApps = useQuery({
+  //   queryKey: ["applications"],
+  //   queryFn: async () => await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/businessProcess/listAppsBizProcess`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+  //     },
+  //   })).json(),
+  // }).data.result;
+  // console.log('listApps:', listApps)
+
+
 
   return (
-    <section className='px-20 py-1 bg-[#F1F5F9] shadow-[inset_4px_4px_10px_0_rgb(203_213_225_/_0.25)]'> {/* #CBD5E140 */}
-      <div className="p-4">
+    <section className={clsx('px-20 py-1 bg-[#F1F5F9]',
+      'shadow-[inset_4px_4px_10px_0_rgb(203_213_225_/_0.25)]'
+    )} > {/* #CBD5E140 */}
+      <div className="p-4" >
         <div className={clsx("flex items-center")}>
-          <h2 className='font-bold text-lg'>Appplications</h2>&nbsp;{selectedApp && <span>{`(${selectedApp})`}</span>}
+          <h2 className='font-bold text-lg'>Appplications</h2>
+          &nbsp;
+          {selectedApp && <span>{`(${selectedApp})`}</span>}
           <UnstyledButton className='ml-auto text-sm' onClick={toggle} color='blue'>
             <span className='flex items-center gap-2 text-[#895CF3]'>
               {opened ? 'Hide' : 'Unhide'}
@@ -212,8 +228,8 @@ const ApplicationSection = ({
             })}
           </div>
         </Collapse>
-      </div>
-    </section>
+      </div >
+    </section >
   )
 };
 

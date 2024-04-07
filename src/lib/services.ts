@@ -68,7 +68,7 @@ export const getCycleList = async ({
       cycle_id: (item.cycle_id).toString(),
     }));
 
-  return stringifyObjectValues;
+  return await stringifyObjectValues;
 };
 
 export const getStageList = async ({

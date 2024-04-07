@@ -20,7 +20,6 @@ export default function ColapsableMenu({
   stageData: StageData[];
   // stageInfoData: StageInfoData;
 }) {
-  console.log('stageData:', stageData)
   const [stageInfo, setStageInfo] = React.useState<StageInfoData>()
   const searchParams = useSearchParams();
   const params = useParams();
