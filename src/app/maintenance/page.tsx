@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { TitleSection } from '../cycle/_components/Content'
 
-const DocumentationPage = () => {
+const MaintenancePage = () => {
   return (
     <div className=''>
-      <TitleSection title='Documentation' />
+      <TitleSection title='Maintenance' />
     </div>
   )
 }
 
-export default DocumentationPage
+export default MaintenancePage

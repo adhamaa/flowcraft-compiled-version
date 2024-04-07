@@ -8,8 +8,7 @@ export default async function Layout({
 }) {
 
   return (
-    <div className={clsx('grid grid-rows-[4rem_auto] h-screen transition-all duration-300 overflow-hidden')}
-    >
+    <div>
       {children}
     </div>
   );

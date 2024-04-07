@@ -3,7 +3,9 @@ import { TitleSection } from '../cycle/_components/Content'
 
 const AboutPage = () => {
   return (
-    <div className=''><TitleSection title='About Flowcraft' /></div>
+    <div className=''>
+      <TitleSection title='About Flowcraft' />
+    </div>
   )
 }
 

@@ -18,7 +18,7 @@ const Providers = ({
 }) => {
   return (
     <MantineProvider theme={theme}>
-      <QueryClientProvider client={queryClient}>.
+      <QueryClientProvider client={queryClient}>
         <SideMenuProvider >
           <GlobalStateProvider>
             {children}
