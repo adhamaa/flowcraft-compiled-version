@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { Icon } from '@iconify-icon/react';
-import { Accordion, Button, ScrollArea, Tabs, Transition, rem } from '@mantine/core';
+import { Accordion, ActionIcon, Button, ScrollArea, Tabs, Transition, rem } from '@mantine/core';
 import { MenuItem, useSideMenu } from '@/hooks/useSideMenu';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
@@ -10,6 +10,7 @@ import EditForm from './Forms/EditForm';
 import GeneralForm from './Forms/GeneralForm';
 import { CycleData, StageData, StageInfoData } from './Content';
 import { getStageInfo } from '@/lib/services';
+import { useDisclosure } from '@mantine/hooks';
 
 export default function ColapsableMenu({
   cycleData,
@@ -20,6 +21,8 @@ export default function ColapsableMenu({
   stageData: StageData[];
   // stageInfoData: StageInfoData;
 }) {
+  const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
+  console.log('isSideMenuCollapse:', isSideMenuCollapse)
   const [stageInfo, setStageInfo] = React.useState<StageInfoData>()
   const searchParams = useSearchParams();
   const params = useParams();
@@ -28,6 +31,8 @@ export default function ColapsableMenu({
   const selected_app = searchParams.get('selected_app');
   const stage_uuid = searchParams.get('stage_uuid');
   const cycle_id = params.cycle_id;
+
+  const sideMenuLayer = stage_uuid ? 3 : 2;
 
   const createQueryString = React.useCallback(
     (name: string, value: string) => {
@@ -40,6 +45,12 @@ export default function ColapsableMenu({
     },
     [searchParams]
   )
+
+  const removeQueryString = (param: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete(param)
+    return params.toString()
+  };
 
   return (
     <aside
@@ -55,9 +66,13 @@ export default function ColapsableMenu({
       }}>
         <Tabs.List>
           <></>
-          <Tabs.Tab value="cycle" className=''>Cycle</Tabs.Tab>
+          <Tabs.Tab value="cycle" className=''>
+            <ActionIcon variant="filled" color="#895CF3" size="lg" radius="md" aria-label="Settings" >
+              <Icon className='cursor-pointer rounded' icon="heroicons-outline:refresh" width="1rem" height="1rem" />
+            </ActionIcon>
+          </Tabs.Tab>
 
-          <CollapseButton onClick={() => { }} />
+          <FooterButton isCollapse onClick={toggleSideMenuCollapse} />{/* ! main collapse button */}
 
         </Tabs.List>
         <Tabs.Panel value="cycle">
@@ -67,10 +82,14 @@ export default function ColapsableMenu({
             tabLabel: 'text-lg',
             panel: ''
           }}>
-            <Tabs.List>
+            {!isSideMenuCollapse && <Tabs.List>
               <></>
-              <Tabs.Tab value="general">General Information</Tabs.Tab>
-              <Tabs.Tab value="stages"
+              <Tabs.Tab
+                value="general"
+                onClick={() => router.replace(pathname + '?' + removeQueryString('stage_uuid'))
+                }>General Information</Tabs.Tab>
+              <Tabs.Tab
+                value="stages"
                 onClick={
                   async () => {
                     router.push(pathname + '?' + createQueryString('stage_uuid', stageData[0]?.stage_uuid as string));
@@ -84,9 +103,9 @@ export default function ColapsableMenu({
                 }
               >Stages</Tabs.Tab>
 
-              <CollapseButton onClick={() => { }} />
-
-            </Tabs.List>
+              {/* {sideMenuLayer === 2 && <FooterButton isCollapse onClick={() => { }} />
+              } */}
+            </Tabs.List>}
             <Tabs.Panel value="general">
               <GeneralForm data={cycleData} />
             </Tabs.Panel>
@@ -112,7 +131,7 @@ export default function ColapsableMenu({
                 }}
               >
                 {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
-                {!!stageData.length && <Tabs.List>
+                {!isSideMenuCollapse && (!!stageData.length && <Tabs.List>
                   <></>
                   <ScrollArea.Autosize mah={768}>
                     {stageData?.map((stage) => (
@@ -125,8 +144,8 @@ export default function ColapsableMenu({
 
                   </ScrollArea.Autosize>
 
-                  <CollapseButton onClick={() => { }} />
-                </Tabs.List>}
+                  <FooterButton isAdd onClick={() => { }} />
+                </Tabs.List>)}
                 {stageData?.map((stage) => (
                   <Tabs.Panel key={stage.stage_uuid} value={stage.stage_uuid}>
                     <EditForm data={stageInfo as StageInfoData} />
@@ -179,22 +198,26 @@ export const SideMenuComponent = ({ menuItems, menuItem }: { menuItems?: MenuIte
   );
 };
 
-const CollapseButton = ({ onClick }: { onClick: () => void }) => {
+const FooterButton = ({ isAdd, isCollapse, onClick }: { isAdd?: boolean; isCollapse?: boolean; onClick: () => void; }) => {
   return (
-    <div className="flex items-end justify-end mt-auto p-2 border-t">
+    <div className="flex items-end justify-end mt-auto py-2 border-t">
       <Button
-        variant='default'
-        classNames={{
-          root: '!border-0 !bg-transparent cursor-pointer !px-0',
-        }}
+        variant='transparent'
+        color='#895CF3'
+        fz={16}
+        {...(isAdd && {
+          leftSection:
+            < Icon className='cursor-pointer rounded' icon="ic:round-plus" width="1.5rem" height="1.5rem" />
+        })}
         onClick={onClick}
       >
-        <Icon
+        {isAdd && "Add stage"}
+        {isCollapse && <Icon
           icon="tabler:chevron-down"
           width="3rem"
           rotate={45}
-          className='text-[#895CF3]' />
+          className='text-[#895CF3]' />}
       </Button>
-    </div>
+    </div >
   );
 }
