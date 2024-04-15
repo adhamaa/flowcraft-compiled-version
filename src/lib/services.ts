@@ -56,7 +56,7 @@ export const getCycleList = async ({
 
   const stringifyObjectValues = cycle_id ?
     data.result.find((item: any) => item.cycle_id === cycle_id) :
-    data.result.map((item: any) => ({
+    data.result?.map((item: any) => ({
       ...item,
       cycle_created: new Date(item.cycle_created).toDateString(),
       cycle_updated: new Date(item.cycle_updated).toDateString(),

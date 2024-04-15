@@ -109,7 +109,7 @@ const EditFormContent = ({
         onSubmit={handleSubmit(onSubmit)}
       >
         <HeaderForm type='edit' {...{ toggleEdit, isEdit, toggleExpand }} />
-        {InputList.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
+        {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
           <Input.Wrapper key={index} label={label} classNames={{
             root: 'px-14',
             label: '!text-sm !font-semibold',

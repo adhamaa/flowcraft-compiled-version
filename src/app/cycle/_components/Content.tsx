@@ -200,7 +200,7 @@ const ApplicationSection = ({
         </div>
         <Collapse in={opened}>
           <div className="flex gap-7 pt-7">
-            {applicationData.map(({ apps_label, apps_name }, index) => {
+            {applicationData?.map(({ apps_label, apps_name }, index) => {
               const handleAppClick = () => {
                 setSelectedApp(apps_name);
                 router.push(pathname + "?" + createQueryString('selected_app', apps_label))

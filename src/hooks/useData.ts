@@ -12,7 +12,8 @@ export const useData = () => {
           queryKey: ["applications"],
           queryFn: () => getApplicationList(),
         });
-      }
+      },
+      
     },
     set: {},
   };

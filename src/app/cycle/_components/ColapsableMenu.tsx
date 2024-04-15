@@ -22,7 +22,6 @@ export default function ColapsableMenu({
   // stageInfoData: StageInfoData;
 }) {
   const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
-  console.log('isSideMenuCollapse:', isSideMenuCollapse)
   const [stageInfo, setStageInfo] = React.useState<StageInfoData>()
   const searchParams = useSearchParams();
   const params = useParams();
@@ -72,7 +71,7 @@ export default function ColapsableMenu({
             </ActionIcon>
           </Tabs.Tab>
 
-          <FooterButton isCollapse onClick={toggleSideMenuCollapse} />{/* ! main collapse button */}
+          <FooterButton {...{ isSideMenuCollapse }} isCollapse onClick={toggleSideMenuCollapse} />{/* ! main collapse button */}
 
         </Tabs.List>
         <Tabs.Panel value="cycle">
@@ -103,7 +102,7 @@ export default function ColapsableMenu({
                 }
               >Stages</Tabs.Tab>
 
-              {/* {sideMenuLayer === 2 && <FooterButton isCollapse onClick={() => { }} />
+              {/* {sideMenuLayer === 2 && <FooterButton {...{isSideMenuCollapse}} isCollapse onClick={() => { }} />
               } */}
             </Tabs.List>}
             <Tabs.Panel value="general">
@@ -144,7 +143,7 @@ export default function ColapsableMenu({
 
                   </ScrollArea.Autosize>
 
-                  <FooterButton isAdd onClick={() => { }} />
+                  <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => { }} />
                 </Tabs.List>)}
                 {stageData?.map((stage) => (
                   <Tabs.Panel key={stage.stage_uuid} value={stage.stage_uuid}>
@@ -198,7 +197,7 @@ export const SideMenuComponent = ({ menuItems, menuItem }: { menuItems?: MenuIte
   );
 };
 
-const FooterButton = ({ isAdd, isCollapse, onClick }: { isAdd?: boolean; isCollapse?: boolean; onClick: () => void; }) => {
+const FooterButton = ({ isAdd, isCollapse, isSideMenuCollapse, onClick }: { isAdd?: boolean; isCollapse?: boolean; isSideMenuCollapse: boolean; onClick: () => void; }) => {
   return (
     <div className="flex items-end justify-end mt-auto py-2 border-t">
       <Button
@@ -215,7 +214,7 @@ const FooterButton = ({ isAdd, isCollapse, onClick }: { isAdd?: boolean; isColla
         {isCollapse && <Icon
           icon="tabler:chevron-down"
           width="3rem"
-          rotate={45}
+          rotate={isSideMenuCollapse ? 15 : 45}
           className='text-[#895CF3]' />}
       </Button>
     </div >
