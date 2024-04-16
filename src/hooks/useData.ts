@@ -1,7 +1,7 @@
 'use client';
 
 /* eslint-disable react-hooks/rules-of-hooks */
-import { getApplicationList, getCycleList, getStageInfo, getStageList, updateCycle } from "@/lib/services";
+import { getApplicationList, getCycleList, getStageInfo, getStageList, updateCycle } from "@/lib/service/client";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 export const useData = () => {

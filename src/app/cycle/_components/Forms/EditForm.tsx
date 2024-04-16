@@ -1,16 +1,18 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Box, Button, Flex, Input, Menu, Modal, ScrollArea, Stack, Table, Tooltip } from '@mantine/core';
+import { Alert, Box, Button, Flex, Input, Menu, Modal, ScrollArea, Stack, Table, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import HeaderForm from './HeaderForm';
 import { StageInfoData } from '../HomeContent';
 import { useForm } from 'react-hook-form';
-import { updateStage } from '@/lib/services';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
+import { updateStage } from '@/lib/service/client';
+import { notifications } from '@mantine/notifications';
+import toast from '@/components/toast';
 
 type stagesData = {
   process_stage_name: string;
@@ -80,11 +82,19 @@ const EditFormContent = ({
     const target_id = e.nativeEvent.submitter.id
     const value = target_id === 'process_stage_name' ? data[target_id] : JSON.parse(data[target_id]);
 
+    const stage_name = InputList.find((input) => input.name === target_id)?.label;
+
     await updateStage({
       stage_uuid: stage_uuid as string,
       field_name: target_id,
       body: { value }
-    })
+    }).then(() => {
+      console.log(`${stage_name} updated successfully`);
+      toast.success(`${stage_name} updated successfully`);
+    }).catch((error) => {
+      console.log('Failed to update stage', error);
+      toast.error('Failed to update stage' + '\n' + error);
+    });
   }
 
   React.useEffect(() => {

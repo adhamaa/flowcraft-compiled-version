@@ -1,6 +1,6 @@
 import * as React from 'react'
 import HomeContent from './_components/HomeContent'
-import { getApplicationList, getCycleList, getStageInfo, getStageList } from '@/lib/services';
+import { getApplicationList, getCycleList, getStageInfo, getStageList } from '@/lib/service/client';
 
 async function HomePage({
   searchParams: { selected_app }

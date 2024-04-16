@@ -3,8 +3,10 @@ import * as React from 'react'
 import { GlobalStateProvider } from '@/hooks/useGlobalState';
 import { SideMenuProvider } from '@/hooks/useSideMenu'
 import { MantineProvider, createTheme } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental'
+import '@mantine/notifications/styles.css';
 const theme = createTheme({
   fontFamily: 'inherit',
 });
@@ -51,6 +53,9 @@ export default function Providers({
   return (
     <MantineProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
+        <Notifications position="top-right" zIndex={1000} classNames={{
+          root: 'w-max'
+        }} />
         <ReactQueryStreamedHydration>
           <SideMenuProvider >
             <GlobalStateProvider>

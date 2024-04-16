@@ -9,7 +9,7 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import EditForm from './Forms/EditForm';
 import GeneralForm from './Forms/GeneralForm';
 import { CycleData, StageData, StageInfoData } from './HomeContent';
-import { getStageInfo } from '@/lib/services';
+import { getStageInfo } from '@/lib/service/client';
 import { useDisclosure } from '@mantine/hooks';
 
 export default function ColapsableMenu({

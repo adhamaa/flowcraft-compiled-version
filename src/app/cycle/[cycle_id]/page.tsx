@@ -1,4 +1,4 @@
-import { getCycleList, getStageInfo, getStageList } from '@/lib/services';
+import { getCycleList, getStageInfo, getStageList } from '@/lib/service/client';
 import * as React from 'react'
 import ColapsableMenu from '../_components/ColapsableMenu';
 
@@ -11,11 +11,6 @@ const CyclePage = async ({
 }) => {
   const cycle = await getCycleList({ apps_label: selected_app ?? '', cycle_id: cycle_id ? parseInt(cycle_id) : undefined });
   const stage = await getStageList({ cycle_id: parseInt(cycle_id), apps_label: selected_app });
-  // const stageInfo = await getStageInfo({
-  //   stage_uuid: stage_uuid,
-  //   cycle_id: parseInt(cycle_id),
-  //   apps_label: selected_app
-  // });
 
   // Wait for the promises to resolve
   const [cycleData, stageData] = await Promise.all([cycle, stage])

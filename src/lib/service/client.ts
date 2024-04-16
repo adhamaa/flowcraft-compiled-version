@@ -1,6 +1,5 @@
-'use server';
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { clientRevalidateTag } from "./server";
 
 export const getApplicationList = async () => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -161,7 +160,7 @@ export const updateCycle = async ({
   // if (!response.ok) {
   //   throw new Error('Failed to update cycle.');
   // }
-  revalidateTag('cyclelist');
+  clientRevalidateTag('cyclelist');
   return response;
 };
 
@@ -192,13 +191,14 @@ export const updateStage = async ({
   // if (!response.ok) {
   //   throw new Error('Failed to update stage.');
   // }
-  revalidateTag('stagelist');
+  // revalidateTag('stagelist');
+  clientRevalidateTag('stagelist');
   return response;
 };
 
-export const setConsoleLog = async (data: any) => {
-  console.log(JSON.stringify(data));
-}
+// export const setConsoleLog = async (data: any) => {
+//   console.log(JSON.stringify(data));
+// }
 
 // export const revalidateGetStageInfo = async () => {
 //   revalidateTag('stageinfo');

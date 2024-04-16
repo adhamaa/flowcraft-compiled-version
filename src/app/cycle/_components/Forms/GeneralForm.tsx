@@ -9,7 +9,8 @@ import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
 import { useForm } from "react-hook-form";
 import { Radio, TextInput } from 'react-hook-form-mantine';
-import { setConsoleLog, updateCycle } from '@/lib/services';
+import { updateCycle } from '@/lib/service/client';
+import toast from '@/components/toast';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
@@ -73,6 +74,10 @@ const GeneralFormContent = ({
         cycle_active: formdata.cycle_active,
         cycle_description: formdata.cycle_description
       }
+    }).then(() => {
+      toast.success(message`Cycle ${compareStates((data.cycle_active).toString(), formdata.cycle_active)} and ${compareStates(data.cycle_description, formdata.cycle_description)} updated successfully`);
+    }).catch((error) => {
+      toast.error('Failed to update cycle' + "\n" + error);
     });
   }
 
@@ -133,4 +138,41 @@ const GeneralFormContent = ({
       </form>
     </ScrollArea.Autosize >
   )
+};
+
+// function to compare the status and description and return appropriate message
+function message(strings: TemplateStringsArray, ...values: any[]) {
+  // let dict = values[values.length - 1] || {};
+  // let result = [strings[0]];
+  // keys.forEach(function (key, i) {
+  //   let value = Number.isInteger(key) ? values[key] : dict[key];
+  //   result.push(value, strings[i + 1]);
+  // });
+  // return result.join('');
+  const status = values[0];
+  console.log('status:', status)
+  const description = values[1];
+  console.log('description:', description)
+
+  const cycle = strings[0];
+  const and = strings[1];
+  const updatedSuccessfully = strings[2];
+
+  // if (status && description) {
+  //   return 'Cycle not changed'
+  // } else if (status && !description) {
+  //   return `Cycle description updated successfully`
+  // } else if (!status && description) {
+  //   return `Cycle status updated successfully`
+  // } else {
+  return `${cycle} status ${and} description ${updatedSuccessfully}`
+  // }
+};
+
+function compareStates(prevStates: string, currStates: string) {
+  if (currStates === prevStates) {
+    return true
+  } else {
+    return false
+  }
 };
