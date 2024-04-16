@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { TitleSection } from '../cycle/_components/Content'
+import TitleSection from '../cycle/_components/HomeContent/TitleSection'
 
 const AboutPage = () => {
   return (

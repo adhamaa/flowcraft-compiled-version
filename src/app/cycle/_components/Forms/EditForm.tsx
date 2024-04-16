@@ -5,7 +5,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import HeaderForm from './HeaderForm';
-import { StageInfoData } from '../Content';
+import { StageInfoData } from '../HomeContent';
 import { useForm } from 'react-hook-form';
 import { updateStage } from '@/lib/services';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';

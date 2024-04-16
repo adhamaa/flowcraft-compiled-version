@@ -1,4 +1,4 @@
-// 'use server';
+'use server';
 
 import { revalidatePath, revalidateTag } from "next/cache";
 
@@ -90,6 +90,7 @@ export const getStageList = async ({
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
     next: { tags: ['stagelist'] }
+    // cache: 'no-store'
   });
   if (response.status === 404) {
     return [];
@@ -191,7 +192,7 @@ export const updateStage = async ({
   // if (!response.ok) {
   //   throw new Error('Failed to update stage.');
   // }
-  // revalidateTag('stageinfo');
+  revalidateTag('stagelist');
   return response;
 };
 
@@ -199,6 +200,10 @@ export const setConsoleLog = async (data: any) => {
   console.log(JSON.stringify(data));
 }
 
-export const revalidateGetStageInfo = async () => {
-  revalidateTag('stageinfo');
-}
+// export const revalidateGetStageInfo = async () => {
+//   revalidateTag('stageinfo');
+// }
+
+// export const revalidateGetStageList = async () => {
+//   revalidateTag('stagelist');
+// }

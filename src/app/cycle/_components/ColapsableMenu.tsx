@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import EditForm from './Forms/EditForm';
 import GeneralForm from './Forms/GeneralForm';
-import { CycleData, StageData, StageInfoData } from './Content';
+import { CycleData, StageData, StageInfoData } from './HomeContent';
 import { getStageInfo } from '@/lib/services';
 import { useDisclosure } from '@mantine/hooks';
 

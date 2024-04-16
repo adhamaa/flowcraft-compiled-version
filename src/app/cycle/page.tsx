@@ -1,5 +1,5 @@
 import * as React from 'react'
-import HomeContent from './_components/Content'
+import HomeContent from './_components/HomeContent'
 import { getApplicationList, getCycleList, getStageInfo, getStageList } from '@/lib/services';
 
 async function HomePage({

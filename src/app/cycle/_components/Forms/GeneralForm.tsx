@@ -5,7 +5,7 @@ import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation'
 import * as React from 'react'
-import { CycleData } from '../Content';
+import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
 import { useForm } from "react-hook-form";
 import { Radio, TextInput } from 'react-hook-form-mantine';

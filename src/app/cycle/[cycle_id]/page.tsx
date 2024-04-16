@@ -10,7 +10,7 @@ const CyclePage = async ({
   searchParams: { selected_app: string; stage_uuid: string; }
 }) => {
   const cycle = await getCycleList({ apps_label: selected_app ?? '', cycle_id: cycle_id ? parseInt(cycle_id) : undefined });
-  const stage = await getStageList({ cycle_id: cycle_id ? parseInt(cycle_id) : undefined, apps_label: selected_app });
+  const stage = await getStageList({ cycle_id: parseInt(cycle_id), apps_label: selected_app });
   // const stageInfo = await getStageInfo({
   //   stage_uuid: stage_uuid,
   //   cycle_id: parseInt(cycle_id),
