@@ -7,7 +7,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from "mantine-react-table";
-import { ActionIcon, Button, Flex, Menu, Stack, Table } from "@mantine/core";
+import { ActionIcon, Button, Flex, Menu, Stack, Table, Tabs } from "@mantine/core";
 import { Icon } from "@iconify-icon/react";
 
 const TabularSection = ({ opened,
@@ -197,6 +197,41 @@ const TabularSection = ({ opened,
               </div>
 
             </Flex>
+
+            <Tabs
+              defaultValue="database"
+              classNames={{
+                root: "m-auto",
+                tab: "!py-[1.6rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:text-[#895CF3] data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:font-semibold",
+              }}
+            // value={activeTab as string}
+            // onChange={(value) => router.push(`/${value}`)}
+            >
+              <Tabs.List>
+                <Tabs.Tab disabled value="memory" fz={20} fw={600}>
+                  Memory
+                </Tabs.Tab>
+                <Tabs.Tab disabled value="redis" fz={20} fw={600}>
+                  Redis
+                </Tabs.Tab>
+                <Tabs.Tab value="database" fz={20} fw={600}>
+                  Database
+                </Tabs.Tab>
+              </Tabs.List>
+
+              <Tabs.Panel value="gallery">
+                Gallery tab content
+              </Tabs.Panel>
+
+              <Tabs.Panel value="messages">
+                Messages tab content
+              </Tabs.Panel>
+
+              <Tabs.Panel value="settings">
+                Settings tab content
+              </Tabs.Panel>
+            </Tabs>
+
             <div className="overflow-auto w-screen">
               <Table
                 captionSide="top"
