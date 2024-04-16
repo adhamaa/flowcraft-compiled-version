@@ -7,7 +7,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from "mantine-react-table";
-import { ActionIcon, Flex, Menu, Stack, Table } from "@mantine/core";
+import { ActionIcon, Button, Flex, Menu, Stack, Table } from "@mantine/core";
 import { Icon } from "@iconify-icon/react";
 
 const TabularSection = ({ opened,
@@ -151,6 +151,24 @@ const TabularSection = ({ opened,
             <Flex justify="end" align="center" classNames={{
               root: 'px-20',
             }}>
+              <Button
+                disabled
+                variant='default'
+                color='#895CF3'
+                radius='md'
+                size="sm"
+                fz={14}
+                mr='auto'
+                leftSection={< Icon className='cursor-pointer rounded' icon="heroicons-outline:plus-circle" width="1rem" height="1rem" />}
+                // onClick={onClick}
+                classNames={{
+                  root: 'disabled:bg-[##F1F5F9]',
+                  label: 'disabled:text-[##94A3B8]',
+                }}
+              >
+                Add Cycle
+              </Button>
+
               <MRT_GlobalFilterTextInput
                 table={table}
                 placeholder='Search Cycle'
@@ -167,13 +185,13 @@ const TabularSection = ({ opened,
               {isPagination && <MRT_TablePagination table={table} />}
 
               <div className='flex ml-2 gap-4'>
-                <ActionIcon variant="light" color="gray" size="lg" radius="md" aria-label="Settings">
+                <ActionIcon disabled variant="transparent" bg="#F1F5F9" color='black' size="lg" radius="md" aria-label="Settings">
                   <Icon icon="heroicons-outline:refresh" width="1rem" height="1rem" />
                 </ActionIcon>
-                <ActionIcon variant="light" color="gray" size="lg" radius="md" aria-label="Settings">
+                <ActionIcon disabled variant="transparent" bg="#F1F5F9" color='black' size="lg" radius="md" aria-label="Settings">
                   <Icon icon="heroicons-outline:adjustments" width="1rem" height="1rem" />
                 </ActionIcon>
-                <ActionIcon variant="light" color="gray" size="lg" radius="md" aria-label="Settings">
+                <ActionIcon disabled variant="transparent" bg="#F1F5F9" color='black' size="lg" radius="md" aria-label="Settings">
                   <Icon icon="heroicons-outline:switch-vertical" width="1rem" height="1rem" />
                 </ActionIcon>
               </div>
