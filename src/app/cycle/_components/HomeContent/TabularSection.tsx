@@ -25,6 +25,29 @@ const TabularSection = ({ opened,
   const pathname = usePathname();
 
   const searchParams = useSearchParams();
+  const selected_app = searchParams.get('selected_app');
+  const data_source = searchParams.get('data_source');
+
+  const [activeTab, setActiveTab] = React.useState<string | null>(data_source || 'database')
+
+
+  const tripleDotMenu = [
+    {
+      group: 'crud',
+      menu: [
+        { label: 'Add new cycle', onClick: () => console.info('reload') },
+        { label: 'Delete cycle', onClick: () => console.info('Delete') },
+        { label: 'Duplicate cycle', onClick: () => console.info('Delete') },
+
+      ],
+    }, {
+      group: 'reset',
+      menu: [
+        { label: 'Reload Business Process', onClick: () => console.info('Delete') },
+        { label: 'Re-align Business Process', onClick: () => console.info('Delete') },
+      ],
+    }
+  ]
 
   const createQueryString = React.useCallback(
     (name: string, value: string) => {
@@ -57,7 +80,7 @@ const TabularSection = ({ opened,
       Cell: ({ cell, row }) => {
         const handleClick = () => router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''));
         return (
-          <div className='flex gap-2 items-center cursor-pointer' onClick={handleClick}>
+          <div className='flex gap-2 items-center cursor-pointer w-20' onClick={handleClick}>
             <p className='hover:underline'>{cell.getValue() as string}</p>
           </div>
         )
@@ -109,18 +132,18 @@ const TabularSection = ({ opened,
         </Menu.Target>
 
         <Menu.Dropdown>
-          <div className="border-r-[3px] hover:border-[#895CF3]">
-            <Menu.Item onClick={() => console.info('reload')}>Add new cycle</Menu.Item>
-          </div>
-          <div className="border-r-[3px] hover:border-[#895CF3]">
-            <Menu.Item onClick={() => console.info('Delete')}>Delete cycle</Menu.Item>          </div>
-          <div className="border-r-[3px] hover:border-[#895CF3]">
-            <Menu.Item onClick={() => console.info('Delete')}>Duplicate cycle</Menu.Item>
-          </div>
-          <Menu.Divider className='!m-0' />
-          <div className="border-r-[3px] hover:border-[#895CF3]">
-            <Menu.Item onClick={() => console.info('Delete')}>Reload Business Process</Menu.Item>
-          </div>
+          {tripleDotMenu.map((menuLayer) => (
+            <div key={menuLayer.group}>
+              {menuLayer.menu.map((menu) => (
+                <Menu.Item key={menu.label} onClick={menu.onClick}>
+                  {menu.label}
+                </Menu.Item>
+              ))}
+              <Menu.Divider className='!m-0' />
+            </div>
+          ))}
+
+
         </Menu.Dropdown>
       </Menu>
     ),
@@ -139,9 +162,22 @@ const TabularSection = ({ opened,
     }),
   });
 
+  const datasourceList = [
+    { name: 'memory', disabled: true },
+    { name: 'cache', disabled: true },
+    { name: 'database', disabled: false }
+  ];
+
   React.useEffect(() => {
     setTableData(cycleData);
   }, [cycleData]);
+
+  React.useEffect(() => {
+    if (selected_app && !data_source) {
+      router.push(pathname + '?' + createQueryString('data_source', activeTab as string))
+    }
+  }, [activeTab, createQueryString, data_source, pathname, router, selected_app])
+
 
   return (
     <section className='flex flex-col items-center'>
@@ -199,37 +235,41 @@ const TabularSection = ({ opened,
             </Flex>
 
             <Tabs
-              defaultValue="database"
+              color='#895CF3'
+              variant='default'
+              // defaultValue="database"
+              value={activeTab as string}
+              onChange={(value) => {
+                router.push(pathname + '?' + createQueryString('data_source', value as string))
+                setActiveTab(value)
+              }}
               classNames={{
                 root: "m-auto",
-                tab: "!py-[1.6rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:text-[#895CF3] data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:font-semibold",
+                tab: "!py-[1.6rem] !border-white data-[active=true]:text-[#895CF3] data-[active=true]:!border-[#895CF3] hover:bg-transparent",
+                list: 'before:!content-none',
               }}
-            // value={activeTab as string}
-            // onChange={(value) => router.push(`/${value}`)}
+
             >
               <Tabs.List>
-                <Tabs.Tab disabled value="memory" fz={20} fw={600}>
-                  Memory
-                </Tabs.Tab>
-                <Tabs.Tab disabled value="redis" fz={20} fw={600}>
-                  Redis
-                </Tabs.Tab>
-                <Tabs.Tab value="database" fz={20} fw={600}>
-                  Database
-                </Tabs.Tab>
+                {datasourceList
+                  .map((tab) => (
+                    <Tabs.Tab
+                      key={tab.name}
+                      disabled={tab.disabled}
+                      value={tab.name}
+                      fz={20}
+                      fw={600}>
+                      <span className="capitalize">{tab.name}</span>
+                    </Tabs.Tab>
+                  ))}
+
               </Tabs.List>
 
-              <Tabs.Panel value="gallery">
-                Gallery tab content
-              </Tabs.Panel>
-
-              <Tabs.Panel value="messages">
-                Messages tab content
-              </Tabs.Panel>
-
-              <Tabs.Panel value="settings">
-                Settings tab content
-              </Tabs.Panel>
+              {/* {datasourceList.map((tab) => (
+                <Tabs.Panel key={tab.name} value={tab.name}>
+                  <></>
+                </Tabs.Panel>
+              ))} */}
             </Tabs>
 
             <div className="overflow-auto w-screen">
@@ -287,8 +327,9 @@ const TabularSection = ({ opened,
           )} alt='process illustration' />
           <span>Explore business process cycles by clicking on the application</span>
         </div>
-      )}
-    </section>
+      )
+      }
+    </section >
   )
 }
 
