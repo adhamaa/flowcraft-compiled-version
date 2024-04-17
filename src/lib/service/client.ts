@@ -196,14 +196,48 @@ export const updateStage = async ({
   return response;
 };
 
-// export const setConsoleLog = async (data: any) => {
-//   console.log(JSON.stringify(data));
-// }
+export const verifySyntax = async () => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const endpoint = `/syntaxEngine/`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['evaluate'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to evaluate semantic.');
+  // }
+ 
+  const data = await response.text();
+  return data;
+}
 
-// export const revalidateGetStageInfo = async () => {
-//   revalidateTag('stageinfo');
-// }
-
-// export const revalidateGetStageList = async () => {
-//   revalidateTag('stagelist');
-// }
+export const evaluateSemantics = async () => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const endpoint = `/semanticEngine/`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['evaluate'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to evaluate semantic.');
+  // }
+ 
+  const data = await response.text();
+  return data;
+}

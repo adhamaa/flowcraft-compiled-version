@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@iconify-icon/react';
-import { Button, Collapse, UnstyledButton } from '@mantine/core';
+import { Button, Collapse, Tooltip, UnstyledButton } from '@mantine/core';
 import clsx from 'clsx';
 import * as React from 'react'
 import { ApplicationData, CycleData } from '.';
@@ -82,7 +82,7 @@ const ApplicationSection = ({
                   variant='default'
                   classNames={{
                     root: apps_label != selected_app_param ? '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none' : '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none shadow-[#895CF3]/30',
-                    label: 'flex flex-col items-center justify-center gap-2',
+                    label: 'flex flex-col items-center justify-center',
                   }}
                   onClick={handleAppClick}
                 >
@@ -91,7 +91,7 @@ const ApplicationSection = ({
                     <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
                       <p className='w-20 whitespace-pre-wrap'>FREE DEMO</p>
                     </div>}
-                  <p className='truncate text-sm text-[#4F4F4F]'>{apps_name}</p>
+                  <p className='text-wrap text-sm text-[#4F4F4F]'>{apps_name}</p>
                 </Button>
               )
             })}

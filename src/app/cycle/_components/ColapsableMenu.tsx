@@ -66,9 +66,10 @@ export default function ColapsableMenu({
         <Tabs.List>
           <></>
           <Tabs.Tab value="cycle" className=''>
-            <ActionIcon variant="filled" color="#895CF3" size="lg" radius="md" aria-label="Settings" >
+            {/* <ActionIcon variant="filled" color="#895CF3" size="lg" radius="md" aria-label="Settings" >
               <Icon className='cursor-pointer rounded' icon="heroicons-outline:refresh" width="1rem" height="1rem" />
-            </ActionIcon>
+            </ActionIcon> */}
+            Cycle
           </Tabs.Tab>
 
           <FooterButton {...{ isSideMenuCollapse }} isCollapse onClick={toggleSideMenuCollapse} />{/* ! main collapse button */}
@@ -160,42 +161,42 @@ export default function ColapsableMenu({
 }
 
 
-export const SideMenuComponent = ({ menuItems, menuItem }: { menuItems?: MenuItem[]; menuItem?: MenuItem }) => {
-  const [activeTab, setActiveTab] = React.useState<string | null>();
+// export const SideMenuComponent = ({ menuItems, menuItem }: { menuItems?: MenuItem[]; menuItem?: MenuItem }) => {
+//   const [activeTab, setActiveTab] = React.useState<string | null>();
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -100 }}
-      animate={activeTab ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
-      transition={{
-        duration: 0.5,
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        ease: "easeInOut"
-      }}
-      exit={{ opacity: 0, x: -100 }}
-    >
-      <Tabs
-        orientation='vertical'
-        value={activeTab}
-        onChange={setActiveTab}
-        classNames={{
+//   return (
+//     <motion.div
+//       initial={{ opacity: 0, x: -100 }}
+//       animate={activeTab ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
+//       transition={{
+//         duration: 0.5,
+//         x: { type: "spring", stiffness: 300, damping: 30 },
+//         ease: "easeInOut"
+//       }}
+//       exit={{ opacity: 0, x: -100 }}
+//     >
+//       <Tabs
+//         orientation='vertical'
+//         value={activeTab}
+//         onChange={setActiveTab}
+//         classNames={{
 
-        }}
-      >
-        <Tabs.List>
-          {menuItems?.map((item, index) => (
-            <Tabs.Tab key={item.id} value={item.id}>{item.label}</Tabs.Tab>
-          ))}
-        </Tabs.List>
-        {menuItems?.map((item, index) => (
-          <Tabs.Panel key={item.id} value={item.id}>
-            {item.children && <SideMenuComponent menuItems={item.children} />}
-          </Tabs.Panel>
-        ))}
-      </Tabs>
-    </motion.div>
-  );
-};
+//         }}
+//       >
+//         <Tabs.List>
+//           {menuItems?.map((item, index) => (
+//             <Tabs.Tab key={item.id} value={item.id}>{item.label}</Tabs.Tab>
+//           ))}
+//         </Tabs.List>
+//         {menuItems?.map((item, index) => (
+//           <Tabs.Panel key={item.id} value={item.id}>
+//             {item.children && <SideMenuComponent menuItems={item.children} />}
+//           </Tabs.Panel>
+//         ))}
+//       </Tabs>
+//     </motion.div>
+//   );
+// };
 
 const FooterButton = ({ isAdd, isCollapse, isSideMenuCollapse, onClick }: { isAdd?: boolean; isCollapse?: boolean; isSideMenuCollapse: boolean; onClick: () => void; }) => {
   return (

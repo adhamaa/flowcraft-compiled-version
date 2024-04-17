@@ -1,21 +1,18 @@
 'use client';
-import { Anchor, Avatar, Button, ColorInput, Group, Input, Stack, Switch, Tabs, useMantineColorScheme } from "@mantine/core";
-import Image from "next/image";
+import { Anchor, Avatar, Input, Switch, Tabs, useMantineColorScheme } from "@mantine/core";
 import { Icon } from '@iconify-icon/react';
 import * as React from 'react'
 import { useSideMenu } from "@/hooks/useSideMenu";
 import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
-import Link from "next/link";
 import { useGlobalState } from "@/hooks/useGlobalState";
 
 function Header({ darkmode = false, className }: { darkmode?: boolean; className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { selectedApp, setSelectedApp } = useGlobalState();
-  const { layoutColSpan, setLayoutColSpan, sideMenuColSpan, setSideMenuColSpan } = useSideMenu();
+  const { setSelectedApp } = useGlobalState();
 
-  const [activeTab, setActiveTab] = React.useState<string | null>(pathname.split('/')[1] || '/');
+  const [activeTab] = React.useState<string | null>(pathname.split('/')[1] || '/');
   const switchRef = React.useRef<HTMLInputElement>(null);
   const { colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
@@ -23,11 +20,6 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
   const isLight = colorScheme === "light";
 
   const profileImg = true;
-
-  const toggleSideMenu = () => {
-    setLayoutColSpan(layoutColSpan === 0 ? 10 : 0)
-    setSideMenuColSpan(sideMenuColSpan === 0 ? 1 : 0)
-  };
 
   React.useEffect(() => {
     if (switchRef.current) {

@@ -4,9 +4,11 @@ import { GlobalStateProvider } from '@/hooks/useGlobalState';
 import { SideMenuProvider } from '@/hooks/useSideMenu'
 import { MantineProvider, createTheme } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
+import { ModalsProvider } from '@mantine/modals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental'
 import '@mantine/notifications/styles.css';
+import modals from '@/app/cycle/_components/Modals';
 const theme = createTheme({
   fontFamily: 'inherit',
 });
@@ -53,16 +55,18 @@ export default function Providers({
   return (
     <MantineProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
-        <Notifications position="top-right" zIndex={1000} classNames={{
-          root: 'w-max'
-        }} />
-        <ReactQueryStreamedHydration>
-          <SideMenuProvider >
-            <GlobalStateProvider>
-              {children}
-            </GlobalStateProvider>
-          </SideMenuProvider>
-        </ReactQueryStreamedHydration>
+        <ModalsProvider modals={modals}>
+          <Notifications position="top-right" classNames={{
+            root: 'w-max'
+          }} />
+          <ReactQueryStreamedHydration>
+            <SideMenuProvider >
+              <GlobalStateProvider>
+                {children}
+              </GlobalStateProvider>
+            </SideMenuProvider>
+          </ReactQueryStreamedHydration>
+        </ModalsProvider>
       </QueryClientProvider>
     </MantineProvider>
   )

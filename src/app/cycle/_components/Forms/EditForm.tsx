@@ -1,6 +1,6 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Alert, Box, Button, Flex, Input, Menu, Modal, ScrollArea, Stack, Table, Tooltip } from '@mantine/core';
+import { Button, Flex, Input, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
@@ -10,9 +10,9 @@ import { useForm } from 'react-hook-form';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
-import { updateStage } from '@/lib/service/client';
-import { notifications } from '@mantine/notifications';
+import { evaluateSemantics, updateStage } from '@/lib/service/client';
 import toast from '@/components/toast';
+import { modals } from '@mantine/modals';
 
 type stagesData = {
   process_stage_name: string;
@@ -308,7 +308,32 @@ const ActionButtons = ({
     <Button key={name} id={name} type='submit' color='#28A745' radius='md' className="!font-normal"
     >Save</Button>
     <Button color='#1C1454' radius='md' className="!font-normal" onClick={() => { }}>Verify syntax</Button>
-    <Button color='#FF6347' radius='md' className="!font-normal" onClick={() => { }}>Evaluate semantics</Button>
+    <Button color='#FF6347' radius='md' className="!font-normal" onClick={() => evaluateSemantics().then((text) => modals.open({
+      title: 'Evaluate semantics',
+      children: (
+        <>
+          <Text size="sm">{text}</Text>
+          <Flex gap={16} justify={'end'} mt="md">
+            <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+              Close
+            </Button>
+            {/* <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+              Cancel
+            </Button>
+            <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+              Save
+            </Button> */}
+          </Flex>
+        </>
+      ),
+      overlayProps: {
+        backgroundOpacity: 0.55,
+        blur: 10,
+      },
+      radius: 'md',
+    }))
+    }>Evaluate semantics
+    </Button>
   </div >
 
 );

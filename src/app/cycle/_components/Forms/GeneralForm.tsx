@@ -78,7 +78,7 @@ const GeneralFormContent = ({
       toast.success(message`Cycle ${compareStates((data.cycle_active).toString(), formdata.cycle_active)} and ${compareStates(data.cycle_description, formdata.cycle_description)} updated successfully`);
     }).catch((error) => {
       toast.error('Failed to update cycle' + "\n" + error);
-    });
+    }).finally(() => { toggleEdit() });
   }
 
   return (
@@ -101,8 +101,25 @@ const GeneralFormContent = ({
         onSubmit={handleSubmit(onSubmit)}
         onError={(e) => console.log(e)}
       >
+        {/* <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button> */}
         <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
-        <div className="flex justify-end py-2 px-14">{diagramToggle && <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button>}</div>
+        <div className="flex justify-end py-2 px-14">{diagramToggle &&
+          <Button
+            // disabled
+            variant='filled'
+            color='#F1F5F9'
+            c='#0F172A'
+            radius='md'
+            size="sm"
+            fz={14}
+            onClick={diagramToggle}
+            classNames={{
+              root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+            }}
+          >
+            Business Process Diagram
+          </Button>
+        }</div>
 
         {InputList?.map(({ name, label, value, disabled }, index) => ['Status'].includes(label) ? (
           <Input.Wrapper key={index} label={label} classNames={{
@@ -150,9 +167,7 @@ function message(strings: TemplateStringsArray, ...values: any[]) {
   // });
   // return result.join('');
   const status = values[0];
-  console.log('status:', status)
   const description = values[1];
-  console.log('description:', description)
 
   const cycle = strings[0];
   const and = strings[1];

@@ -2,7 +2,7 @@ import { SideMenuProvider } from '@/hooks/useSideMenu';
 import Providers from '@/provider';
 import '@/styles/globals.css';
 
-import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
+import { ColorSchemeScript } from '@mantine/core';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 

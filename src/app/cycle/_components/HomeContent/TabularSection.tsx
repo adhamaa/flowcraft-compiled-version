@@ -37,14 +37,14 @@ const TabularSection = ({ opened,
       menu: [
         { label: 'Add new cycle', onClick: () => console.info('reload') },
         { label: 'Delete cycle', onClick: () => console.info('Delete') },
-        { label: 'Duplicate cycle', onClick: () => console.info('Delete') },
+        { label: 'Duplicate cycle', onClick: () => console.info('Duplicate') },
 
       ],
     }, {
       group: 'reset',
       menu: [
-        { label: 'Reload Business Process', onClick: () => console.info('Delete') },
-        { label: 'Re-align Business Process', onClick: () => console.info('Delete') },
+        { label: 'Reload Business Process', onClick: () => console.info('Reload') },
+        { label: 'Optimize business process ', onClick: () => console.info('Optimize') },
       ],
     }
   ]
@@ -189,8 +189,9 @@ const TabularSection = ({ opened,
             }}>
               <Button
                 disabled
-                variant='default'
-                color='#895CF3'
+                variant='filled'
+                color='#F1F5F9'
+                c='#0F172A'
                 radius='md'
                 size="sm"
                 fz={14}
@@ -198,9 +199,9 @@ const TabularSection = ({ opened,
                 leftSection={< Icon className='cursor-pointer rounded' icon="heroicons-outline:plus-circle" width="1rem" height="1rem" />}
                 // onClick={onClick}
                 classNames={{
-                  root: 'disabled:bg-[##F1F5F9]',
-                  label: 'disabled:text-[##94A3B8]',
+                  root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
                 }}
+
               >
                 Add Cycle
               </Button>
