@@ -196,16 +196,17 @@ export const updateStage = async ({
   return response;
 };
 
-export const verifySyntax = async () => {
+export const verifySyntax = async ({ body }: { body: { str_test_syntax: string } }) => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/syntaxEngine/`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
+    body: JSON.stringify({ str_test_syntax: body.str_test_syntax }),
     next: { tags: ['evaluate'] }
   });
   if (response.status === 404) {
@@ -214,8 +215,8 @@ export const verifySyntax = async () => {
   // if (!response.ok) {
   //   throw new Error('Failed to evaluate semantic.');
   // }
- 
-  const data = await response.text();
+
+  const data = await response.json();
   return data;
 }
 
@@ -237,7 +238,7 @@ export const evaluateSemantics = async () => {
   // if (!response.ok) {
   //   throw new Error('Failed to evaluate semantic.');
   // }
- 
+
   const data = await response.text();
   return data;
 }

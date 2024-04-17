@@ -6,11 +6,11 @@ import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import HeaderForm from './HeaderForm';
 import { StageInfoData } from '../HomeContent';
-import { useForm } from 'react-hook-form';
+import { FieldValues, UseFormHandleSubmit, useForm } from 'react-hook-form';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
-import { evaluateSemantics, updateStage } from '@/lib/service/client';
+import { evaluateSemantics, updateStage, verifySyntax } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 
@@ -133,7 +133,7 @@ const EditFormContent = ({
               classNames={{
                 input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
               }} />
-            {!disabled && <ActionButtons {...{ name, value, toggleEdit }} />}
+            {!disabled && <ActionButtons {...{ name, value, toggleEdit, handleSubmit }} />}
           </Input.Wrapper>
         ) : ['List of previous stage', 'List of next stage'].includes(label) ? (
           <Input.Wrapper key={index} label={label} classNames={{
@@ -165,7 +165,7 @@ const EditFormContent = ({
                 input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
               }}
             />
-            {!disabled && <ActionButtons  {...{ name, value, toggleEdit }} />}
+            {!disabled && <ActionButtons  {...{ name, value, toggleEdit, handleSubmit }} />}
           </Input.Wrapper>
         ))}
       </form >
@@ -297,46 +297,64 @@ export const TextareaHeader = ({ isTable, table }: {
 const ActionButtons = ({
   name,
   value,
-  toggleEdit
+  toggleEdit,
+  handleSubmit
 }: {
   name?: string;
   value?: string | string[] | number | boolean | undefined | null | any[] | Record<string, any> | Record<string, any>[];
   toggleEdit: () => void;
-}) => (
-  <div className="text-right ml-auto space-x-4 mt-4" >
-    <Button color='#DC3545' radius='md' className="!font-normal" onClick={toggleEdit}>Cancel</Button>
-    <Button key={name} id={name} type='submit' color='#28A745' radius='md' className="!font-normal"
-    >Save</Button>
-    <Button color='#1C1454' radius='md' className="!font-normal" onClick={() => { }}>Verify syntax</Button>
-    <Button color='#FF6347' radius='md' className="!font-normal" onClick={() => evaluateSemantics().then((text) => modals.open({
-      title: 'Evaluate semantics',
-      children: (
-        <>
-          <Text size="sm">{text}</Text>
-          <Flex gap={16} justify={'end'} mt="md">
-            <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-              Close
-            </Button>
-            {/* <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+  handleSubmit: UseFormHandleSubmit<FieldValues, undefined>;
+}) => {
+  const onSubmit = async (data: any, e: any) => {
+    const target_id = e.target.offsetParent.id
+    const str_test_syntax = target_id === 'process_stage_name' ? data[target_id] : JSON.parse(data[target_id]);
+    await verifySyntax({ body: { str_test_syntax } }).then((response) => {
+      console.log(response);
+      toast.success('Syntax verified successfully');
+    }).catch((error) => {
+      console.log('Failed to verify syntax', error);
+      toast.error('Failed to verify syntax' + '\n' + error);
+    });
+  }
+  return (
+
+    <div className="text-right ml-auto space-x-4 mt-4" >
+      <Button color='#DC3545' radius='md' className="!font-normal" onClick={toggleEdit}>Cancel</Button>
+      <Button key={name} id={name} type='submit' color='#28A745' radius='md' className="!font-normal"
+      >Save</Button>
+      <Button key={name} id={name} color='#1C1454' radius='md' className="!font-normal"
+        onClick={handleSubmit(onSubmit)}
+      >Verify syntax</Button>
+      <Button color='#FF6347' radius='md' className="!font-normal" onClick={() => evaluateSemantics().then((text) => modals.open({
+        title: 'Evaluate semantics',
+        children: (
+          <>
+            <Text size="sm">{text}</Text>
+            <Flex gap={16} justify={'end'} mt="md">
+              <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                Close
+              </Button>
+              {/* <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
               Cancel
             </Button>
             <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
               Save
             </Button> */}
-          </Flex>
-        </>
-      ),
-      overlayProps: {
-        backgroundOpacity: 0.55,
-        blur: 10,
-      },
-      radius: 'md',
-    }))
-    }>Evaluate semantics
-    </Button>
-  </div >
+            </Flex>
+          </>
+        ),
+        overlayProps: {
+          backgroundOpacity: 0.55,
+          blur: 10,
+        },
+        radius: 'md',
+      }))
+      }>Evaluate semantics
+      </Button>
+    </div >
 
-);
+  )
+};
 
 const LabelTooltip = ({
   onMouseEnter,
