@@ -10,6 +10,7 @@ import { useGlobalState } from "@/hooks/useGlobalState";
 function Header({ darkmode = false, className }: { darkmode?: boolean; className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
+  const profilePage = pathname.split('/')[1] === 'profile';
   const { setSelectedApp } = useGlobalState();
 
   const [activeTab] = React.useState<string | null>(pathname.split('/')[1] || '/');
@@ -86,7 +87,22 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
 
           }}
         />
-        {profileImg ? <Avatar src="/profile_image.png" alt="it's me" /> : <Avatar color="#895CF3" radius="xl">AA</Avatar>}
+        <Anchor
+          component="button"
+          // disabled
+          // href="#"
+          // target="_blank"
+          onClick={() => router.push("/profile")}
+          underline="hover"
+          c="#895CF3"
+          className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[#895CF3] dark:hover:text-[#895CF3] transition-all duration-300 ease-in-out"
+        >
+          {profileImg ?
+            <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} src="/profile_image.png" alt="it's me" />
+            :
+            <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} color="#895CF3" radius="xl">AA</Avatar>
+          }
+        </Anchor>
         {darkmode && <Switch
           ref={switchRef}
           classNames={{
