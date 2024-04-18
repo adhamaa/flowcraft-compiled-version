@@ -207,7 +207,31 @@ export const verifySyntax = async ({ body }: { body: { str_test_syntax: string }
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
     body: JSON.stringify({ str_test_syntax: body.str_test_syntax }),
-    next: { tags: ['evaluate'] }
+    next: { tags: ['evaluateSyntax'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to evaluate semantic.');
+  // }
+
+  const data = await response.json();
+  return data;
+}
+
+export const getErrorMessages = async ({ body }: { body: { list_error_no: number[] } }) => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const endpoint = `/syntaxEngine/getErrorMessage/`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    body: JSON.stringify({ list_error_no: body.list_error_no }),
+    next: { tags: ['errorMessages'] }
   });
   if (response.status === 404) {
     return [];
@@ -230,7 +254,7 @@ export const evaluateSemantics = async () => {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    next: { tags: ['evaluate'] }
+    next: { tags: ['evaluateSemantics'] }
   });
   if (response.status === 404) {
     return [];

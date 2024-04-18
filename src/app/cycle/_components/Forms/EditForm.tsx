@@ -1,6 +1,6 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Button, Flex, Input, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { Button, Flex, Input, List, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
@@ -10,7 +10,7 @@ import { FieldValues, UseFormHandleSubmit, useForm } from 'react-hook-form';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
-import { evaluateSemantics, updateStage, verifySyntax } from '@/lib/service/client';
+import { evaluateSemantics, getErrorMessages, updateStage, verifySyntax } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 
@@ -70,6 +70,7 @@ const EditFormContent = ({
     { name: 'list_next_stage', label: 'List of next stage', value: data?.list_next_stage, disabled: true }, // this is a list
     { name: 'list_user', label: 'Users', value: data?.list_user, disabled: !isEdit }, // this is a list
     { name: 'list_pbt', label: 'PBT', value: data?.list_pbt, disabled: !isEdit }, // this is a list
+    { name: 'list_role', label: 'Roles', value: data?.list_role, disabled: !isEdit },
     { name: 'list_requirement', label: 'Requirements', value: data?.list_requirement, disabled: !isEdit }, // this is a list
     { name: 'list_action', label: 'Action', value: data?.list_action, disabled: !isEdit }, // this is a list
     { name: 'list_entry_condition', label: 'Entry condition', value: data?.list_entry_condition, disabled: !isEdit },
@@ -105,6 +106,7 @@ const EditFormContent = ({
       setValue('list_next_stage', data.list_next_stage);
       setValue('list_user', JSON.stringify(data.list_user, null, 2));
       setValue('list_pbt', JSON.stringify(data.list_pbt, null, 2));
+      setValue('list_role', JSON.stringify(data.list_role, null, 2));
       setValue('list_requirement', JSON.stringify(data.list_requirement, null, 2));
       setValue('list_action', JSON.stringify(data.list_action, null, 2));
       setValue('list_entry_condition', JSON.stringify(data.list_entry_condition, null, 2));
@@ -308,9 +310,46 @@ const ActionButtons = ({
   const onSubmit = async (data: any, e: any) => {
     const target_id = e.target.offsetParent.id
     const str_test_syntax = target_id === 'process_stage_name' ? data[target_id] : JSON.parse(data[target_id]);
-    await verifySyntax({ body: { str_test_syntax } }).then((response) => {
-      console.log(response);
-      toast.success('Syntax verified successfully');
+    await verifySyntax({ body: { str_test_syntax } }).then(async (response) => {
+      if (response.error) {
+        toast.error(response.message);
+        await getErrorMessages({ body: { list_error_no: response.list_error_no } }).then((errorMessages) => {
+          modals.open({
+            title: 'Evaluate semantics errors',
+            children: (
+              <>
+                {errorMessages.map(({ error_message }: { error_message: string }, index: React.Key | null | undefined) => (
+                  <List key={index} type="ordered" withPadding>
+                    <List.Item>{error_message}</List.Item>
+                  </List>
+                ))}
+                <Flex gap={16} justify={'end'} mt="md">
+                  <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                    Close
+                  </Button>
+                  {/* <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+                  Cancel
+                </Button>
+                <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                  Save
+                </Button> */}
+                </Flex>
+              </>
+            ),
+            overlayProps: {
+              backgroundOpacity: 0.55,
+              blur: 10,
+            },
+            radius: 'md',
+          })
+        }).catch((error) => {
+          console.log('Failed to get error messages', error);
+          toast.error('Failed to get error messages' + '\n' + error);
+        });
+      } else {
+        toast.success(response.message);
+      }
+
     }).catch((error) => {
       console.log('Failed to verify syntax', error);
       toast.error('Failed to verify syntax' + '\n' + error);
