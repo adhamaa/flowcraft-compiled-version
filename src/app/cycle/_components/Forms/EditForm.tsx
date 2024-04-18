@@ -10,7 +10,7 @@ import { FieldValues, UseFormHandleSubmit, useForm } from 'react-hook-form';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
-import { evaluateSemantics, getErrorMessages, updateStage, verifySyntax } from '@/lib/service/client';
+import { evaluateSemantics, getErrorMessages, testStageName, updateStage, verifySyntax } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 
@@ -310,50 +310,63 @@ const ActionButtons = ({
   const onSubmit = async (data: any, e: any) => {
     const target_id = e.target.offsetParent.id
     const str_test_syntax = target_id === 'process_stage_name' ? data[target_id] : JSON.parse(data[target_id]);
-    await verifySyntax({ body: { str_test_syntax } }).then(async (response) => {
-      if (response.error) {
-        toast.error(response.message);
-        await getErrorMessages({ body: { list_error_no: response.list_error_no } }).then((errorMessages) => {
-          modals.open({
-            title: 'Evaluate semantics errors',
-            children: (
-              <>
-                {errorMessages.map(({ error_message }: { error_message: string }, index: React.Key | null | undefined) => (
-                  <List key={index} type="ordered" withPadding>
-                    <List.Item>{error_message}</List.Item>
-                  </List>
-                ))}
-                <Flex gap={16} justify={'end'} mt="md">
-                  <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-                    Close
-                  </Button>
-                  {/* <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+    if (target_id === 'process_stage_name') {
+      await testStageName({ params: { stage_name: str_test_syntax } }).then((response) => {
+        if (response.error) {
+          toast.error(response.message);
+        } else {
+          toast.success(response.message);
+        }
+      }).catch((error) => {
+        console.log('Failed to test stage name', error);
+        toast.error('Failed to test stage name' + '\n' + error);
+      });
+    } else {
+      await verifySyntax({ body: { str_test_syntax } }).then(async (response) => {
+        if (response.error) {
+          toast.error(response.message);
+          await getErrorMessages({ body: { list_error_no: response.list_error_no } }).then((errorMessages) => {
+            modals.open({
+              title: 'Syntax errors',
+              children: (
+                <>
+                  {errorMessages.map(({ error_message }: { error_message: string }, index: React.Key | null | undefined) => (
+                    <List key={index} type="ordered" withPadding>
+                      <List.Item>{error_message}</List.Item>
+                    </List>
+                  ))}
+                  <Flex gap={16} justify={'end'} mt="md">
+                    <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                      Close
+                    </Button>
+                    {/* <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
                   Cancel
                 </Button>
                 <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
                   Save
                 </Button> */}
-                </Flex>
-              </>
-            ),
-            overlayProps: {
-              backgroundOpacity: 0.55,
-              blur: 10,
-            },
-            radius: 'md',
-          })
-        }).catch((error) => {
-          console.log('Failed to get error messages', error);
-          toast.error('Failed to get error messages' + '\n' + error);
-        });
-      } else {
-        toast.success(response.message);
-      }
+                  </Flex>
+                </>
+              ),
+              overlayProps: {
+                backgroundOpacity: 0.55,
+                blur: 10,
+              },
+              radius: 'md',
+            })
+          }).catch((error) => {
+            console.log('Failed to get error messages', error);
+            toast.error('Failed to get error messages' + '\n' + error);
+          });
+        } else {
+          toast.success(response.message);
+        }
 
-    }).catch((error) => {
-      console.log('Failed to verify syntax', error);
-      toast.error('Failed to verify syntax' + '\n' + error);
-    });
+      }).catch((error) => {
+        console.log('Failed to verify syntax', error);
+        toast.error('Failed to verify syntax' + '\n' + error);
+      });
+    }
   }
   return (
 
@@ -365,7 +378,7 @@ const ActionButtons = ({
         onClick={handleSubmit(onSubmit)}
       >Verify syntax</Button>
       <Button color='#FF6347' radius='md' className="!font-normal" onClick={() => evaluateSemantics().then((text) => modals.open({
-        title: 'Evaluate semantics',
+        title: 'Semantics errors',
         children: (
           <>
             <Text size="sm">{text}</Text>

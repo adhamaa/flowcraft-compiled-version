@@ -244,6 +244,29 @@ export const getErrorMessages = async ({ body }: { body: { list_error_no: number
   return data;
 }
 
+export const testStageName = async ({ params }: { params: { stage_name: string; } }) => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const endpoint = `/syntaxEngine/testStageName/?strText=${params.stage_name}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['testStageName'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to evaluate semantic.');
+  // }
+
+  const data = await response.json();
+  return data;
+}
+
 export const evaluateSemantics = async () => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/semanticEngine/`;
