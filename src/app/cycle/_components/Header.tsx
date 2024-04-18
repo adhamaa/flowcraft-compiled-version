@@ -81,7 +81,9 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
           placeholder="Search"
           radius="md"
           classNames={{
-            input: '!rounded-lg !border-none p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent focus:!bg-white transition-all duration-300 ease-in-out !bg-[#F1F4F5]',
+
+            input: '!rounded-lg !border-none w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent focus:!bg-white transition-all duration-300 ease-in-out !bg-[#F1F4F5] placeholder:ml-8',
+
           }}
         />
         {profileImg ? <Avatar src="/profile_image.png" alt="it's me" /> : <Avatar color="#895CF3" radius="xl">AA</Avatar>}

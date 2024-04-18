@@ -217,7 +217,7 @@ const TabularSection = ({ opened,
                     className="hover:text-[#895CF3] cursor-pointer" />
                 }
                 classNames={{
-                  input: '!rounded-lg border border-gray-300 p-2 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white',
+                  input: '!rounded-lg border border-gray-300 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white placeholder:ml-8',
                 }} />
               {isPagination && <MRT_TablePagination table={table} />}
 
