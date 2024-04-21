@@ -34,7 +34,7 @@ export const getCycleList = async ({
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  const endpoint = `/businessProcess/listCycleProcess?apps_label=${apps_label}`;
+  const endpoint = `/businessProcessTmp/listCycleProcess?apps_label=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
 
