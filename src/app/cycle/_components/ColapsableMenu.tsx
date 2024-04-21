@@ -60,7 +60,7 @@ export default function ColapsableMenu({
       <Tabs component='div' defaultValue="cycle" orientation="vertical" classNames={{
         root: 'h-full w-screen',
         tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-        tabLabel: 'text-md',
+        tabLabel: '~text-md/lg',
         panel: ''
       }}>
         <Tabs.List>
@@ -79,7 +79,7 @@ export default function ColapsableMenu({
           <Tabs defaultValue="general" orientation="vertical" classNames={{
             root: 'h-full',
             tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-            tabLabel: 'text-md',
+            tabLabel: '~text-md/lg',
             panel: ''
           }}>
             {!isSideMenuCollapse && <Tabs.List>
@@ -117,7 +117,7 @@ export default function ColapsableMenu({
                 classNames={{
                   root: 'h-full',
                   tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-                  tabLabel: 'text-md',
+                  tabLabel: '~text-md/lg',
                   panel: ''
                 }}
                 onChange={async (value) => {

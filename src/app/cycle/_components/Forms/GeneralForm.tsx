@@ -54,14 +54,14 @@ const GeneralFormContent = ({
   toggle: () => void;
 }) => {
   const InputList = [
-    { name: 'cycle_name', label: 'Cycle name', value: data.cycle_name, disabled: true },
-    { name: "cycle_id", label: 'Cycle id', value: data.cycle_id, disabled: true },
-    { name: "app_name", label: 'Applications', value: data.app_name, disabled: true },
-    { name: "cycle_created", label: 'Date Created', value: data.cycle_created, disabled: true },
-    { name: "cycle_updated", label: 'Last edited date', value: data.cycle_updated, disabled: true },
-    { name: "no_of_stages", label: 'No of stage', value: data.no_of_stages, disabled: true },
-    { name: "cycle_active", label: 'Status', value: data.cycle_active, disabled: !isEdit },
-    { name: "cycle_description", label: 'Description', value: data.cycle_description, disabled: !isEdit },
+    { name: 'cycle_name', label: 'Cycle name', value: data?.cycle_name, disabled: true },
+    { name: "cycle_id", label: 'Cycle id', value: data?.cycle_id, disabled: true },
+    { name: "app_name", label: 'Applications', value: data?.app_name, disabled: true },
+    { name: "cycle_created", label: 'Date Created', value: data?.cycle_created, disabled: true },
+    { name: "cycle_updated", label: 'Last edited date', value: data?.cycle_updated, disabled: true },
+    { name: "no_of_stages", label: 'No of stage', value: data?.no_of_stages, disabled: true },
+    { name: "cycle_active", label: 'Status', value: data?.cycle_active, disabled: !isEdit },
+    { name: "cycle_description", label: 'Description', value: data?.cycle_description, disabled: !isEdit },
   ];
 
   const [diagramOpened, { open: diagramOpen, close: diagramClose, toggle: diagramToggle }] = useDisclosure(false);
@@ -129,7 +129,7 @@ const GeneralFormContent = ({
             <Radio.Group
               name={name}
               control={control}
-              defaultValue={value.toString()}
+              defaultValue={value?.toString()}
             >
               <Group>
                 <Radio.Item disabled={disabled} value="1" label="Active" />

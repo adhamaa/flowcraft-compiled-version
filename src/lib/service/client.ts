@@ -1,5 +1,6 @@
 
 import { clientRevalidateTag } from "./server";
+import { datasource_mapping } from "@/constant/datasource";
 
 export const getApplicationList = async () => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -25,16 +26,18 @@ export const getApplicationList = async () => {
 
 export const getCycleList = async ({
   apps_label,
-  cycle_id
+  cycle_id,
+  datasource_type = 'cache'
 }: {
   apps_label?: string;
-  cycle_id?: number
+  cycle_id?: number;
+  datasource_type: string;
 }) => {
   if (!apps_label) return [];
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  const endpoint = `/businessProcessTmp/listCycleProcess?apps_label=${apps_label}`;
+  const endpoint = `/businessProcessRedis/listCycleProcess?apps_label=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
 
@@ -43,7 +46,8 @@ export const getCycleList = async ({
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    next: { tags: ['cyclelist'] }
+    next: { tags: ['cyclelist'] },
+    // cache: 'no-store'
   });
   if (response.status === 404) {
     return [];
@@ -63,7 +67,7 @@ export const getCycleList = async ({
       app_name: item.app_name ?? 'N/A',
       cycle_name: item.cycle_name ?? 'N/A',
       no_of_stages: (item.no_of_stages).toString() ?? 'N/A',
-      cycle_active: (item.cycle_active).toString() ? 'Active' : 'Inactive',
+      cycle_active: item.cycle_active ? 'Active' : 'Inactive',
       cycle_id: (item.cycle_id).toString(),
     }));
 
@@ -72,15 +76,17 @@ export const getCycleList = async ({
 
 export const getStageList = async ({
   cycle_id,
-  apps_label
+  apps_label,
+  datasource_type = 'cache'
 }: {
   cycle_id: number | undefined;
   apps_label: string;
+  datasource_type: string;
 }) => {
   if (!cycle_id) return [];
   if (!apps_label) return [];
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint = `/businessProcessTmp/mAllStage?cycle_id=${cycle_id}&app_type=${apps_label}`;
+  const endpoint = `${datasource_mapping[datasource_type]}/mAllStage?cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'GET',
@@ -88,7 +94,7 @@ export const getStageList = async ({
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    next: { tags: ['stagelist'] }
+    next: { tags: ['stagelist'] },
     // cache: 'no-store'
   });
   if (response.status === 404) {
@@ -104,17 +110,19 @@ export const getStageList = async ({
 export const getStageInfo = async ({
   stage_uuid,
   cycle_id,
-  apps_label
+  apps_label,
+  datasource_type = 'cache'
 }: {
   stage_uuid: string;
   cycle_id: number | undefined;
   apps_label: string;
+  datasource_type: string;
 }) => {
   if (!stage_uuid) return {};
   if (!cycle_id) return {};
   if (!apps_label) return {};
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint = `/businessProcessTmp/mCurrentStage?process_stage_uuid=${stage_uuid}&cycle_id=${cycle_id}&app_type=${apps_label}`;
+  const endpoint = `${datasource_mapping[datasource_type]}/mCurrentStage?process_stage_uuid=${stage_uuid}&cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'GET',
@@ -143,7 +151,7 @@ export const updateCycle = async ({
   body: { cycle_active: number; cycle_description: string };
 }) => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint = `/businessProcess/updateCycle?cycle_uuid=${cycle_uuid}`;
+  const endpoint = `/businessProcessTmp/updateCycle?cycle_uuid=${cycle_uuid}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'POST',
@@ -174,7 +182,7 @@ export const updateStage = async ({
   body: { value: string };
 }) => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint = `/businessProcess/update?field_name=${field_name}&stage_uuid=${stage_uuid}`;
+  const endpoint = `/businessProcessTmp/updateStage?field_name=${field_name}&stage_uuid=${stage_uuid}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'POST',

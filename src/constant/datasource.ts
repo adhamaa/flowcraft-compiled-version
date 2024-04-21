@@ -13,9 +13,25 @@
  * 1. /updateCycle (update cycle process for a given business process)
  * 2. /update (update stage for a given cycle process)
  */
-export const datasource = {};
 
 
-datasource.memory = "/businessProcess";
-datasource.cache = "/businessProcessRedis";
-datasource.database = "/businessProcessTmp";
+export const datasource = {
+  memory: "/businessProcess",
+  cache: "/businessProcessRedis",
+  database: "/businessProcessTmp",
+};
+
+export const datasource_type = {
+  memory: "memory",
+  cache: "cache",
+  database: "database",
+};
+
+export const datasource_mapping = {
+  [datasource_type.memory]: datasource.memory,
+  [datasource_type.cache]: datasource.cache,
+  [datasource_type.database]: datasource.database,
+};
+
+export type DatasourceType = keyof typeof datasource_type;
+

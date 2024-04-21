@@ -163,8 +163,8 @@ const TabularSection = ({ opened,
   });
 
   const datasourceList = [
-    { name: 'memory', disabled: true },
-    { name: 'cache', disabled: true },
+    { name: 'memory', disabled: false },
+    { name: 'cache', disabled: false },
     { name: 'database', disabled: false }
   ];
 
@@ -260,7 +260,7 @@ const TabularSection = ({ opened,
                       value={tab.name}
                       fz={20}
                       fw={600}>
-                      <span className="capitalize">{tab.name}</span>
+                      <span className="capitalize ~text-base/lg">{tab.name}</span>
                     </Tabs.Tab>
                   ))}
 
