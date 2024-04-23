@@ -358,6 +358,7 @@ export const reloadBizProcess = async () => {
   const endpoint2 = `/businessProcess/reCreateProcess`;
   const url1 = `${baseUrl}${endpoint1}`;
   const url2 = `${baseUrl}${endpoint2}`;
+
   const response1 = await fetch(url1, {
     method: 'POST',
     headers: {
@@ -366,12 +367,7 @@ export const reloadBizProcess = async () => {
     },
     next: { tags: ['reloadBizProcess'] }
   });
-  if (response1.status === 404) {
-    return [];
-  }
-  // if (!response1.ok) {
-  //   throw new Error('Failed to reload business process.');
-  // }
+
 
   const data = await response1.json();
 
@@ -384,6 +380,8 @@ export const reloadBizProcess = async () => {
       },
       next: { tags: ['reloadBizProcess'] }
     })
+
+    const data2 = await response2.json();
+    return data2;
   }
-  return data;
 }

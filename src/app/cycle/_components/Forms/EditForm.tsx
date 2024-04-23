@@ -82,19 +82,41 @@ const EditFormContent = ({
     const target_id = e.nativeEvent.submitter.id
     const value = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
 
-    const stage_name = InputList.find((input) => input.name === target_id)?.label;
+    const label = InputList.find((input) => input.name === target_id)?.label;
 
-    await updateStage({
-      stage_uuid: stage_uuid as string,
-      field_name: target_id,
-      body: { value }
-    }).then(() => {
-      console.log(`${stage_name} updated successfully`);
-      toast.success(`${stage_name} updated successfully`);
-    }).catch((error) => {
-      console.log('Failed to update stage', error);
-      toast.error('Failed to update stage' + '\n' + error);
-    });
+    modals.open({
+      title: 'Confirm update',
+      children: (
+        <>
+          <Text size="sm">Are you sure you want to update <strong>{label}</strong>?</Text>
+          <Flex gap={16} justify={'end'} mt="md">
+            <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+              Cancel
+            </Button>
+            <Button onClick={async () => {
+              await updateStage({
+                stage_uuid: stage_uuid as string,
+                field_name: target_id,
+                body: { value }
+              }).then(() => {
+                toast.success(`${label} updated successfully`);
+              }).catch((error) => {
+                toast.error('Failed to update stage' + '\n' + error);
+              }).finally(() => {
+                modals.closeAll();
+              });
+            }} color='#895CF3' radius='md'>
+              Yes
+            </Button>
+          </Flex>
+        </>
+      ),
+      overlayProps: {
+        backgroundOpacity: 0.55,
+        blur: 10,
+      },
+      radius: 'md',
+    })
   }
 
   React.useEffect(() => {
@@ -317,7 +339,6 @@ const ActionButtons = ({
           toast.success(response.message);
         }
       }).catch((error) => {
-        console.log('Failed to test stage name', error);
         toast.error('Failed to test stage name' + '\n' + error);
       });
     } else {
@@ -354,7 +375,6 @@ const ActionButtons = ({
               radius: 'md',
             })
           }).catch((error) => {
-            console.log('Failed to get error messages', error);
             toast.error('Failed to get error messages' + '\n' + error);
           });
         } else {
@@ -362,7 +382,6 @@ const ActionButtons = ({
         }
 
       }).catch((error) => {
-        console.log('Failed to verify syntax', error);
         toast.error('Failed to verify syntax' + '\n' + error);
       });
     }
