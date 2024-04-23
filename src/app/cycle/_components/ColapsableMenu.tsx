@@ -1,9 +1,7 @@
 'use client';
 import * as React from 'react';
 import { Icon } from '@iconify-icon/react';
-import { Accordion, ActionIcon, Button, ScrollArea, Tabs, Transition, rem } from '@mantine/core';
-import { MenuItem, useSideMenu } from '@/hooks/useSideMenu';
-import { motion } from 'framer-motion';
+import { Button, ScrollArea, Tabs } from '@mantine/core';
 import clsx from 'clsx';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import EditForm from './Forms/EditForm';
@@ -13,13 +11,9 @@ import { getCycleInfo, getStageInfo } from '@/lib/service/client';
 import { useDisclosure } from '@mantine/hooks';
 
 export default function ColapsableMenu({
-  cycleData,
   stageData,
-  // stageInfoData
 }: {
-  cycleData: CycleData;
   stageData: StageData[];
-  // stageInfoData: StageInfoData;
 }) {
   const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
   const [stageInfo, setStageInfo] = React.useState<StageInfoData>();
@@ -125,13 +119,6 @@ export default function ColapsableMenu({
                 onClick={
                   async () => {
                     router.push(pathname + '?' + createQueryString('stage_uuid', stageData[0]?.stage_uuid as string));
-                    // const stageInfoRes = await getStageInfo({
-                    //   stage_uuid: stage_uuid as string,
-                    //   cycle_id: cycle_id as string,
-                    //   apps_label: selected_app as string,
-                    //   datasource_type: datasource_type as string
-                    // });
-                    // setStageInfo(stageInfoRes)
                   }
                 }
               >Stages</Tabs.Tab>
@@ -155,13 +142,6 @@ export default function ColapsableMenu({
                 }}
                 onChange={async (value) => {
                   router.push(pathname + '?' + createQueryString('stage_uuid', value as string));
-                  // const stageInfoRes = await getStageInfo({
-                  //   stage_uuid: value as string,
-                  //   cycle_id: cycle_id as string,
-                  //   apps_label: selected_app as string,
-                  //   datasource_type: datasource_type as string
-                  // });
-                  // setStageInfo(stageInfoRes)
                 }}
               >
                 {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
@@ -193,44 +173,6 @@ export default function ColapsableMenu({
     </aside >
   );
 }
-
-
-// export const SideMenuComponent = ({ menuItems, menuItem }: { menuItems?: MenuItem[]; menuItem?: MenuItem }) => {
-//   const [activeTab, setActiveTab] = React.useState<string | null>();
-
-//   return (
-//     <motion.div
-//       initial={{ opacity: 0, x: -100 }}
-//       animate={activeTab ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
-//       transition={{
-//         duration: 0.5,
-//         x: { type: "spring", stiffness: 300, damping: 30 },
-//         ease: "easeInOut"
-//       }}
-//       exit={{ opacity: 0, x: -100 }}
-//     >
-//       <Tabs
-//         orientation='vertical'
-//         value={activeTab}
-//         onChange={setActiveTab}
-//         classNames={{
-
-//         }}
-//       >
-//         <Tabs.List>
-//           {menuItems?.map((item, index) => (
-//             <Tabs.Tab key={item.id} value={item.id}>{item.label}</Tabs.Tab>
-//           ))}
-//         </Tabs.List>
-//         {menuItems?.map((item, index) => (
-//           <Tabs.Panel key={item.id} value={item.id}>
-//             {item.children && <SideMenuComponent menuItems={item.children} />}
-//           </Tabs.Panel>
-//         ))}
-//       </Tabs>
-//     </motion.div>
-//   );
-// };
 
 const FooterButton = ({ isAdd, isCollapse, isSideMenuCollapse, onClick }: { isAdd?: boolean; isCollapse?: boolean; isSideMenuCollapse: boolean; onClick: () => void; }) => {
   return (

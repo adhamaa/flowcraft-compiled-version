@@ -59,7 +59,6 @@ const EditFormContent = ({
   isEdit: boolean;
   toggle: () => void;
 }) => {
-  console.log('data:', data)
   const searchParams = useSearchParams();
   const stage_uuid = searchParams.get('stage_uuid');
 

@@ -3,7 +3,6 @@ import { Icon } from '@iconify-icon/react';
 import { Button, Group, Input, Modal, ScrollArea } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
-import { useParams, useSearchParams } from 'next/navigation'
 import * as React from 'react'
 import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
@@ -14,10 +13,6 @@ import toast from '@/components/toast';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
-  const params = useParams();
-  const cycle_id = params.cycle_id;
-  const apps_label = useSearchParams().get('apps_label')
-  const datasource_type = useSearchParams().get('data_source')
   const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
 
@@ -192,15 +187,7 @@ function message(strings: TemplateStringsArray, ...values: any[]) {
   const and = strings[1];
   const updatedSuccessfully = strings[2];
 
-  // if (status && description) {
-  //   return 'Cycle not changed'
-  // } else if (status && !description) {
-  //   return `Cycle description updated successfully`
-  // } else if (!status && description) {
-  //   return `Cycle status updated successfully`
-  // } else {
   return `${cycle} status ${and} description ${updatedSuccessfully}`
-  // }
 };
 
 function compareStates(prevStates: string, currStates: string) {
