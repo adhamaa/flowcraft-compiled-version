@@ -94,17 +94,90 @@ const EditFormContent = ({
               Cancel
             </Button>
             <Button onClick={async () => {
-              await updateStage({
-                stage_uuid: stage_uuid as string,
-                field_name: target_id,
-                body: { value }
-              }).then(() => {
-                toast.success(`${label} updated successfully`);
-              }).catch((error) => {
-                toast.error('Failed to update stage' + '\n' + error);
-              }).finally(() => {
-                modals.closeAll();
-              });
+              let syntax;
+              let semantics;
+
+              if (target_id === 'process_stage_name') {
+                syntax = await testStageName({ params: { stage_name: value } })
+                  .then((response) => {
+                    if (response.error) {
+                      toast.error(response.message)
+                      return response.result
+                    } else {
+                      toast.success(response.message);
+                      return response.result
+                    }
+                  })
+                  .catch((error) => {
+                    toast.error('Failed to test stage name' + '\n' + error);
+                  });
+              } else {
+                syntax = await verifySyntax({ body: { str_test_syntax: value } })
+                  .then(async (response) => {
+                    if (response.error) {
+                      toast.error(response.message);
+                      // await getErrorMessages({ body: { list_error_no: response.list_error_no } })
+                      //   .then((errorMessages) => {
+                      //     modals.open({
+                      //       title: 'Syntax errors',
+                      //       children: (
+                      //         <>
+                      //           {errorMessages.map(({ error_message }: { error_message: string }, index: React.Key | null | undefined) => (
+                      //             <List key={index} type="ordered" withPadding>
+                      //               <List.Item>{error_message}</List.Item>
+                      //             </List>
+                      //           ))}
+                      //           <Flex gap={16} justify={'end'} mt="md">
+                      //             <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                      //               Close
+                      //             </Button>
+                      //           </Flex>
+                      //         </>
+                      //       ),
+                      //       overlayProps: {
+                      //         backgroundOpacity: 0.55,
+                      //         blur: 10,
+                      //       },
+                      //       radius: 'md',
+                      //     })
+                      //   }).catch((error) => {
+                      //     toast.error('Failed to get error messages' + '\n' + error);
+                      //   });
+
+                      return response.result
+                    } else {
+                      toast.success(response.message);
+                      return response.result
+                    }
+
+                  }).catch((error) => {
+                    toast.error('Failed to verify syntax' + '\n' + error);
+                  });
+              }
+
+
+              semantics = await evaluateSemantics()
+                .then((text) => {
+                  toast.warning(text as string);
+                  return true
+                })
+
+              if (syntax && semantics) {
+                await updateStage({
+                  stage_uuid: stage_uuid as string,
+                  field_name: target_id,
+                  body: { value }
+                }).then(() => {
+                  toast.success(`${label} updated successfully`);
+                }).catch((error) => {
+                  toast.error('Failed to update stage' + '\n' + error);
+                }).finally(() => {
+                  modals.closeAll();
+                });
+              } else {
+                toast.error(`Failed to update ${label}`);
+              }
+
             }} color='#895CF3' radius='md'>
               Yes
             </Button>
@@ -359,12 +432,6 @@ const ActionButtons = ({
                     <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
                       Close
                     </Button>
-                    {/* <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
-                  Cancel
-                </Button>
-                <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-                  Save
-                </Button> */}
                   </Flex>
                 </>
               ),
@@ -395,31 +462,27 @@ const ActionButtons = ({
       <Button key={name} id={name} color='#1C1454' radius='md' className="!font-normal"
         onClick={handleSubmit(onSubmit)}
       >Verify syntax</Button>
-      <Button color='#FF6347' radius='md' className="!font-normal" onClick={() => evaluateSemantics().then((text) => modals.open({
-        title: 'Semantics errors',
-        children: (
-          <>
-            <Text size="sm">{text}</Text>
-            <Flex gap={16} justify={'end'} mt="md">
-              <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-                Close
-              </Button>
-              {/* <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
-              Cancel
-            </Button>
-            <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-              Save
-            </Button> */}
-            </Flex>
-          </>
-        ),
-        overlayProps: {
-          backgroundOpacity: 0.55,
-          blur: 10,
-        },
-        radius: 'md',
-      }))
-      }>Evaluate semantics
+      <Button color='#FF6347' radius='md' className="!font-normal"
+        onClick={() => evaluateSemantics()
+          .then((text) => modals.open({
+            title: 'Semantics errors',
+            children: (
+              <>
+                <Text size="sm">{text}</Text>
+                <Flex gap={16} justify={'end'} mt="md">
+                  <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                    Close
+                  </Button>
+                </Flex>
+              </>
+            ),
+            overlayProps: {
+              backgroundOpacity: 0.55,
+              blur: 10,
+            },
+            radius: 'md',
+          }))
+        }>Evaluate semantics
       </Button>
     </div >
 
