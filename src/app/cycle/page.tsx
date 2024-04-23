@@ -21,7 +21,6 @@ async function HomePage({
 
   // Wait for the promises to resolve
   const [applicationData, cycleData] = await Promise.all([application, cycle])
-  console.log('cycleData:', cycleData)
 
   return (
     <div className="flex h-[calc(100vh-66px)]">

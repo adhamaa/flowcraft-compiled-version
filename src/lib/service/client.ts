@@ -26,18 +26,19 @@ export const getApplicationList = async () => {
 
 export const getCycleList = async ({
   apps_label,
-  cycle_id,
-  datasource_type = 'cache'
+  // cycle_id,
+  datasource_type = 'database'
 }: {
   apps_label?: string;
-  cycle_id?: number;
+  // cycle_id?: number;
   datasource_type: string;
 }) => {
   if (!apps_label) return [];
+  if (!datasource_type) return [];
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  const endpoint = `/businessProcessRedis/listCycleProcess?apps_label=${apps_label}`;
+  const endpoint = `${datasource_mapping[datasource_type]}/listCycleProcess?apps_label=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
 
@@ -57,8 +58,7 @@ export const getCycleList = async ({
   }
   const data = await response.json();
 
-  const stringifyObjectValues = cycle_id ?
-    data.result.find((item: any) => item.cycle_id === cycle_id) :
+  const stringifyObjectValues =
     data.result?.map((item: any) => ({
       ...item,
       cycle_created: new Date(item.cycle_created).toDateString(),
@@ -67,17 +67,51 @@ export const getCycleList = async ({
       app_name: item.app_name ?? 'N/A',
       cycle_name: item.cycle_name ?? 'N/A',
       no_of_stages: (item.no_of_stages).toString() ?? 'N/A',
-      cycle_active: item.cycle_active ? 'Active' : 'Inactive',
-      cycle_id: (item.cycle_id).toString(),
+      cycle_active: item.cycle_active == 1 ? 'Active' : 'Inactive',
+      cycle_id: typeof (item.cycle_id) === 'number' ? (item.cycle_id).toString() : item.cycle_id,
     }));
 
   return await stringifyObjectValues;
 };
 
+export const getCycleInfo = async ({
+  cycle_id,
+  data
+}: {
+  cycle_id: string;
+  data: {
+    app_label: string;
+    app_name: string;
+    app_sys_code: string;
+    app_uuid: string;
+    cycle_active: number;
+    cycle_created: string;
+    cycle_description: string;
+    cycle_id: number;
+    cycle_name: string;
+    cycle_updated: string;
+    cycle_uuid: string;
+    no_of_stages: number;
+  };
+}) => {
+  if (!cycle_id) return {};
+  const mappedData = {
+    cycle_created: data.cycle_created,
+    cycle_updated: data.cycle_updated,
+    app_label: data.app_label,
+    app_name: data.app_name,
+    cycle_name: data.cycle_name,
+    no_of_stages: data.no_of_stages,
+    cycle_active: data.cycle_active,
+    cycle_id: data.cycle_id,
+  }
+  return mappedData;
+}
+
 export const getStageList = async ({
   cycle_id,
   apps_label,
-  datasource_type = 'cache'
+  datasource_type = 'database'
 }: {
   cycle_id: number | undefined;
   apps_label: string;
@@ -111,7 +145,7 @@ export const getStageInfo = async ({
   stage_uuid,
   cycle_id,
   apps_label,
-  datasource_type = 'cache'
+  datasource_type = 'database'
 }: {
   stage_uuid: string;
   cycle_id: number | undefined;
@@ -121,6 +155,7 @@ export const getStageInfo = async ({
   if (!stage_uuid) return {};
   if (!cycle_id) return {};
   if (!apps_label) return {};
+  if (!datasource_type) return {};
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `${datasource_mapping[datasource_type]}/mCurrentStage?process_stage_uuid=${stage_uuid}&cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;

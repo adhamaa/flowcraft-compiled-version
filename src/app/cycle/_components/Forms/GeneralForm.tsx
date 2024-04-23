@@ -53,6 +53,7 @@ const GeneralFormContent = ({
   isEdit: boolean;
   toggle: () => void;
 }) => {
+  console.log('data:', data)
   const InputList = [
     { name: 'cycle_name', label: 'Cycle name', value: data?.cycle_name, disabled: true },
     { name: "cycle_id", label: 'Cycle id', value: data?.cycle_id, disabled: true },

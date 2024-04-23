@@ -18,31 +18,37 @@ export const useData = () => {
       cycle: {
         all: async ({
           apps_label,
-          cycle_id
+          cycle_id,
+          datasource_type
         }: {
           apps_label?: string;
-          cycle_id?: number
+          cycle_id?: number;
+          datasource_type: string;
         }) => {
           return useQuery({
             queryKey: ["cycles", apps_label, cycle_id],
             queryFn: () => getCycleList({
               apps_label,
-              cycle_id
+              cycle_id,
+              datasource_type
             }),
           });
         },
         one: async ({
           apps_label,
-          cycle_id
+          cycle_id,
+          datasource_type
         }: {
           apps_label: string;
           cycle_id: number | undefined;
+          datasource_type: string;
         }) => {
           return useQuery({
             queryKey: ["cycles", apps_label, cycle_id],
             queryFn: () => getCycleList({
               apps_label,
-              cycle_id
+              cycle_id,
+              datasource_type
             }),
           });
         }
@@ -50,34 +56,40 @@ export const useData = () => {
       stage: {
         all: async ({
           cycle_id,
-          apps_label
+          apps_label,
+          datasource_type
         }: {
           cycle_id: number | undefined;
           apps_label: string;
+          datasource_type: string;
         }) => {
           return useQuery({
             queryKey: ["stages", cycle_id, apps_label],
             queryFn: () => getStageList({
               cycle_id,
-              apps_label
+              apps_label,
+              datasource_type
             }),
           });
         },
         one: async ({
           stage_uuid,
           cycle_id,
-          apps_label
+          apps_label,
+          datasource_type
         }: {
           stage_uuid: string;
           cycle_id: number | undefined;
           apps_label: string;
+          datasource_type: string;
         }) => {
           return useQuery({
             queryKey: ["stages", stage_uuid, cycle_id, apps_label],
             queryFn: () => getStageInfo({
               stage_uuid,
               cycle_id,
-              apps_label
+              apps_label,
+              datasource_type
             }),
           });
         },

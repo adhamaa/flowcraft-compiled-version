@@ -29,9 +29,8 @@ export default function ColapsableMenu({
   const pathname = usePathname();
   const selected_app = searchParams.get('selected_app');
   const stage_uuid = searchParams.get('stage_uuid');
+  const datasource_type = searchParams.get('data_source');
   const cycle_id = params.cycle_id;
-
-  const sideMenuLayer = stage_uuid ? 3 : 2;
 
   const createQueryString = React.useCallback(
     (name: string, value: string) => {
@@ -96,7 +95,8 @@ export default function ColapsableMenu({
                     const stageInfoRes = await getStageInfo({
                       stage_uuid: stageData[0]?.stage_uuid as string,
                       cycle_id: parseInt(cycle_id as string),
-                      apps_label: selected_app as string
+                      apps_label: selected_app as string,
+                      datasource_type: datasource_type as string
                     });
                     setStageInfo(stageInfoRes)
                   }
@@ -125,7 +125,8 @@ export default function ColapsableMenu({
                   const stageInfoRes = await getStageInfo({
                     stage_uuid: value as string,
                     cycle_id: parseInt(cycle_id as string),
-                    apps_label: selected_app as string
+                    apps_label: selected_app as string,
+                    datasource_type: datasource_type as string
                   });
                   setStageInfo(stageInfoRes)
                 }}

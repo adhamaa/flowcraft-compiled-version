@@ -1,4 +1,4 @@
-import { getCycleList, getStageInfo, getStageList } from '@/lib/service/client';
+import { getCycleList, getStageList } from '@/lib/service/client';
 import * as React from 'react'
 import ColapsableMenu from '../_components/ColapsableMenu';
 
@@ -28,7 +28,6 @@ const CyclePage = async ({
 
   // Wait for the promises to resolve
   const [cycleData, stageData] = await Promise.all([cycle, stage])
-  console.log('stageData:', stageData)
 
   return (
     <div className="flex h-[calc(100vh-66px)]">
