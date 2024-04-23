@@ -15,10 +15,7 @@ const CyclePage = async ({
     data_source: string;
   }
 }) => {
-  const cycle = await getCycleList({
-    apps_label: selected_app ?? '',
-    datasource_type: data_source
-  });
+
   const stage = await getStageList({
     cycle_id: cycle_id,
     apps_label: selected_app,
@@ -26,11 +23,11 @@ const CyclePage = async ({
   });
 
   // Wait for the promises to resolve
-  const [cycleData, stageData] = await Promise.all([cycle, stage])
+  const [stageData] = await Promise.all([stage])
 
   return (
     <div className="flex h-[calc(100vh-66px)]">
-      <ColapsableMenu cycleData={cycleData} stageData={stageData} />
+      <ColapsableMenu stageData={stageData} />
     </div>
   )
 }
