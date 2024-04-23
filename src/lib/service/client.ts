@@ -176,7 +176,8 @@ export const getStageInfo = async ({
   // if (!datasource_type) return {};
   console.log('datasource_type:', datasource_type)
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint = `${datasource_mapping[datasource_type]}/mCurrentStage?process_stage_uuid=${stage_uuid}&cycle_id=${cycle_id}&app_type=${apps_label}`;
+  //! have to change the endpoint 
+  const endpoint = `${datasource_type === 'memory' ? '/businessProcessV2' : datasource_mapping[datasource_type]}/mCurrentStage?process_stage_uuid=${stage_uuid}&cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'GET',
