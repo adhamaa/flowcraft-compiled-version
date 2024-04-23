@@ -17,11 +17,10 @@ const CyclePage = async ({
 }) => {
   const cycle = await getCycleList({
     apps_label: selected_app ?? '',
-    cycle_id: cycle_id ? parseInt(cycle_id) : undefined,
     datasource_type: data_source
   });
   const stage = await getStageList({
-    cycle_id: parseInt(cycle_id),
+    cycle_id: cycle_id,
     apps_label: selected_app,
     datasource_type: data_source
   });

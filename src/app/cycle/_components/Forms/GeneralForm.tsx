@@ -3,7 +3,7 @@ import { Icon } from '@iconify-icon/react';
 import { Button, Group, Input, Modal, ScrollArea } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import * as React from 'react'
 import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
@@ -14,7 +14,10 @@ import toast from '@/components/toast';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
-  const cycle_id = useSearchParams().get('cycle_id')
+  const params = useParams();
+  const cycle_id = params.cycle_id;
+  const apps_label = useSearchParams().get('apps_label')
+  const datasource_type = useSearchParams().get('data_source')
   const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
 
@@ -29,9 +32,11 @@ const GeneralForm = ({ data }: { data: CycleData }) => {
       transitionProps={{ transition: 'fade', duration: 200 }}
       withCloseButton={false}
     >
+
       <GeneralFormContent {...{ data, toggleEdit, isEdit, open, close, toggle }} />
     </Modal>
   ) : (
+
     <GeneralFormContent {...{ data, toggleEdit, isEdit, open, close, toggle }} />
   )
 }
@@ -53,7 +58,6 @@ const GeneralFormContent = ({
   isEdit: boolean;
   toggle: () => void;
 }) => {
-  console.log('data:', data)
   const InputList = [
     { name: 'cycle_name', label: 'Cycle name', value: data?.cycle_name, disabled: true },
     { name: "cycle_id", label: 'Cycle id', value: data?.cycle_id, disabled: true },
@@ -66,11 +70,11 @@ const GeneralFormContent = ({
   ];
 
   const [diagramOpened, { open: diagramOpen, close: diagramClose, toggle: diagramToggle }] = useDisclosure(false);
-  const { control, handleSubmit } = useForm();
+  const { control, handleSubmit, setValue } = useForm();
 
   const onSubmit = async (formdata: any) => {
     await updateCycle({
-      cycle_uuid: data.cycle_uuid.toString(),
+      cycle_uuid: data.cycle_uuid,
       body: {
         cycle_active: formdata.cycle_active,
         cycle_description: formdata.cycle_description
@@ -81,6 +85,20 @@ const GeneralFormContent = ({
       toast.error('Failed to update cycle' + "\n" + error);
     }).finally(() => { toggleEdit() });
   }
+
+  React.useEffect(() => {
+    if (data) {
+      setValue('cycle_active', data.cycle_active);
+      setValue('cycle_description', data.cycle_description);
+      setValue('cycle_id', data.cycle_id);
+      setValue('app_name', data.app_name);
+      setValue('cycle_updated', data.cycle_updated);
+      setValue('no_of_stages', data.no_of_stages);
+      setValue('cycle_name', data.cycle_name);
+
+    }
+  }, [data, setValue])
+
 
   return (
     <ScrollArea.Autosize mah={768}>

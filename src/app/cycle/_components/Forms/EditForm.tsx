@@ -25,7 +25,6 @@ const EditForm = ({
 }: {
   data: StageInfoData
 }) => {
-  const cycle_id = useSearchParams().get('cycle_id');
   const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
 
@@ -60,6 +59,7 @@ const EditFormContent = ({
   isEdit: boolean;
   toggle: () => void;
 }) => {
+  console.log('data:', data)
   const searchParams = useSearchParams();
   const stage_uuid = searchParams.get('stage_uuid');
 
@@ -79,9 +79,9 @@ const EditFormContent = ({
 
   const { control, handleSubmit, setValue } = useForm();
 
-  const onSubmit = async (data: any, e: any) => {
+  const onSubmit = async (formdata: any, e: any) => {
     const target_id = e.nativeEvent.submitter.id
-    const value = target_id === 'process_stage_name' ? data[target_id] : JSON.parse(data[target_id]);
+    const value = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
 
     const stage_name = InputList.find((input) => input.name === target_id)?.label;
 
@@ -307,9 +307,9 @@ const ActionButtons = ({
   toggleEdit: () => void;
   handleSubmit: UseFormHandleSubmit<FieldValues, undefined>;
 }) => {
-  const onSubmit = async (data: any, e: any) => {
+  const onSubmit = async (formdata: any, e: any) => {
     const target_id = e.target.offsetParent.id
-    const str_test_syntax = target_id === 'process_stage_name' ? data[target_id] : JSON.parse(data[target_id]);
+    const str_test_syntax = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
     if (target_id === 'process_stage_name') {
       await testStageName({ params: { stage_name: str_test_syntax } }).then((response) => {
         if (response.error) {

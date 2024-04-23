@@ -9,7 +9,7 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import EditForm from './Forms/EditForm';
 import GeneralForm from './Forms/GeneralForm';
 import { CycleData, StageData, StageInfoData } from './HomeContent';
-import { getStageInfo } from '@/lib/service/client';
+import { getCycleInfo, getStageInfo } from '@/lib/service/client';
 import { useDisclosure } from '@mantine/hooks';
 
 export default function ColapsableMenu({
@@ -22,7 +22,8 @@ export default function ColapsableMenu({
   // stageInfoData: StageInfoData;
 }) {
   const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
-  const [stageInfo, setStageInfo] = React.useState<StageInfoData>()
+  const [stageInfo, setStageInfo] = React.useState<StageInfoData>();
+  const [cycleInfo, setCycleInfo] = React.useState<CycleData>();
   const searchParams = useSearchParams();
   const params = useParams();
   const router = useRouter();
@@ -49,6 +50,38 @@ export default function ColapsableMenu({
     params.delete(param)
     return params.toString()
   };
+
+  React.useEffect(() => {
+    async function getCycleInfoData() {
+      const cycleInfoDataRes = await getCycleInfo({
+        apps_label: selected_app as string,
+        cycle_id: cycle_id as string,
+        datasource_type: datasource_type as string
+      });
+      setCycleInfo(cycleInfoDataRes)
+    }
+
+    if (cycle_id && selected_app && datasource_type) {
+      getCycleInfoData()
+    }
+  }, [cycle_id, datasource_type, selected_app])
+
+  React.useEffect(() => {
+    async function getStageInfoData() {
+      const stageInfoDataRes = await getStageInfo({
+        stage_uuid: stage_uuid as string,
+        cycle_id: cycle_id as string,
+        apps_label: selected_app as string,
+        datasource_type: datasource_type as string
+      });
+      setStageInfo(stageInfoDataRes)
+    }
+
+    if (cycle_id && selected_app && datasource_type && stage_uuid) {
+      getStageInfoData()
+    }
+  }, [cycle_id, datasource_type, selected_app, stage_uuid])
+
 
   return (
     <aside
@@ -92,13 +125,13 @@ export default function ColapsableMenu({
                 onClick={
                   async () => {
                     router.push(pathname + '?' + createQueryString('stage_uuid', stageData[0]?.stage_uuid as string));
-                    const stageInfoRes = await getStageInfo({
-                      stage_uuid: stageData[0]?.stage_uuid as string,
-                      cycle_id: parseInt(cycle_id as string),
-                      apps_label: selected_app as string,
-                      datasource_type: datasource_type as string
-                    });
-                    setStageInfo(stageInfoRes)
+                    // const stageInfoRes = await getStageInfo({
+                    //   stage_uuid: stage_uuid as string,
+                    //   cycle_id: cycle_id as string,
+                    //   apps_label: selected_app as string,
+                    //   datasource_type: datasource_type as string
+                    // });
+                    // setStageInfo(stageInfoRes)
                   }
                 }
               >Stages</Tabs.Tab>
@@ -107,7 +140,7 @@ export default function ColapsableMenu({
               } */}
             </Tabs.List>}
             <Tabs.Panel value="general">
-              <GeneralForm data={cycleData} />
+              <GeneralForm data={cycleInfo as CycleData} />
             </Tabs.Panel>
             <Tabs.Panel value="stages" >
               <Tabs
@@ -122,13 +155,13 @@ export default function ColapsableMenu({
                 }}
                 onChange={async (value) => {
                   router.push(pathname + '?' + createQueryString('stage_uuid', value as string));
-                  const stageInfoRes = await getStageInfo({
-                    stage_uuid: value as string,
-                    cycle_id: parseInt(cycle_id as string),
-                    apps_label: selected_app as string,
-                    datasource_type: datasource_type as string
-                  });
-                  setStageInfo(stageInfoRes)
+                  // const stageInfoRes = await getStageInfo({
+                  //   stage_uuid: value as string,
+                  //   cycle_id: cycle_id as string,
+                  //   apps_label: selected_app as string,
+                  //   datasource_type: datasource_type as string
+                  // });
+                  // setStageInfo(stageInfoRes)
                 }}
               >
                 {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}

@@ -1,7 +1,7 @@
 'use client';
 
 /* eslint-disable react-hooks/rules-of-hooks */
-import { getApplicationList, getCycleList, getStageInfo, getStageList, updateCycle } from "@/lib/service/client";
+import { getApplicationList, getCycleInfo, getCycleList, getStageInfo, getStageList, updateCycle } from "@/lib/service/client";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 export const useData = () => {
@@ -18,18 +18,15 @@ export const useData = () => {
       cycle: {
         all: async ({
           apps_label,
-          cycle_id,
           datasource_type
         }: {
           apps_label?: string;
-          cycle_id?: number;
           datasource_type: string;
         }) => {
           return useQuery({
-            queryKey: ["cycles", apps_label, cycle_id],
+            queryKey: ["cycles", apps_label],
             queryFn: () => getCycleList({
               apps_label,
-              cycle_id,
               datasource_type
             }),
           });
@@ -40,12 +37,12 @@ export const useData = () => {
           datasource_type
         }: {
           apps_label: string;
-          cycle_id: number | undefined;
+          cycle_id: string;
           datasource_type: string;
         }) => {
           return useQuery({
             queryKey: ["cycles", apps_label, cycle_id],
-            queryFn: () => getCycleList({
+            queryFn: () => getCycleInfo({
               apps_label,
               cycle_id,
               datasource_type
@@ -59,7 +56,7 @@ export const useData = () => {
           apps_label,
           datasource_type
         }: {
-          cycle_id: number | undefined;
+          cycle_id: string;
           apps_label: string;
           datasource_type: string;
         }) => {
@@ -79,7 +76,7 @@ export const useData = () => {
           datasource_type
         }: {
           stage_uuid: string;
-          cycle_id: number | undefined;
+          cycle_id: string;
           apps_label: string;
           datasource_type: string;
         }) => {
