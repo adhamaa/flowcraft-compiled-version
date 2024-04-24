@@ -1,6 +1,6 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Button, Group, Input, Modal, ScrollArea } from '@mantine/core'
+import { Button, Flex, Group, Input, Modal, ScrollArea, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
 import * as React from 'react'
@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { Radio, TextInput } from 'react-hook-form-mantine';
 import { updateCycle } from '@/lib/service/client';
 import toast from '@/components/toast';
+import { modals } from '@mantine/modals';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
@@ -68,17 +69,47 @@ const GeneralFormContent = ({
   const { control, handleSubmit, setValue } = useForm();
 
   const onSubmit = async (formdata: any) => {
-    await updateCycle({
-      cycle_uuid: data.cycle_uuid,
-      body: {
-        cycle_active: formdata.cycle_active,
-        cycle_description: formdata.cycle_description
-      }
-    }).then(() => {
-      toast.success(message`Cycle ${compareStates((data.cycle_active).toString(), formdata.cycle_active)} and ${compareStates(data.cycle_description, formdata.cycle_description)} updated successfully`);
-    }).catch((error) => {
-      toast.error('Failed to update cycle' + "\n" + error);
-    }).finally(() => { toggleEdit() });
+    const hasStatusChange = !compareStates((data.cycle_active).toString(), formdata.cycle_active);
+    const hasDescriptionChange = !compareStates(data.cycle_description, formdata.cycle_description);
+    modals.open({
+      title: 'Confirm update',
+      children: (
+        <>
+          <Text size="sm">Are you sure you want to update <strong>Cycle status & description</strong>?</Text>
+          <Flex gap={16} justify={'end'} mt="md">
+            <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+              Cancel
+            </Button>
+            <Button onClick={
+              async () => {
+                await updateCycle({
+                  cycle_uuid: data.cycle_uuid,
+                  body: {
+                    cycle_active: formdata.cycle_active,
+                    cycle_description: formdata.cycle_description
+                  }
+                }).then(() => {
+                  toast.success(message`Cycle ${compareStates((data.cycle_active).toString(), formdata.cycle_active)} and ${compareStates(data.cycle_description, formdata.cycle_description)} updated successfully`);
+                }).catch((error) => {
+                  toast.error('Failed to update cycle' + "\n" + error);
+                }).finally(() => {
+                  modals.closeAll();
+                  toggleEdit()
+                });
+
+              }} color='#895CF3' radius='md'>
+              Yes
+            </Button>
+          </Flex>
+        </>
+      ),
+      overlayProps: {
+        backgroundOpacity: 0.55,
+        blur: 10,
+      },
+      radius: 'md',
+    });
+
   }
 
   React.useEffect(() => {
