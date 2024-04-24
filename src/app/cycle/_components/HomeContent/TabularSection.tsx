@@ -7,8 +7,11 @@ import Image from "next/image";
 import clsx from "clsx";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from "mantine-react-table";
-import { ActionIcon, Button, Flex, Menu, Stack, Table, Tabs } from "@mantine/core";
+import { ActionIcon, Button, Flex, Menu, Stack, Table, Tabs, Text, Tooltip } from "@mantine/core";
 import { Icon } from "@iconify-icon/react";
+import { reloadBizProcess } from '@/lib/service/client';
+import { modals } from '@mantine/modals';
+import toast from '@/components/toast';
 
 const TabularSection = ({ opened,
   statusIndicator,
@@ -222,15 +225,78 @@ const TabularSection = ({ opened,
               {isPagination && <MRT_TablePagination table={table} />}
 
               <div className='flex ml-2 gap-4'>
-                <ActionIcon disabled variant="transparent" bg="#F1F5F9" color='black' size="lg" radius="md" aria-label="Settings">
-                  <Icon icon="heroicons-outline:refresh" width="1rem" height="1rem" />
-                </ActionIcon>
-                <ActionIcon disabled variant="transparent" bg="#F1F5F9" color='black' size="lg" radius="md" aria-label="Settings">
-                  <Icon icon="heroicons-outline:adjustments" width="1rem" height="1rem" />
-                </ActionIcon>
-                <ActionIcon disabled variant="transparent" bg="#F1F5F9" color='black' size="lg" radius="md" aria-label="Settings">
-                  <Icon icon="heroicons-outline:switch-vertical" width="1rem" height="1rem" />
-                </ActionIcon>
+                <Tooltip label="Reload Business Process (All)">
+                  <ActionIcon
+                    // disabled
+                    onClick={async () => {
+                      modals.open({
+                        title: 'Confirm update',
+                        children: (
+                          <>
+                            <Text size="sm">Are you sure you want to Reload <strong>The Business Process</strong>?</Text>
+                            <Flex gap={16} justify={'end'} mt="md">
+                              <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+                                Cancel
+                              </Button>
+                              <Button onClick={
+                                async () => {
+                                  await reloadBizProcess()
+                                    .then((res) => {
+                                      if (res) {
+                                        toast.success(res.message)
+                                      }
+                                    }).catch((err) => {
+                                      toast.error(err.message)
+                                    }).finally(() => {
+                                      modals.closeAll()
+                                    });
+                                }} color='#895CF3' radius='md'>
+                                Yes
+                              </Button>
+                            </Flex>
+                          </>
+                        ),
+                        overlayProps: {
+                          backgroundOpacity: 0.55,
+                          blur: 10,
+                        },
+                        radius: 'md',
+                      });
+
+                    }}
+                    variant="transparent"
+                    bg="#F1F5F9"
+                    color='black'
+                    size="lg"
+                    radius="md"
+                    aria-label="Settings">
+                    <Icon icon="heroicons-outline:refresh" width="1rem" height="1rem" />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Filter">
+                  <ActionIcon
+                    disabled
+                    variant="transparent"
+                    bg="#F1F5F9"
+                    color='black'
+                    size="lg"
+                    radius="md"
+                    aria-label="Settings">
+                    <Icon icon="heroicons-outline:adjustments" width="1rem" height="1rem" />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Sort">
+                  <ActionIcon
+                    disabled
+                    variant="transparent"
+                    bg="#F1F5F9"
+                    color='black'
+                    size="lg"
+                    radius="md"
+                    aria-label="Settings">
+                    <Icon icon="heroicons-outline:switch-vertical" width="1rem" height="1rem" />
+                  </ActionIcon>
+                </Tooltip>
               </div>
 
             </Flex>

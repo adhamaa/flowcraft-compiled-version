@@ -117,34 +117,6 @@ const EditFormContent = ({
                     .then(async (response) => {
                       if (response.error) {
                         toast.error(response.message);
-                        // await getErrorMessages({ body: { list_error_no: response.list_error_no } })
-                        //   .then((errorMessages) => {
-                        //     modals.open({
-                        //       title: 'Syntax errors',
-                        //       children: (
-                        //         <>
-                        //           {errorMessages.map(({ error_message }: { error_message: string }, index: React.Key | null | undefined) => (
-                        //             <List key={index} type="ordered" withPadding>
-                        //               <List.Item>{error_message}</List.Item>
-                        //             </List>
-                        //           ))}
-                        //           <Flex gap={16} justify={'end'} mt="md">
-                        //             <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-                        //               Close
-                        //             </Button>
-                        //           </Flex>
-                        //         </>
-                        //       ),
-                        //       overlayProps: {
-                        //         backgroundOpacity: 0.55,
-                        //         blur: 10,
-                        //       },
-                        //       radius: 'md',
-                        //     })
-                        //   }).catch((error) => {
-                        //     toast.error('Failed to get error messages' + '\n' + error);
-                        //   });
-
                         return response.result
                       } else {
                         toast.success(response.message);

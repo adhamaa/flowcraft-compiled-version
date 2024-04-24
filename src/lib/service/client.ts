@@ -2,8 +2,11 @@
 import { clientRevalidateTag } from "./server";
 import { datasource_mapping } from "@/constant/datasource";
 
+// const baseUrl = process.env.NEXT_PUBLIC_M1_API_URL;
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
 export const getApplicationList = async () => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = '/businessProcess/listAppsBizProcess';
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -34,7 +37,7 @@ export const getCycleList = async ({
   if (!apps_label) return [];
   if (!datasource_type) return [];
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const endpoint = `${datasource_mapping[datasource_type]}/listCycleProcess?apps_label=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
@@ -85,7 +88,7 @@ export const getCycleInfo = async ({
   // if (!cycle_id) return {};
   // if (!datasource_type) return {};
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const endpoint = `${datasource_mapping[datasource_type]}/listCycleProcess?apps_label=${apps_label}&cycle_id=${cycle_id}`;
   const url = `${baseUrl}${endpoint}`;
@@ -134,7 +137,7 @@ export const getStageList = async ({
 }) => {
   if (!cycle_id) return [];
   if (!apps_label) return [];
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `${datasource_mapping[datasource_type]}/mAllStage?cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -168,14 +171,10 @@ export const getStageInfo = async ({
   datasource_type: string;
 }) => {
   // if (!stage_uuid) return {};
-  console.log('stage_uuid:', stage_uuid)
   // if (!cycle_id) return {};
-  console.log('cycle_id:', cycle_id)
   // if (!apps_label) return {};
-  console.log('apps_label:', apps_label)
   // if (!datasource_type) return {};
-  console.log('datasource_type:', datasource_type)
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   //! have to change the endpoint 
   const endpoint = `${datasource_type === 'memory' ? '/businessProcessV2' : datasource_mapping[datasource_type]}/mCurrentStage?process_stage_uuid=${stage_uuid}&cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
@@ -205,7 +204,7 @@ export const updateCycle = async ({
   cycle_uuid: string;
   body: { cycle_active: number; cycle_description: string };
 }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/businessProcessTmp/updateCycle?cycle_uuid=${cycle_uuid}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -236,7 +235,7 @@ export const updateStage = async ({
   field_name: string;
   body: { value: string };
 }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/businessProcessTmp/updateStage?field_name=${field_name}&stage_uuid=${stage_uuid}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -260,7 +259,7 @@ export const updateStage = async ({
 };
 
 export const verifySyntax = async ({ body }: { body: { str_test_syntax: string } }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/syntaxEngine/`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -284,7 +283,7 @@ export const verifySyntax = async ({ body }: { body: { str_test_syntax: string }
 }
 
 export const getErrorMessages = async ({ body }: { body: { list_error_no: number[] } }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/syntaxEngine/getErrorMessage/`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -308,7 +307,7 @@ export const getErrorMessages = async ({ body }: { body: { list_error_no: number
 }
 
 export const testStageName = async ({ params }: { params: { stage_name: string; } }) => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/syntaxEngine/testStageName/?strText=${params.stage_name}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -331,7 +330,7 @@ export const testStageName = async ({ params }: { params: { stage_name: string; 
 }
 
 export const evaluateSemantics = async () => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/semanticEngine/`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -353,36 +352,60 @@ export const evaluateSemantics = async () => {
   return data;
 }
 
-export const reloadBizProcess = async () => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint1 = `/businessProcess/uploadTableProcess/`;
-  const endpoint2 = `/businessProcess/reCreateProcess`;
-  const url1 = `${baseUrl}${endpoint1}`;
-  const url2 = `${baseUrl}${endpoint2}`;
+export const reloadBizProcess = async (baseUrlIndex = 0): Promise<{ message: string }> => {
+  const baseUrl = [process.env.NEXT_PUBLIC_M1_API_URL, process.env.NEXT_PUBLIC_M2_API_URL]
 
-  const response1 = await fetch(url1, {
+  if (baseUrlIndex >= baseUrl.length) {
+    return { message: 'Business process reloaded successfully.' };
+  }
+
+  const url = baseUrl[baseUrlIndex];
+  await uploadNCreate(url);
+
+  // Call recursively with the next index
+  return reloadBizProcess(baseUrlIndex + 1);
+};
+
+
+async function uploadNCreate(baseUrl: string | undefined) {
+  const uploadTableProcessPath = `/businessProcess/uploadTableProcess/`;
+  const reCreateProcessPath = `/businessProcess/reCreateProcess`;
+  const uploadTableProcessPathUrl = `${baseUrl}${uploadTableProcessPath}`;
+  const reCreateProcessPathUrl = `${baseUrl}${reCreateProcessPath}`;
+
+  return await fetch(uploadTableProcessPathUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    next: { tags: ['reloadBizProcess'] }
-  });
+    next: { tags: ['uploadTableProcess'] }
+  }).then(async (response) => {
+    if (!response.ok) {
+      throw new Error('Failed to reload business process (uploadTableProcess).');
+    }
 
-
-  const data = await response1.json();
-
-  if (data.status === 'success') {
-    const response2 = await fetch(url2, {
-      method: 'POST',
+    return await fetch(reCreateProcessPathUrl, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
       },
-      next: { tags: ['reloadBizProcess'] }
-    })
+      next: { tags: ['reCreateProcess'] }
+    }).then(async (response) => {
+      if (!response.ok) {
+        throw new Error('Failed to reload business process (reCreateProcess).');
+      }
 
-    const data2 = await response2.json();
-    return data2;
-  }
+      return {
+        url: baseUrl,
+        message: 'Business process reloaded successfully.',
+        result: await (await response.json()).result
+      };
+
+    });
+
+  });
+
+
 }
