@@ -9,6 +9,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from "mantine-react-table";
 import { ActionIcon, Button, Flex, Menu, Stack, Table, Tabs } from "@mantine/core";
 import { Icon } from "@iconify-icon/react";
+import { reloadBizProcess } from '@/lib/service/client';
 
 const TabularSection = ({ opened,
   statusIndicator,
@@ -222,13 +223,38 @@ const TabularSection = ({ opened,
               {isPagination && <MRT_TablePagination table={table} />}
 
               <div className='flex ml-2 gap-4'>
-                <ActionIcon disabled variant="transparent" bg="#F1F5F9" color='black' size="lg" radius="md" aria-label="Settings">
+                <ActionIcon
+                  // disabled
+                  onClick={() => {
+                    async () => await reloadBizProcess();
+
+                  }}
+                  variant="transparent"
+                  bg="#F1F5F9"
+                  color='black'
+                  size="lg"
+                  radius="md"
+                  aria-label="Settings">
                   <Icon icon="heroicons-outline:refresh" width="1rem" height="1rem" />
                 </ActionIcon>
-                <ActionIcon disabled variant="transparent" bg="#F1F5F9" color='black' size="lg" radius="md" aria-label="Settings">
+                <ActionIcon
+                  disabled
+                  variant="transparent"
+                  bg="#F1F5F9"
+                  color='black'
+                  size="lg"
+                  radius="md"
+                  aria-label="Settings">
                   <Icon icon="heroicons-outline:adjustments" width="1rem" height="1rem" />
                 </ActionIcon>
-                <ActionIcon disabled variant="transparent" bg="#F1F5F9" color='black' size="lg" radius="md" aria-label="Settings">
+                <ActionIcon
+                  disabled
+                  variant="transparent"
+                  bg="#F1F5F9"
+                  color='black'
+                  size="lg"
+                  radius="md"
+                  aria-label="Settings">
                   <Icon icon="heroicons-outline:switch-vertical" width="1rem" height="1rem" />
                 </ActionIcon>
               </div>

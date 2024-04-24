@@ -355,10 +355,12 @@ export const evaluateSemantics = async () => {
 
 export const reloadBizProcess = async () => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const baseUrl_m1 = process.env.NEXT_PUBLIC_M1_API_URL;
+  const baseUrl_m2 = process.env.NEXT_PUBLIC_M2_API_URL;
   const endpoint1 = `/businessProcess/uploadTableProcess/`;
   const endpoint2 = `/businessProcess/reCreateProcess`;
-  const url1 = `${baseUrl}${endpoint1}`;
-  const url2 = `${baseUrl}${endpoint2}`;
+  const url1 = `${baseUrl_m1}${endpoint1}`;
+  const url2 = `${baseUrl_m1}${endpoint2}`;
 
   const response1 = await fetch(url1, {
     method: 'POST',
@@ -370,19 +372,22 @@ export const reloadBizProcess = async () => {
   });
 
 
+  console.log('response1:', response1)
   const data = await response1.json();
+  console.log('data:', data)
 
-  if (data.status === 'success') {
-    const response2 = await fetch(url2, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
-      },
-      next: { tags: ['reloadBizProcess'] }
-    })
+  // if (data.status === 'success') {
+  //   const response2 = await fetch(url2, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+  //     },
+  //     next: { tags: ['reloadBizProcess'] }
+  //   })
 
-    const data2 = await response2.json();
-    return data2;
-  }
+  //   const data2 = await response2.json();
+  //   console.log('data2:', data2)
+  //   return data2;
+  // }
 }
