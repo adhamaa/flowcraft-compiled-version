@@ -9,9 +9,11 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "clean": "rm -rf .next node_modules pnpm-lock.yaml yarn.lock package-lock.json && pnpm install"
+    "clean": "rm -rf .next node_modules pnpm-lock.yaml yarn.lock package-lock.json && pnpm install",
+    "db:push": "drizzle-kit push:mysql --config=drizzle.config.ts"
   },
   "dependencies": {
+    "@auth/drizzle-adapter": "^1.0.0",
     "@hookform/resolvers": "^3.3.4",
     "@mantine/core": "^7.6.1",
     "@mantine/dates": "^7.6.2",
@@ -23,8 +25,10 @@
     "@tanstack/react-query-next-experimental": "^5.29.0",
     "clsx": "^2.1.0",
     "dayjs": "^1.11.10",
+    "drizzle-orm": "^0.30.9",
     "framer-motion": "^11.0.25",
     "mantine-react-table": "2.0.0-beta.0",
+    "mysql2": "^3.9.7",
     "next": "14.1.4",
     "next-auth": "5.0.0-beta.16",
     "react": "^18",
@@ -41,6 +45,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
+    "drizzle-kit": "^0.20.17",
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
     "fluid-tailwind": "^0.1.6",

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import HomeContent from './_components/HomeContent'
 import { getApplicationList, getCycleList } from '@/lib/service/client';
+import { auth } from '@/auth';
 
 async function HomePage({
   searchParams: {
@@ -13,6 +14,10 @@ async function HomePage({
     data_source: string;
   }
 }) {
+
+  const session = auth()
+  console.log('session:', session)
+
   const application = getApplicationList();
   const cycle = getCycleList({
     apps_label: selected_app,
