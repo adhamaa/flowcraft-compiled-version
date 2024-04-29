@@ -1,19 +1,12 @@
-import { auth as middleware } from 'auth'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+// import { auth as middleware } from 'auth'
+import NextAuth from 'next-auth';
+import { authConfig } from '@/auth';
 
-export default middleware((request: NextRequest) => {
-  const { pathname } = request.nextUrl;
-
-  if (pathname === '/') {
-    return NextResponse.redirect(new URL('/cycle', request.url))
-  }
-
-  return NextResponse.next()
-})
-
+// const auth = NextAuth(authConfig).auth;
+export default NextAuth(authConfig).auth;
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.png).*)"],
 }
+

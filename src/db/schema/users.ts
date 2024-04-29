@@ -4,15 +4,15 @@ import {
   mysqlTable,
   primaryKey,
   varchar,
-  index,
 } from "drizzle-orm/mysql-core"
-import type { AdapterAccount } from "next-auth/adapters"
-import { randomUUID } from "crypto"
+import type { AdapterAccount } from "@auth/core/adapters"
 
 export const users = mysqlTable("user", {
-  id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => randomUUID()),
+  id: varchar("id", { length: 255 })
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull(),
   emailVerified: timestamp("emailVerified", {
     mode: "date",
     fsp: 3,
@@ -40,7 +40,6 @@ export const accounts = mysqlTable(
     session_state: varchar("session_state", { length: 255 }),
   },
   (account) => ({
-    userIdIdx: index("Account_userId_index").on(account.userId),
     compoundKey: primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
@@ -48,15 +47,12 @@ export const accounts = mysqlTable(
 )
 
 export const sessions = mysqlTable("session", {
-  id: varchar("id", { length: 255 }).primaryKey().$defaultFn(() => randomUUID()),
-  sessionToken: varchar("sessionToken", { length: 255 }).notNull().unique(),
+  sessionToken: varchar("sessionToken", { length: 255 }).primaryKey(),
   userId: varchar("userId", { length: 255 })
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
-}, (s) => ({
-  userIdIdx: index("Session_userId_index").on(s.userId),
-}))
+})
 
 export const verificationTokens = mysqlTable(
   "verificationToken",
@@ -69,11 +65,3 @@ export const verificationTokens = mysqlTable(
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
   })
 )
-
-
-// export {
-//   mysqlUsersTable as users,
-//   mysqlAccountsTable as accounts,
-//   mysqlSessionsTable as sessions,
-//   mysqlVerificationTokensTable as verificationTokens,
-// } from '@auth/drizzle-adapter'
