@@ -7,25 +7,39 @@ export default async function SignInPage() {
       <form
         action={async (formData) => {
           "use server"
-          const username = formData.get("username")
+          const userid = formData.get("userid")
           const password = formData.get("password")
           await signIn("credentials",
             {
-              username, password,
+              userid, password,
               redirectTo: "/"
             })
         }}
         className="flex flex-col gap-4 w-96 p-4 bg-white rounded-lg shadow-md"
       >
-        <label>
-          Username
-          <input name="username" type="text" />
+        <label
+          className="flex flex-col gap-1"
+        >
+          User ID
+          <input
+            className="p-2 border border-gray-300 rounded-lg"
+            name="username"
+            type="text"
+          />
         </label>
-        <label>
+        <label
+          className="flex flex-col gap-1"
+        >
           Password
-          <input name="password" type="password" />
+          <input
+            className="p-2 border border-gray-300 rounded-lg"
+            name="password"
+            type="password"
+          />
         </label>
-        <button>Sign In</button>
+        <button
+          className="p-2 bg-blue-500 text-white rounded-lg"
+        >Sign In</button>
       </form>
     </div>
   )

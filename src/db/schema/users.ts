@@ -5,13 +5,14 @@ import {
   primaryKey,
   varchar,
 } from "drizzle-orm/mysql-core"
-import type { AdapterAccount } from "@auth/core/adapters"
+import type { AdapterAccount } from "next-auth/adapters"
 
-export const users = mysqlTable("user", {
+export const users = mysqlTable("tbl_fc_user", {
   id: varchar("id", { length: 255 })
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }),
+  password: varchar("password", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
   emailVerified: timestamp("emailVerified", {
     mode: "date",
@@ -21,7 +22,7 @@ export const users = mysqlTable("user", {
 })
 
 export const accounts = mysqlTable(
-  "account",
+  "tbl_fc_account",
   {
     userId: varchar("userId", { length: 255 })
       .notNull()
@@ -46,7 +47,7 @@ export const accounts = mysqlTable(
   })
 )
 
-export const sessions = mysqlTable("session", {
+export const sessions = mysqlTable("tbl_fc_session", {
   sessionToken: varchar("sessionToken", { length: 255 }).primaryKey(),
   userId: varchar("userId", { length: 255 })
     .notNull()
@@ -55,7 +56,7 @@ export const sessions = mysqlTable("session", {
 })
 
 export const verificationTokens = mysqlTable(
-  "verificationToken",
+  "tbl_fc_verificationToken",
   {
     identifier: varchar("identifier", { length: 255 }).notNull(),
     token: varchar("token", { length: 255 }).notNull(),
