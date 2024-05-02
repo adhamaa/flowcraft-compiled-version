@@ -7,11 +7,11 @@ export default async function SignInPage() {
       <form
         action={async (formData) => {
           "use server"
-          const userid = formData.get("userid")
+          const email = formData.get("email")
           const password = formData.get("password")
           await signIn("credentials",
             {
-              userid, password,
+              email, password,
               redirectTo: "/"
             })
         }}
@@ -20,10 +20,10 @@ export default async function SignInPage() {
         <label
           className="flex flex-col gap-1"
         >
-          User ID
+          Email
           <input
             className="p-2 border border-gray-300 rounded-lg"
-            name="username"
+            name="email"
             type="text"
           />
         </label>

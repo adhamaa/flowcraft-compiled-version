@@ -16,7 +16,6 @@ async function HomePage({
 }) {
 
   const session = await auth()
-  console.log('session----->cycle page:', session)
 
   const application = getApplicationList();
   const cycle = getCycleList({

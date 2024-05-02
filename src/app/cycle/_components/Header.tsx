@@ -7,8 +7,10 @@ import clsx from "clsx";
 import { useGlobalState } from "@/hooks/useGlobalState";
 import { signOut } from "@/auth";
 import { bypassSignout } from "@/app/_action";
+import { Session } from "next-auth";
 
-function Header({ darkmode = false, className }: { darkmode?: boolean; className?: string }) {
+function Header({ session, darkmode = false, className }: { session: Session; darkmode?: boolean; className?: string }) {
+  console.log('session:', session)
   const router = useRouter();
   const pathname = usePathname();
   const profilePage = pathname.split('/')[1] === 'profile';
@@ -107,7 +109,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
               className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[#895CF3] dark:hover:text-[#895CF3] transition-all duration-300 ease-in-out"
             >
               {profileImg ?
-                <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} src="/profile_image.png" alt="it's me" />
+                <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} src={session?.user?.image} alt="it's me" />
                 :
                 <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} color="#895CF3" radius="xl">AA</Avatar>
               }
@@ -115,7 +117,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Label>Application</Menu.Label>
+            <Menu.Label><span className="text-[0.6rem]">{session.user?.name}</span></Menu.Label>
             <Menu.Item
               component="button"
               onClick={() => {
@@ -125,14 +127,14 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
               Log out
             </Menu.Item>
 
-            <Menu.Divider />
+            {/* <Menu.Divider /> */}
 
-            <Menu.Label>Danger zone</Menu.Label>
+            {/* <Menu.Label>Danger zone</Menu.Label>
             <Menu.Item
               color="red"
             >
               Delete my account
-            </Menu.Item>
+            </Menu.Item> */}
           </Menu.Dropdown>
         </Menu>
 

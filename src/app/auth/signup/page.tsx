@@ -1,11 +1,12 @@
 
-import SignupForm from './_component/signup-form';
+import SignupForm from './_components/signup-form';
 
 const SignupPage = () => {
 
   return (
-    <div>
-      <h1>Signup Page</h1>
+    <div
+      className='grid place-items-center h-screen bg-gray-100'
+    >
       <SignupForm />
     </div>
   );

@@ -103,7 +103,6 @@ export default function HomeContent({
 }) {
   const [opened, { toggle }] = useDisclosure(true);
 
-
   return (
     <div
       className={clsx('overflow-y-auto',
