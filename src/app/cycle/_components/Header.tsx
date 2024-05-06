@@ -9,7 +9,7 @@ import { signOut } from "@/auth";
 import { bypassSignout } from "@/app/_action";
 import { Session } from "next-auth";
 
-function Header({ session, darkmode = false, className }: { session: Session; darkmode?: boolean; className?: string }) {
+function Header({ session, darkmode = false, className }: { session: Session | null; darkmode?: boolean; className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const profilePage = pathname.split('/')[1] === 'profile';
@@ -48,12 +48,12 @@ function Header({ session, darkmode = false, className }: { session: Session; da
         onChange={(value) => router.push(`/${value}`)}>
         <Tabs.List>
           {[
-            { value: "cycle", label: "Cycle" },
-            { value: "maintenance", label: "Maintenance" },
-            { value: "documentation", label: "Documentation" },
-            { value: "about", label: "About" },
+            { value: "cycle", label: "Cycle", disabled: false },
+            { value: "maintenance", label: "Maintenance", disabled: true },
+            { value: "documentation", label: "Documentation", disabled: true },
+            { value: "about", label: "About", disabled: true },
           ].map((tab) => (
-            <Tabs.Tab key={tab.value} value={tab.value}>
+            <Tabs.Tab key={tab.value} value={tab.value} disabled={tab.disabled}>
               {tab.label}
             </Tabs.Tab>
           ))}
@@ -116,7 +116,7 @@ function Header({ session, darkmode = false, className }: { session: Session; da
           </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Label><span className="text-[0.6rem]">{session.user?.name}</span></Menu.Label>
+            <Menu.Label><span className="text-[0.6rem]">{session?.user?.name}</span></Menu.Label>
             <Menu.Item
               component="button"
               onClick={() => {

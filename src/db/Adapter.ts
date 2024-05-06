@@ -10,13 +10,14 @@ function customAdapter(): Adapter {
   adapter.createUser = async (data): Promise<AdapterUser & { password: string | null }> => {
     const id = crypto.randomUUID()
     await db.insert(users).values({ ...data, id })
+    // @ts-ignore
     return await db
       .select()
       .from(users)
       .where(eq(users.id, id))
       .then((res) => res[0])
   };
-
+  // @ts-ignore
   adapter.getUser = async (data) => {
     const thing =
       (await db
@@ -27,7 +28,7 @@ function customAdapter(): Adapter {
 
     return thing
   };
-
+  // @ts-ignore
   adapter.getUserByEmail = async (data) => {
     const user =
       (await db
@@ -48,7 +49,7 @@ function customAdapter(): Adapter {
       .where(eq(sessions.sessionToken, data.sessionToken))
       .then((res) => res[0])
   };
-
+  // @ts-ignore
   adapter.getSessionAndUser = async (data) => {
     const sessionAndUser =
       (await db
@@ -63,7 +64,7 @@ function customAdapter(): Adapter {
 
     return sessionAndUser
   };
-
+  // @ts-ignore
   adapter.updateUser = async (data) => {
     if (!data.id) {
       throw new Error("No user id.")
@@ -94,7 +95,7 @@ function customAdapter(): Adapter {
   adapter.linkAccount = async (rawAccount) => {
     await db.insert(accounts).values(rawAccount)
   }
-
+  // @ts-ignore
   adapter.getUserByAccount = async (account) => {
     const dbAccount =
       (await db
@@ -170,7 +171,7 @@ function customAdapter(): Adapter {
       throw new Error("No verification token found.")
     }
   };
-
+  // @ts-ignore
   adapter.deleteUser = async (id) => {
     const user = await db
       .select()

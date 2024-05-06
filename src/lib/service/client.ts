@@ -282,9 +282,10 @@ export const verifySyntax = async ({ body }: { body: { str_test_syntax: string }
   return data;
 }
 
-export const getErrorMessages = async ({ body }: { body: { list_error_no: number[] } }) => {
+export const getErrorMessages = async ({ params }: { params: { error_message_uuid: string } }) => {
   // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint = `/syntaxEngine/getErrorMessage/`;
+  const urlParams = new URLSearchParams({ error_message_uuid: params.error_message_uuid });
+  const endpoint = `/syntaxEngine/getErrorMessage/?${urlParams.toString()}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'POST',
@@ -292,7 +293,6 @@ export const getErrorMessages = async ({ body }: { body: { list_error_no: number
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    body: JSON.stringify({ list_error_no: body.list_error_no }),
     next: { tags: ['errorMessages'] }
   });
   if (response.status === 404) {
@@ -326,7 +326,6 @@ export const testStageName = async ({ params }: { params: { stage_name: string; 
   // }
 
   const data = await response.json();
-  console.log('data:', data)
   return data;
 }
 
