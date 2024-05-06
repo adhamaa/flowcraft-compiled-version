@@ -9,7 +9,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from "mantine-react-table";
 import { ActionIcon, Button, Flex, Menu, Stack, Table, Tabs, Text, Tooltip } from "@mantine/core";
 import { Icon } from "@iconify-icon/react";
-import { reloadBizProcess } from '@/lib/service/client';
+import { duplicateCycle, reloadBizProcess } from '@/lib/service/client';
 import { modals } from '@mantine/modals';
 import toast from '@/components/toast';
 
@@ -38,16 +38,63 @@ const TabularSection = ({ opened,
     {
       group: 'crud',
       menu: [
-        { label: 'Add new cycle', onClick: () => console.info('reload') },
-        { label: 'Delete cycle', onClick: () => console.info('Delete') },
-        { label: 'Duplicate cycle', onClick: () => console.info('Duplicate') },
+        { label: 'Add new cycle', onClick: () => console.log('reload') },
+        { label: 'Delete cycle', onClick: () => console.log('Delete') },
+        {
+          label: 'Duplicate cycle', onClick: async ({
+            original: {
+              cycle_id,
+              app_label,
+              app_name
+            } }: {
+              original: CycleData;
+            }) => {
+            console.log('row-cycle_id: ', cycle_id)
+            console.log('row-app_label: ', app_label)
+            modals.open({
+              title: 'Duplicate Cycle',
+              children: (
+                <>
+                  <Text size="sm">Are you sure you want to duplicate <strong>{app_name} - cycle id: {cycle_id}</strong>?</Text>
+                  <Flex gap={16} justify={'end'} mt="md">
+                    <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+                      Cancel
+                    </Button>
+                    <Button onClick={async () => {
+                      await duplicateCycle({
+                        cycle_id: cycle_id.toString(),
+                        apps_label: app_label
+                      })
+                        .then((response) => {
+                          if (response) {
+                            toast.success(response.message)
+                          }
+                        }).catch((err) => {
+                          toast.error(err.message)
+                        }).finally(() => {
+                          modals.closeAll()
+                        });
+                    }} color='#895CF3' radius='md'>
+                      Yes
+                    </Button>
+                  </Flex>
+                </>
+              ),
+              overlayProps: {
+                backgroundOpacity: 0.55,
+                blur: 10,
+              },
+              radius: 'md',
+            });
+          }
+        },
 
       ],
     }, {
       group: 'reset',
       menu: [
-        { label: 'Reload Business Process', onClick: () => console.info('Reload') },
-        { label: 'Optimize business process ', onClick: () => console.info('Optimize') },
+        { label: 'Reload Business Process', onClick: () => console.log('Reload') },
+        { label: 'Optimize business process ', onClick: () => console.log('Optimize') },
       ],
     }
   ]
@@ -138,7 +185,7 @@ const TabularSection = ({ opened,
           {tripleDotMenu.map((menuLayer) => (
             <div key={menuLayer.group}>
               {menuLayer.menu.map((menu) => (
-                <Menu.Item key={menu.label} onClick={menu.onClick}>
+                <Menu.Item key={menu.label} onClick={() => menu.onClick(row)}>
                   {menu.label}
                 </Menu.Item>
               ))}
@@ -222,7 +269,7 @@ const TabularSection = ({ opened,
                 classNames={{
                   input: '!rounded-lg border border-gray-300 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white placeholder:ml-8',
                 }} />
-              {isPagination && <MRT_TablePagination table={table} />}
+              {isPagination && <MRT_TablePagination table={table} color='#895CF3' />}
 
               <div className='flex ml-2 gap-4'>
                 <Tooltip label="Reload Business Process (All)">

@@ -110,7 +110,7 @@ export default function HomeContent({
       )}>
       <TitleSection title='Business Process Cycle' />
       <ApplicationSection {...{ opened, toggle, applicationData, cycleData }} />
-      <TabularSection {...{ opened, cycleData }} />
+      <TabularSection isPagination {...{ opened, cycleData }} />
     </div>
   );
 }

@@ -47,7 +47,6 @@ export const getCycleList = async ({
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
     next: { tags: ['cyclelist'] },
-    // cache: 'no-store'
   });
   if (response.status === 404) {
     return [];
@@ -96,7 +95,6 @@ export const getCycleInfo = async ({
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
     next: { tags: ['cycleinfo'] },
-    // cache: 'no-store'
   });
   if (response.status === 404) {
     return [];
@@ -143,7 +141,6 @@ export const getStageList = async ({
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
     next: { tags: ['stagelist'] },
-    // cache: 'no-store'
   });
   if (response.status === 404) {
     return [];
@@ -180,7 +177,6 @@ export const getStageInfo = async ({
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
     next: { tags: ['stageinfo', stage_uuid] },
-    // cache: 'no-store'
   });
   if (response.status === 404) {
     return {};
@@ -217,7 +213,7 @@ export const updateCycle = async ({
   //   throw new Error('Failed to update cycle.');
   // }
   clientRevalidateTag('cyclelist');
-  return response;
+  return await response.json();
 };
 
 export const updateStage = async ({
@@ -248,7 +244,7 @@ export const updateStage = async ({
   // }
   // revalidateTag('stagelist');
   clientRevalidateTag('stagelist');
-  return response;
+  return await response.json();
 };
 
 export const verifySyntax = async ({ body }: { body: { str_test_syntax: string } }) => {
@@ -419,13 +415,30 @@ async function uploadNCreate(baseUrl: string | undefined) {
   });
 }
 
-
-
-const isValidJSON = (str: string) => {
-  try {
-    JSON.parse(str);
-    return true;
-  } catch (e) {
-    return false;
+export const duplicateCycle = async ({
+  cycle_id,
+  apps_label,
+}:
+  {
+    cycle_id: string;
+    apps_label: string;
+  }) => {
+  const endpoint = `/businessProcessTmp/duplicateCycle?cycle_id=${cycle_id}&app_type=${apps_label}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['duplicateCycle'] }
+  });
+  if (response.status === 404) {
+    return [];
   }
+  // if (!response.ok) {
+  //   throw new Error('Failed to duplicate cycle.');
+  // }
+  clientRevalidateTag('cyclelist');
+  return await response.json();
 };
