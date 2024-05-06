@@ -14,11 +14,6 @@ export type SignupCredentials = {
   confirmPassword: string;
 };
 
-type LoginCredentials = {
-  email: string;
-  password: string;
-};
-
 type CustomUser = AdapterUser & {
   password: string;
   encrypted_password: string;

@@ -10,7 +10,6 @@ import { bypassSignout } from "@/app/_action";
 import { Session } from "next-auth";
 
 function Header({ session, darkmode = false, className }: { session: Session; darkmode?: boolean; className?: string }) {
-  console.log('session:', session)
   const router = useRouter();
   const pathname = usePathname();
   const profilePage = pathname.split('/')[1] === 'profile';

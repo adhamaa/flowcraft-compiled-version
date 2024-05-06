@@ -326,6 +326,7 @@ export const testStageName = async ({ params }: { params: { stage_name: string; 
   // }
 
   const data = await response.json();
+  console.log('data:', data)
   return data;
 }
 

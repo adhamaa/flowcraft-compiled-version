@@ -12,14 +12,14 @@ function SignupForm() {
   const { handleSubmit, control } = useForm()
 
   const onSubmit = async (formData: any) => {
-    await SignupAction(formData)
-      .then((res) => {
-        toast.success(res.message)
-        redirect('/api/auth/signin')
-      })
-      .catch((err) => {
-        toast.error(err.message)
-      })
+    // await SignupAction(formData)
+    //   .then((res) => {
+    //     toast.success(res.message)
+    //     redirect('/api/auth/signin')
+    //   })
+    //   .catch((err) => {
+    //     toast.error(err.message)
+    //   })
   }
 
   const inputList = [{

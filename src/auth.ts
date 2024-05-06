@@ -22,10 +22,13 @@ class InvalidLoginError extends CredentialsSignin {
 
 export const authConfig = {
   providers: [
-    Github,
+    // Github,
     Credentials({
       credentials: {
-        email: { label: "Email", type: "email" },
+        identifier: {
+          label: 'Email',
+          type: 'email',
+        },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
@@ -69,8 +72,9 @@ export const authConfig = {
   ],
   debug: process.env.NODE_ENV === "development",
   pages: {
-    // signIn: "/auth/signin",
-    // error: "/auth/error",
+    signIn: "/auth/signin",
+    // error: "/auth/signin",
+    error: "/auth/error",
   },
   callbacks: {
     async jwt(params: {
