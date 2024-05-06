@@ -1,13 +1,15 @@
 'use client';
-import { Anchor, Avatar, Input, Switch, Tabs, useMantineColorScheme } from "@mantine/core";
+import { Anchor, Avatar, Input, Menu, Switch, Tabs, Text, useMantineColorScheme } from "@mantine/core";
 import { Icon } from '@iconify-icon/react';
 import * as React from 'react'
-import { useSideMenu } from "@/hooks/useSideMenu";
 import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
 import { useGlobalState } from "@/hooks/useGlobalState";
+import { signOut } from "@/auth";
+import { bypassSignout } from "@/app/_action";
+import { Session } from "next-auth";
 
-function Header({ darkmode = false, className }: { darkmode?: boolean; className?: string }) {
+function Header({ session, darkmode = false, className }: { session: Session; darkmode?: boolean; className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const profilePage = pathname.split('/')[1] === 'profile';
@@ -87,22 +89,54 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
 
           }}
         />
-        <Anchor
-          component="button"
-          // disabled
-          // href="#"
-          // target="_blank"
-          onClick={() => router.push("/profile")}
-          underline="hover"
-          c="#895CF3"
-          className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[#895CF3] dark:hover:text-[#895CF3] transition-all duration-300 ease-in-out"
+
+
+        <Menu
+          shadow="md"
+          width={200}
+          trigger="click-hover"
         >
-          {profileImg ?
-            <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} src="/profile_image.png" alt="it's me" />
-            :
-            <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} color="#895CF3" radius="xl">AA</Avatar>
-          }
-        </Anchor>
+          <Menu.Target>
+            <Anchor
+              component="button"
+              // disabled
+              // href="#"
+              // target="_blank"
+              onClick={() => router.push("/profile")}
+              underline="hover"
+              c="#895CF3"
+              className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[#895CF3] dark:hover:text-[#895CF3] transition-all duration-300 ease-in-out"
+            >
+              {profileImg ?
+                <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} src={session?.user?.image} alt="it's me" />
+                :
+                <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} color="#895CF3" radius="xl">AA</Avatar>
+              }
+            </Anchor>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Label><span className="text-[0.6rem]">{session.user?.name}</span></Menu.Label>
+            <Menu.Item
+              component="button"
+              onClick={() => {
+                bypassSignout();
+              }}
+            >
+              Log out
+            </Menu.Item>
+
+            {/* <Menu.Divider /> */}
+
+            {/* <Menu.Label>Danger zone</Menu.Label>
+            <Menu.Item
+              color="red"
+            >
+              Delete my account
+            </Menu.Item> */}
+          </Menu.Dropdown>
+        </Menu>
+
         {darkmode && <Switch
           ref={switchRef}
           classNames={{
