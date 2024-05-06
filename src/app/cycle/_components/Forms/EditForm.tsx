@@ -1,4 +1,5 @@
 'use client';
+
 import { Icon } from '@iconify-icon/react';
 import { Button, Flex, Input, List, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -78,6 +79,7 @@ const EditFormContent = ({
 
   const { control, handleSubmit, setValue } = useForm();
 
+  //! to SAVE the changes made to the stage and TEST the syntax of the stage name or the syntax of the JSON string
   const onSubmit = async (formdata: any, e: any) => {
     const target_id = e.nativeEvent.submitter.id
     const value = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
@@ -376,11 +378,13 @@ const ActionButtons = ({
   toggleEdit: () => void;
   handleSubmit: UseFormHandleSubmit<FieldValues, undefined>;
 }) => {
+  //! to TEST the syntax of the stage name or the syntax of the JSON string
   const onSubmit = async (formdata: any, e: any) => {
     const target_id = e.target.offsetParent.id
     const str_test_syntax = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
     if (target_id === 'process_stage_name') {
       await testStageName({ params: { stage_name: str_test_syntax } }).then((response) => {
+        console.log('response:', response)
         if (response.error) {
           toast.error(response.message);
         } else {

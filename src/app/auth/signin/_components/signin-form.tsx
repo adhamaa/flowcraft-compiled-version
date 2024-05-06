@@ -35,7 +35,7 @@ function SigninForm() {
           alt='Flowcraft Logo'
         />
       </div>
-      <div className='relative col-span-1 w-full h-full'>
+      <div className='relative grid w-full h-full col-span-1'>
         <form
           className='p-10 pt-12 space-y-4'
           onSubmit={handleSubmit(onSubmit)}
@@ -83,6 +83,10 @@ function SigninForm() {
             Sign in
           </Button>
         </form >
+
+        <div className='relative w-full text-center mt-auto p-8'>
+          <h5 className='text-xs text-[#64748B]'>Powered by Schinkels Technik</h5>
+        </div>
       </div>
     </div>
   )
