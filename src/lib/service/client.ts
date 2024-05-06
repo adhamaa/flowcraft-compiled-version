@@ -6,7 +6,6 @@ import { datasource_mapping } from "@/constant/datasource";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const getApplicationList = async () => {
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = '/businessProcess/listAppsBizProcess';
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -37,7 +36,6 @@ export const getCycleList = async ({
   if (!apps_label) return [];
   if (!datasource_type) return [];
 
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const endpoint = `${datasource_mapping[datasource_type]}/listCycleProcess?apps_label=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
@@ -88,7 +86,6 @@ export const getCycleInfo = async ({
   // if (!cycle_id) return {};
   // if (!datasource_type) return {};
 
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const endpoint = `${datasource_mapping[datasource_type]}/listCycleProcess?apps_label=${apps_label}&cycle_id=${cycle_id}`;
   const url = `${baseUrl}${endpoint}`;
@@ -137,7 +134,6 @@ export const getStageList = async ({
 }) => {
   if (!cycle_id) return [];
   if (!apps_label) return [];
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `${datasource_mapping[datasource_type]}/mAllStage?cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -174,7 +170,6 @@ export const getStageInfo = async ({
   // if (!cycle_id) return {};
   // if (!apps_label) return {};
   // if (!datasource_type) return {};
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   //! have to change the endpoint 
   const endpoint = `${datasource_type === 'memory' ? '/businessProcessV2' : datasource_mapping[datasource_type]}/mCurrentStage?process_stage_uuid=${stage_uuid}&cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
@@ -204,7 +199,6 @@ export const updateCycle = async ({
   cycle_uuid: string;
   body: { cycle_active: number; cycle_description: string };
 }) => {
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/businessProcessTmp/updateCycle?cycle_uuid=${cycle_uuid}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -235,7 +229,6 @@ export const updateStage = async ({
   field_name: string;
   body: { value: string };
 }) => {
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/businessProcessTmp/updateStage?field_name=${field_name}&stage_uuid=${stage_uuid}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -259,7 +252,6 @@ export const updateStage = async ({
 };
 
 export const verifySyntax = async ({ body }: { body: { str_test_syntax: string } }) => {
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/syntaxEngine/`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -282,8 +274,7 @@ export const verifySyntax = async ({ body }: { body: { str_test_syntax: string }
   return data;
 }
 
-export const getErrorMessages = async ({ params }: { params: { error_message_uuid: string } }) => {
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+export const getSyntaxErrorMessages = async ({ params }: { params: { error_message_uuid: string } }) => {
   const urlParams = new URLSearchParams({ error_message_uuid: params.error_message_uuid });
   const endpoint = `/syntaxEngine/getErrorMessage/?${urlParams.toString()}`;
   const url = `${baseUrl}${endpoint}`;
@@ -307,7 +298,6 @@ export const getErrorMessages = async ({ params }: { params: { error_message_uui
 }
 
 export const testStageName = async ({ params }: { params: { stage_name: string; } }) => {
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const endpoint = `/syntaxEngine/testStageName/?strText=${params.stage_name}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -329,12 +319,19 @@ export const testStageName = async ({ params }: { params: { stage_name: string; 
   return data;
 }
 
-export const evaluateSemantics = async () => {
-  // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const endpoint = `/semanticEngine/`;
+export const evaluateSemantics = async ({ params }: {
+  params: {
+    strText: string;
+  }
+}) => {
+  console.log('params.strText:', params.strText)
+  const isObj = isValidJSON(params.strText);
+  console.log('isObj:', isObj)
+  const urlParams = new URLSearchParams({ strText: params.strText });
+  const endpoint = `/semanticEngine/?strText=${urlParams.toString()}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
@@ -349,6 +346,29 @@ export const evaluateSemantics = async () => {
   // }
 
   const data = await response.text();
+  return data;
+}
+
+export const getSemanticsErrorMessages = async ({ params }: { params: { error_message_uuid: string } }) => {
+  const urlParams = new URLSearchParams({ error_message_uuid: params.error_message_uuid });
+  const endpoint = `/semanticEngine/getErrorMessage/?${urlParams.toString()}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['errorMessages'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to evaluate semantic.');
+  // }
+
+  const data = await response.json();
   return data;
 }
 
@@ -402,10 +422,17 @@ async function uploadNCreate(baseUrl: string | undefined) {
         message: 'Business process reloaded successfully.',
         result: await (await response.json()).result
       };
-
     });
-
   });
-
-
 }
+
+
+
+const isValidJSON = (str: string) => {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};

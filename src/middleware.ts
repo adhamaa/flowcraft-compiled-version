@@ -1,8 +1,6 @@
-// import { auth as middleware } from 'auth'
 import NextAuth from 'next-auth';
 import { authConfig } from '@/auth';
 
-// const auth = NextAuth(authConfig).auth;
 export default NextAuth(authConfig).auth;
 
 // See "Matching Paths" below to learn more

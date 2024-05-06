@@ -23,52 +23,52 @@ class InvalidLoginError extends CredentialsSignin {
 export const authConfig = {
   providers: [
     // Github,
-    Credentials({
-      credentials: {
-        identifier: {
-          label: 'Email',
-          type: 'email',
-        },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        try {
-          const result = await loginSchema.parseAsync(credentials);
+    // Credentials({
+    //   credentials: {
+    //     identifier: {
+    //       label: 'Email',
+    //       type: 'email',
+    //     },
+    //     password: { label: "Password", type: "password" },
+    //   },
+    //   async authorize(credentials) {
+    //     try {
+    //       const result = await loginSchema.parseAsync(credentials);
 
-          const { email, password } = result;
+    //       const { email, password } = result;
 
-          const user = await CustomAdapter.getUserByEmail?.(email as string)
+    //       const user = await CustomAdapter.getUserByEmail?.(email as string)
 
-          if (!user) {
-            throw new InvalidLoginError("User account does not exist");
-          }
+    //       if (!user) {
+    //         throw new InvalidLoginError("User account does not exist");
+    //       }
 
-          const passwordDB = Fernet.decrypt(user.password, process.env.FERNET_KEY as string)
+    //       const passwordDB = Fernet.decrypt(user.password, process.env.FERNET_KEY as string)
 
-          const passwordsMatch = password === passwordDB;
+    //       const passwordsMatch = password === passwordDB;
 
-          if (!passwordsMatch) {
-            throw new InvalidLoginError("Password is not correct");
-          }
+    //       if (!passwordsMatch) {
+    //         throw new InvalidLoginError("Password is not correct");
+    //       }
 
-          return user;
-        } catch (error) {
-          if (
-            error instanceof DrizzleError
-          ) {
-            throw new InvalidLoginError(
-              "System error. Please contact support"
-            );
-          }
+    //       return user;
+    //     } catch (error) {
+    //       if (
+    //         error instanceof DrizzleError
+    //       ) {
+    //         throw new InvalidLoginError(
+    //           "System error. Please contact support"
+    //         );
+    //       }
 
-          if (error instanceof ZodError) {
-            throw new InvalidLoginError(error.errors[0].message);
-          }
+    //       if (error instanceof ZodError) {
+    //         throw new InvalidLoginError(error.errors[0].message);
+    //       }
 
-          throw error;
-        }
-      },
-    }),
+    //       throw error;
+    //     }
+    //   },
+    // }),
   ],
   debug: process.env.NODE_ENV === "development",
   pages: {
@@ -112,7 +112,12 @@ export const authConfig = {
     authorized({ auth, request }) {
       const { nextUrl } = request;
       const isLoggedIn = !!auth?.user;
-      const paths = ["/cycle", "/profile", "/documentation", "/maintenance"];
+      const paths = [
+        // "/cycle",
+        "/profile",
+        "/documentation",
+        "/maintenance"
+      ];
       const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
       const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
       const isAuthRoute = authRoutes.includes(nextUrl.pathname);
