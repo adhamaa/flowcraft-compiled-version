@@ -80,7 +80,7 @@ const EditFormContent = ({
   const { control, handleSubmit, setValue } = useForm();
 
   //! to SAVE the changes made to the stage and TEST the syntax of the stage name or the syntax of the JSON string
-  const onSubmit = async (formdata: any, e: any) => {
+  const onSaveSubmit = async (formdata: any, e: any) => {
     const target_id = e.nativeEvent.submitter.id
     const value = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
 
@@ -115,6 +115,7 @@ const EditFormContent = ({
                       toast.error('Failed to test stage name' + '\n' + error);
                     });
                 } else {
+
                   syntax = await verifySyntax({ body: { str_test_syntax: value } })
                     .then(async (response) => {
                       if (response.error) {
@@ -132,12 +133,20 @@ const EditFormContent = ({
                     });
                 }
 
-
-                semantics = await evaluateSemantics({ params: { strText: value } })
-                  .then((text) => {
-                    toast.warning(text as string);
-                    return true
-                  })
+                semantics = await evaluateSemantics({ body: { str_test_semantic: value } })
+                  .then(async (response) => {
+                    if (response.error) {
+                      toast.error(response.message);
+                      return response.result
+                    } else {
+                      toast.success(response.message);
+                      return response.result
+                    }
+                  }).catch((error) => {
+                    toast.error('Failed to evaluate semantics' + '\n' + error);
+                  }).finally(() => {
+                    modals.closeAll();
+                  });
 
                 if (syntax && semantics) {
                   await updateStage({
@@ -189,7 +198,7 @@ const EditFormContent = ({
     <ScrollArea.Autosize mah={768}>
       <form
         className='space-y-4 py-4'
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSaveSubmit)}
       >
         <HeaderForm type='edit' {...{ toggleEdit, isEdit, toggleExpand }} />
         {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
@@ -464,43 +473,42 @@ const ActionButtons = ({
 
   const onSemanticsSubmit = async (formdata: any, e: any) => {
     const target_id = e.target.offsetParent.id
-    const str_test_semantics = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
+    const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
 
-    await evaluateSemantics({ params: { strText: str_test_semantics } })
+    await evaluateSemantics({ body: { str_test_semantic } })
       .then(async (response) => {
-        console.log('response:', response)
-        // if (response.error) {
-        //   toast.error(response.message);
-        //   await getSemanticsErrorMessages({ params: { error_message_uuid: response.list_error_no } })
-        //     .then((errorMessages) => {
-        //       modals.open({
-        //         title: 'Syntax errors',
-        //         children: (
-        //           <>
-        //             {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
-        //               <List key={index} type="ordered" withPadding>
-        //                 <List.Item>{index + 1}. {error_message}</List.Item>
-        //               </List>
-        //             ))}
-        //             <Flex gap={16} justify={'end'} mt="md">
-        //               <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-        //                 Close
-        //               </Button>
-        //             </Flex>
-        //           </>
-        //         ),
-        //         overlayProps: {
-        //           backgroundOpacity: 0.55,
-        //           blur: 10,
-        //         },
-        //         radius: 'md',
-        //       })
-        //     }).catch((error) => {
-        //       toast.error('Failed to get error messages' + '\n' + error);
-        //     });
-        // } else {
-        //   toast.success(response.message);
-        // }
+        if (response.error) {
+          toast.error(response.message);
+          await getSemanticsErrorMessages({ params: { error_message_uuid: response.list_error_no } })
+            .then((errorMessages) => {
+              modals.open({
+                title: 'Semantic errors',
+                children: (
+                  <>
+                    {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
+                      <List key={index} type="ordered" withPadding>
+                        <List.Item>{index + 1}. {error_message}</List.Item>
+                      </List>
+                    ))}
+                    <Flex gap={16} justify={'end'} mt="md">
+                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                        Close
+                      </Button>
+                    </Flex>
+                  </>
+                ),
+                overlayProps: {
+                  backgroundOpacity: 0.55,
+                  blur: 10,
+                },
+                radius: 'md',
+              })
+            }).catch((error) => {
+              toast.error('Failed to get error messages' + '\n' + error);
+            });
+        } else {
+          toast.success(response.message);
+        }
 
       }).catch((error) => {
         toast.error('Failed to verify syntax' + '\n' + error);

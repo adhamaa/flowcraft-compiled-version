@@ -319,16 +319,8 @@ export const testStageName = async ({ params }: { params: { stage_name: string; 
   return data;
 }
 
-export const evaluateSemantics = async ({ params }: {
-  params: {
-    strText: string;
-  }
-}) => {
-  console.log('params.strText:', params.strText)
-  const isObj = isValidJSON(params.strText);
-  console.log('isObj:', isObj)
-  const urlParams = new URLSearchParams({ strText: params.strText });
-  const endpoint = `/semanticEngine/?strText=${urlParams.toString()}`;
+export const evaluateSemantics = async ({ body }: { body: { str_test_semantic: string } }) => {
+  const endpoint = `/semanticEngine/`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'POST',
@@ -336,6 +328,7 @@ export const evaluateSemantics = async ({ params }: {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
+    body: JSON.stringify({ str_test_semantic: body.str_test_semantic }),
     next: { tags: ['evaluateSemantics'] }
   });
   if (response.status === 404) {
@@ -345,7 +338,7 @@ export const evaluateSemantics = async ({ params }: {
   //   throw new Error('Failed to evaluate semantic.');
   // }
 
-  const data = await response.text();
+  const data = await response.json();
   return data;
 }
 
