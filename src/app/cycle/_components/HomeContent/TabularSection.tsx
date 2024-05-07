@@ -153,10 +153,18 @@ const TabularSection = ({ opened,
       accessorFn: (originalRow) => originalRow.cycle_active,
     }
   ];
+
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 5, //customize the default page size
+  });
+
   const table = useMantineReactTable({
     columns,
     data: React.useMemo(() => tableData, [tableData]),
     // enableRowSelection: true,
+    // onPaginationChange: setPagination, //hoist pagination state to your state when it changes internally
+    // state: { pagination }, //pass the pagination state to the table
     initialState: {
       pagination: { pageSize: 5, pageIndex: 0 },
       showGlobalFilter: true,
@@ -200,6 +208,7 @@ const TabularSection = ({ opened,
     //customize the MRT components
     mantinePaginationProps: {
       rowsPerPageOptions: ['5', '10', '15'],
+      showRowsPerPage: false,
     },
     paginationDisplayMode: 'pages',
     mantineTableBodyRowProps: ({ row }) => ({
