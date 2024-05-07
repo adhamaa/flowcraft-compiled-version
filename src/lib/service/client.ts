@@ -57,7 +57,20 @@ export const getCycleList = async ({
   const data = await response.json();
 
   const stringifyObjectValues =
-    data.result?.map((item: any) => ({
+    data.result?.map((item: {
+      app_label: string;
+      app_name: string;
+      app_sys_code: string;
+      app_uuid: string;
+      cycle_active: number,
+      cycle_created: string;
+      cycle_description: string;
+      cycle_id: number,
+      cycle_name: string;
+      cycle_updated: string;
+      cycle_uuid: string;
+      no_of_stages: number
+    }) => ({
       ...item,
       cycle_created: new Date(item.cycle_created).toDateString(),
       cycle_updated: new Date(item.cycle_updated).toDateString(),
@@ -67,6 +80,10 @@ export const getCycleList = async ({
       no_of_stages: (item.no_of_stages).toString() ?? 'N/A',
       cycle_active: item.cycle_active == 1 ? 'Active' : 'Inactive',
       cycle_id: typeof (item.cycle_id) === 'number' ? (item.cycle_id).toString() : item.cycle_id,
+      cycle_uuid: item.cycle_uuid ?? 'N/A',
+      cycle_description: item.cycle_description ?? 'N/A',
+      app_sys_code: item.app_sys_code ?? 'N/A',
+      app_uuid: item.app_uuid ?? 'N/A',
     }));
 
   return await stringifyObjectValues;
@@ -105,7 +122,20 @@ export const getCycleInfo = async ({
   const data = await response.json();
 
   const stringifyObjectValues =
-    data.result?.reduce((acc: any, item: any) => ({
+    data.result?.reduce((acc: any, item: {
+      app_label: string;
+      app_name: string;
+      app_sys_code: string;
+      app_uuid: string;
+      cycle_active: number,
+      cycle_created: string;
+      cycle_description: string;
+      cycle_id: number,
+      cycle_name: string;
+      cycle_updated: string;
+      cycle_uuid: string;
+      no_of_stages: number
+    }) => ({
       ...acc,
       cycle_created: new Date(item.cycle_created).toDateString(),
       cycle_updated: new Date(item.cycle_updated).toDateString(),
@@ -115,11 +145,14 @@ export const getCycleInfo = async ({
       no_of_stages: (item.no_of_stages).toString() ?? 'N/A',
       cycle_active: item.cycle_active.toString(),
       cycle_id: typeof (item.cycle_id) === 'number' ? (item.cycle_id).toString() : item.cycle_id,
+      cycle_uuid: item.cycle_uuid ?? 'N/A',
+      cycle_description: item.cycle_description ?? 'N/A',
+      app_sys_code: item.app_sys_code ?? 'N/A',
+      app_uuid: item.app_uuid ?? 'N/A',
     }), {});
 
   return await stringifyObjectValues;
 };
-
 
 export const getStageList = async ({
   cycle_id,
