@@ -25,7 +25,7 @@ type SiggnupReturnType = {
   message: string;
 };
 
-export async function SignupAction(credentials: SignupCredentials): Promise<SiggnupReturnType> {
+export async function SignUp(credentials: SignupCredentials): Promise<SiggnupReturnType> {
 
   const result = await registerSchema.safeParseAsync(credentials);
   if (!result.success) {
@@ -62,6 +62,9 @@ export async function SignupAction(credentials: SignupCredentials): Promise<Sigg
   }).then(() => ({
     result: 'success',
     message: 'User created',
+  })).catch((error) => ({
+    result: 'error',
+    message: error.message,
   }));
 
   return response as unknown as SiggnupReturnType;

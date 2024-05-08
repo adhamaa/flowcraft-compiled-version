@@ -151,6 +151,13 @@ const TabularSection = ({ opened,
     {
       header: 'Status',
       accessorFn: (originalRow) => originalRow.cycle_active,
+      Cell: ({ cell }) => {
+        return (
+          <div className='flex gap-2 items-center'>
+            <span className={clsx('capitalize rounded-full px-2 py-1 text-sm font-semibold', statusIndicator && 'bg-green-500 text-white')}>{cell.getValue() as string}</span>
+          </div>
+        )
+      },
     }
   ];
 

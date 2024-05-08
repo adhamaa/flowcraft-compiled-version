@@ -3,7 +3,7 @@
 import toast from '@/components/toast'
 import { PasswordInput, TextInput } from 'react-hook-form-mantine';
 import { useForm } from 'react-hook-form';
-import { Button } from '@mantine/core';
+import { Anchor, Button } from '@mantine/core';
 import Image from 'next/image';
 import { LoginCredentials, signIn } from '../_action';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -83,10 +83,24 @@ function SigninForm() {
             )
           )}
           <div className='flex justify-end'>
-            <a href='/auth/forgot-password' className='text-xs text-blue-500'>Forgot password?</a>
+            <Anchor
+              component="button"
+              type='button'
+              disabled
+              // href="#"
+              // target="_blank"
+              onClick={() => console.log("clicked")}
+              underline="hover"
+              // c="#895CF3"
+              classNames={{
+                root: 'disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-blue-500 dark:hover:text-blue-500 transition-all duration-300 ease-in-out !text-xs',
+              }}
+            >
+              Forgot password?
+            </Anchor>
           </div>
           <Button type='submit' color='#895CF3' radius='md' classNames={{
-            root: 'w-full !my-8',
+            root: '!w-full !my-8',
           }}>
             Sign in
           </Button>

@@ -8,7 +8,7 @@ import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
 import { useForm } from "react-hook-form";
 import { Radio, TextInput } from 'react-hook-form-mantine';
-import { updateCycle } from '@/lib/service/client';
+import { getStatusRefList, updateCycle } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 
@@ -39,6 +39,14 @@ const GeneralForm = ({ data }: { data: CycleData }) => {
 
 export default GeneralForm
 
+type StatusRef = {
+  code: string;
+  created_datetime: string;
+  descriptions: string;
+  updated_datetime: string;
+  uuid: string;
+};
+
 const GeneralFormContent = ({
   data,
   open,
@@ -64,6 +72,8 @@ const GeneralFormContent = ({
     { name: "cycle_active", label: 'Status', value: data?.cycle_active, disabled: !isEdit },
     { name: "cycle_description", label: 'Description', value: data?.cycle_description, disabled: !isEdit },
   ];
+
+  const [statusRefList, setStatusRefList] = React.useState<StatusRef[]>([]);
 
   const [diagramOpened, { open: diagramOpen, close: diagramClose, toggle: diagramToggle }] = useDisclosure(false);
   const { control, handleSubmit, setValue } = useForm();
@@ -125,6 +135,15 @@ const GeneralFormContent = ({
     }
   }, [data, setValue])
 
+  React.useEffect(() => {
+    async function getStatusList() {
+      const statusRefListRes = await getStatusRefList();
+      setStatusRefList(statusRefListRes);
+    }
+
+    getStatusList();
+  }, [])
+
 
   return (
     <ScrollArea.Autosize mah={768}>
@@ -177,8 +196,13 @@ const GeneralFormContent = ({
               defaultValue={value?.toString()}
             >
               <Group>
-                <Radio.Item disabled={disabled} value="1" label="Active" />
-                <Radio.Item disabled={disabled} value="0" label="Inactive" />
+                {statusRefList?.map((status: StatusRef) => (
+                  <Radio.Item
+                    key={status.uuid}
+                    disabled={disabled}
+                    value={status.code}
+                    label={<span className='capitalize'>{status.descriptions}</span>} />
+                ))}
               </Group>
             </Radio.Group>
           </Input.Wrapper>

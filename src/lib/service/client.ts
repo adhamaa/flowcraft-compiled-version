@@ -78,7 +78,7 @@ export const getCycleList = async ({
       app_name: item.app_name ?? 'N/A',
       cycle_name: item.cycle_name ?? 'N/A',
       no_of_stages: (item.no_of_stages).toString() ?? 'N/A',
-      cycle_active: item.cycle_active == 1 ? 'Active' : 'Inactive',
+      cycle_active: getStatusRef(item.cycle_active),
       cycle_id: typeof (item.cycle_id) === 'number' ? (item.cycle_id).toString() : item.cycle_id,
       cycle_uuid: item.cycle_uuid ?? 'N/A',
       cycle_description: item.cycle_description ?? 'N/A',
@@ -88,6 +88,54 @@ export const getCycleList = async ({
 
   return await stringifyObjectValues;
 };
+
+
+export const getStatusRef = async (status_code: number) => {
+  const endpoint = `/businessProcessTmp/statusRef?status_code=${status_code}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['statusref'] },
+    cache: 'no-store'
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch status reference.');
+  }
+  const data = await response.json();
+  return data.result.descriptions;
+};
+
+export const getStatusRefList = async () => {
+  const endpoint = '/businessProcessTmp/statusRef';
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['statusreflist'] },
+    cache: 'no-store'
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch status reference.');
+  }
+  const data = await response.json();
+  return data.result;
+};
+
 
 export const getCycleInfo = async ({
   apps_label,
