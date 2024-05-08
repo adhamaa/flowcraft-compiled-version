@@ -1,13 +1,12 @@
 import NextAuth, { Account, CredentialsSignin, NextAuthConfig, Profile, Session, User } from "next-auth"
-import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, publicRoutes } from "./routes"
+import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, publicRoutes } from "../routes"
 import { NextResponse } from "next/server"
 import Credentials from "next-auth/providers/credentials"
-import Github from "next-auth/providers/github"
 import { JWT, encode } from "next-auth/jwt"
 import { CustomAdapter } from "@/db/Adapter"
 import { ZodError } from "zod"
 import { Fernet } from "fernet-nodejs"
-import { loginSchema } from "./lib/validation"
+import { loginSchema } from "../lib/validation"
 import { DrizzleError } from "drizzle-orm"
 import { AdapterUser } from "next-auth/adapters"
 import { randomUUID } from "crypto"
@@ -20,60 +19,60 @@ class InvalidLoginError extends CredentialsSignin {
   }
 }
 
+export const BASE_PATH = '/api/auth'
+
 export const authConfig = {
   providers: [
-    // Github,
-    // Credentials({
-    //   credentials: {
-    //     identifier: {
-    //       label: 'Email',
-    //       type: 'email',
-    //     },
-    //     password: { label: "Password", type: "password" },
-    //   },
-    //   async authorize(credentials) {
-    //     try {
-    //       const result = await loginSchema.parseAsync(credentials);
+    Credentials({
+      credentials: {
+        identifier: {
+          label: 'Email',
+          type: 'email',
+        },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        try {
+          const result = await loginSchema.parseAsync(credentials);
 
-    //       const { email, password } = result;
+          const { email, password } = result;
 
-    //       const user = await CustomAdapter.getUserByEmail?.(email as string)
+          const user = await CustomAdapter.getUserByEmail?.(email as string)
 
-    //       if (!user) {
-    //         throw new InvalidLoginError("User account does not exist");
-    //       }
+          if (!user) {
+            throw new InvalidLoginError("User account does not exist");
+          }
 
-    //       const passwordDB = Fernet.decrypt(user.password, process.env.FERNET_KEY as string)
+          const passwordDB = Fernet.decrypt(user.password, process.env.FERNET_KEY as string)
 
-    //       const passwordsMatch = password === passwordDB;
+          const passwordsMatch = password === passwordDB;
 
-    //       if (!passwordsMatch) {
-    //         throw new InvalidLoginError("Password is not correct");
-    //       }
+          if (!passwordsMatch) {
+            throw new InvalidLoginError("Password is not correct");
+          }
 
-    //       return user;
-    //     } catch (error) {
-    //       if (
-    //         error instanceof DrizzleError
-    //       ) {
-    //         throw new InvalidLoginError(
-    //           "System error. Please contact support"
-    //         );
-    //       }
+          return user;
+        } catch (error) {
+          if (
+            error instanceof DrizzleError
+          ) {
+            throw new InvalidLoginError(
+              "System error. Please contact support"
+            );
+          }
 
-    //       if (error instanceof ZodError) {
-    //         throw new InvalidLoginError(error.errors[0].message);
-    //       }
+          if (error instanceof ZodError) {
+            throw new InvalidLoginError(error.errors[0].message);
+          }
 
-    //       throw error;
-    //     }
-    //   },
-    // }),
+          throw error;
+        }
+      },
+    }),
   ],
   debug: process.env.NODE_ENV === "development",
   pages: {
     signIn: "/auth/signin",
-    // error: "/auth/signin",
     error: "/auth/error",
   },
   callbacks: {
@@ -109,11 +108,31 @@ export const authConfig = {
     //   // params.session.user.id = params.user.id as string
     //   return params.session
     // },
+    async redirect({ url, baseUrl }: { url: string, baseUrl: string }) {
+      const isRelativeUrl = url.startsWith("/");
+      if (isRelativeUrl) {
+        return `${baseUrl}${url}`;
+      }
+
+      const isSameOriginUrl = new URL(url).origin === baseUrl;
+      const alreadyRedirected = url.includes('callbackUrl=')
+      if (isSameOriginUrl && alreadyRedirected) {
+        const originalCallbackUrl = decodeURIComponent(url.split('callbackUrl=')[1]);
+
+        return originalCallbackUrl;
+      }
+
+      if (isSameOriginUrl) {
+        return url;
+      }
+
+      return baseUrl;
+    },
     authorized({ auth, request }) {
       const { nextUrl } = request;
       const isLoggedIn = !!auth?.user;
       const paths = [
-        // "/cycle",
+        ...(process.env.WITH_AUTH === 'true' ? ["/cycle"] : []),
         "/profile",
         "/documentation",
         "/maintenance"
@@ -128,7 +147,7 @@ export const authConfig = {
       }
 
       if (isProtected && !isLoggedIn) {
-        const redirectUrl = new URL("api/auth/signin", nextUrl.origin)
+        const redirectUrl = new URL(`${BASE_PATH}/signin`, nextUrl.origin)
         redirectUrl.searchParams.append("callbackUrl", nextUrl.href)
         return Response.redirect(redirectUrl)
       }
@@ -155,6 +174,8 @@ export const authConfig = {
     // maxAge: 30 * 24 * 60 * 60, // 30 days
     // updateAge: 24 * 60 * 60, // 24 hours
   },
+  basePath: BASE_PATH,
+  // secret: process.env.NEXTAUTH_SECRET,
 } satisfies NextAuthConfig
 
 export const { handlers, auth, signOut, signIn } = NextAuth({ adapter: CustomAdapter, ...authConfig })

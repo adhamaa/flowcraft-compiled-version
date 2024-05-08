@@ -1,4 +1,5 @@
 "use client";
+
 import * as React from 'react'
 import { GlobalStateProvider } from '@/hooks/useGlobalState';
 import { SideMenuProvider } from '@/hooks/useSideMenu'
@@ -53,6 +54,7 @@ export default function Providers({
   const queryClient = getQueryClient()
 
   return (
+
     <MantineProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <ModalsProvider modals={modals}>
