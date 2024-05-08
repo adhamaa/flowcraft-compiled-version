@@ -5,11 +5,12 @@ import * as React from 'react'
 import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
 import { useGlobalState } from "@/hooks/useGlobalState";
-import { signOut } from "@/auth";
-import { bypassSignout } from "@/app/_action";
 import { Session } from "next-auth";
+import { signOut } from "@/app/auth/signout/_action";
+import { useSession } from "next-auth/react";
 
-function Header({ session, darkmode = false, className }: { session: Session | null; darkmode?: boolean; className?: string }) {
+function Header({ darkmode = false, className }: { darkmode?: boolean; className?: string }) {
+  const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const profilePage = pathname.split('/')[1] === 'profile';
@@ -119,8 +120,9 @@ function Header({ session, darkmode = false, className }: { session: Session | n
             <Menu.Label><span className="text-[0.6rem]">{session?.user?.name}</span></Menu.Label>
             <Menu.Item
               component="button"
-              onClick={() => {
-                bypassSignout();
+              onClick={async () => {
+                await signOut();
+                router.push("/");
               }}
             >
               Log out

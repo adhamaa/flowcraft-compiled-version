@@ -5,14 +5,14 @@ import { PasswordInput, TextInput } from 'react-hook-form-mantine';
 import { useForm } from 'react-hook-form';
 import { Button } from '@mantine/core';
 import Image from 'next/image';
-import { LoginCredentials, SigninAction } from '../_action';
+import { LoginCredentials, signIn } from '../_action';
 
 function SigninForm() {
 
   const { handleSubmit, control } = useForm()
 
   const onSubmit = async ({ email, password }: any) => {
-    await SigninAction({ email, password } as LoginCredentials, '/')
+    await signIn({ email, password } as LoginCredentials)
   }
 
   const inputList = [{

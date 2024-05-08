@@ -1,6 +1,6 @@
 'use server';
 
-import { signIn } from "@/auth";
+import { signIn as nasignIn } from "@/auth";
 import { redirect } from "next/navigation";
 
 export type LoginCredentials = {
@@ -8,8 +8,8 @@ export type LoginCredentials = {
   password: string;
 };
 
-export async function SigninAction(credentials: LoginCredentials, redirectTo?: string) {
-  const callbackUrl = await signIn('credentials', {
+export async function signIn(credentials: LoginCredentials, redirectTo?: string) {
+  const callbackUrl = await nasignIn('credentials', {
     email: credentials.email,
     password: credentials.password,
     redirect: false,
