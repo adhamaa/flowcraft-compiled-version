@@ -6,13 +6,21 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@mantine/core';
 import Image from 'next/image';
 import { LoginCredentials, signIn } from '../_action';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema } from '@/lib/validation';
 
 function SigninForm() {
 
-  const { handleSubmit, control } = useForm()
+  const { handleSubmit, control } = useForm({
+    resolver: zodResolver(loginSchema),
+  })
 
   const onSubmit = async ({ email, password }: any) => {
-    await signIn({ email, password } as LoginCredentials)
+    try {
+      await signIn({ email, password } as LoginCredentials)
+    } catch (error: any) {
+      toast.error(error.message)
+    }
   }
 
   const inputList = [{
