@@ -516,10 +516,10 @@ const ActionButtons = ({
         .then(async (response) => {
           if (response.error) {
             toast.error(response.message);
-            await getSyntaxErrorMessages({ params: { error_message_uuid: response.uuid_error } })
+            await getSemanticsErrorMessages({ params: { error_message_uuid: response.uuid_error } })
               .then((errorMessages) => {
                 modals.open({
-                  title: 'Syntax errors',
+                  title: 'Semantic errors',
                   children: (
                     <>
                       {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
