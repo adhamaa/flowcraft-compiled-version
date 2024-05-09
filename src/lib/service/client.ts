@@ -338,7 +338,7 @@ export const verifySyntax = async ({ body }: { body: { str_test_syntax: string }
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
     body: JSON.stringify({ str_test_syntax: body.str_test_syntax }),
-    next: { tags: ['evaluateSyntax'] }
+    next: { tags: ['evaluatesyntax'] }
   });
   if (response.status === 404) {
     return [];
@@ -361,7 +361,7 @@ export const getSyntaxErrorMessages = async ({ params }: { params: { error_messa
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    next: { tags: ['errorMessages'] }
+    next: { tags: ['errorsyntaxmessages'] }
   });
   if (response.status === 404) {
     return [];
@@ -374,7 +374,7 @@ export const getSyntaxErrorMessages = async ({ params }: { params: { error_messa
   return data;
 }
 
-export const testStageName = async ({ params }: { params: { stage_name: string; } }) => {
+export const testSyntaxStageName = async ({ params }: { params: { stage_name: string; } }) => {
   const endpoint = `/syntaxEngine/testStageName/?strText=${params.stage_name}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -383,7 +383,7 @@ export const testStageName = async ({ params }: { params: { stage_name: string; 
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    next: { tags: ['testStageName'] }
+    next: { tags: ['testsyntaxstagename'] }
   });
   if (response.status === 404) {
     return [];
@@ -406,7 +406,7 @@ export const evaluateSemantics = async ({ body }: { body: { str_test_semantic: s
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
     body: JSON.stringify({ str_test_semantic: body.str_test_semantic }),
-    next: { tags: ['evaluateSemantics'] }
+    next: { tags: ['evaluatesemantics'] }
   });
   if (response.status === 404) {
     return [];
@@ -429,7 +429,29 @@ export const getSemanticsErrorMessages = async ({ params }: { params: { error_me
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    next: { tags: ['errorMessages'] }
+    next: { tags: ['errorsemanticmessages'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to evaluate semantic.');
+  // }
+
+  const data = await response.json();
+  return data;
+}
+
+export const testSemanticStageName = async ({ params }: { params: { stage_name: string; } }) => {
+  const endpoint = `/semanticEngine/testStageName/?strText=${params.stage_name}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['testsemanticstagename'] }
   });
   if (response.status === 404) {
     return [];
@@ -469,7 +491,7 @@ async function uploadNCreate(baseUrl: string | undefined) {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    next: { tags: ['uploadTableProcess'] }
+    next: { tags: ['uploadtableprocess'] }
   }).then(async (response) => {
     if (!response.ok) {
       throw new Error('Failed to reload business process (uploadTableProcess).');
@@ -481,7 +503,7 @@ async function uploadNCreate(baseUrl: string | undefined) {
         'Content-Type': 'application/json',
         'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
       },
-      next: { tags: ['reCreateProcess'] }
+      next: { tags: ['recreateprocess'] }
     }).then(async (response) => {
       if (!response.ok) {
         throw new Error('Failed to reload business process (reCreateProcess).');
@@ -512,7 +534,7 @@ export const duplicateCycle = async ({
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
-    next: { tags: ['duplicateCycle'] }
+    next: { tags: ['duplicatecycle'] }
   });
   if (response.status === 404) {
     return [];

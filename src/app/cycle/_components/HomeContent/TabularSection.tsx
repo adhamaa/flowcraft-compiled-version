@@ -163,17 +163,17 @@ const TabularSection = ({ opened,
 
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 5, //customize the default page size
+    pageSize: 10, //customize the default page size
   });
 
   const table = useMantineReactTable({
     columns,
     data: React.useMemo(() => tableData, [tableData]),
     // enableRowSelection: true,
-    // onPaginationChange: setPagination, //hoist pagination state to your state when it changes internally
-    // state: { pagination }, //pass the pagination state to the table
+    onPaginationChange: setPagination, //hoist pagination state to your state when it changes internally
+    state: { pagination }, //pass the pagination state to the table
     initialState: {
-      pagination: { pageSize: 5, pageIndex: 0 },
+      // pagination: { pageSize: 10, pageIndex: 0 },
       showGlobalFilter: true,
     },
     enableRowActions: true,

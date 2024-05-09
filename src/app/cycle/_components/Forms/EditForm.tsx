@@ -11,7 +11,7 @@ import { FieldValues, UseFormHandleSubmit, useForm } from 'react-hook-form';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
-import { evaluateSemantics, getSemanticsErrorMessages, getSyntaxErrorMessages, testStageName, updateStage, verifySyntax } from '@/lib/service/client';
+import { evaluateSemantics, getSemanticsErrorMessages, getSyntaxErrorMessages, testSemanticStageName, testSyntaxStageName, updateStage, verifySyntax } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 
@@ -101,7 +101,7 @@ const EditFormContent = ({
                 let semantics;
 
                 if (target_id === 'process_stage_name') {
-                  syntax = await testStageName({ params: { stage_name: value } })
+                  syntax = await testSyntaxStageName({ params: { stage_name: value } })
                     .then((response) => {
                       if (response.error) {
                         toast.error(response.message)
@@ -112,8 +112,43 @@ const EditFormContent = ({
                       }
                     })
                     .catch((error) => {
-                      toast.error('Failed to test stage name' + '\n' + error);
+                      toast.error('Failed to test syntax on stage name' + '\n' + error);
+                    }).finally(() => {
+                      modals.closeAll();
                     });
+
+                  semantics = await testSemanticStageName({ params: { stage_name: value } })
+                    .then((response) => {
+                      if (response.error) {
+                        toast.error(response.message);
+                        return response.result
+                      } else {
+                        toast.success(response.message);
+                        return response.result
+                      }
+                    })
+                    .catch((error) => {
+                      toast.error('Failed to test semantics on stage name' + '\n' + error);
+                    }).finally(() => {
+                      modals.closeAll();
+                    });
+
+                  if (syntax && semantics) {
+                    await updateStage({
+                      stage_uuid: stage_uuid as string,
+                      field_name: target_id,
+                      body: { value }
+                    }).then(() => {
+                      toast.success(`${label} updated successfully`);
+                    }).catch((error) => {
+                      toast.error('Failed to update stage' + '\n' + error);
+                    }).finally(() => {
+                      modals.closeAll();
+                    });
+                  } else {
+                    toast.error(`Failed to update ${label}`);
+                  }
+
                 } else {
 
                   syntax = await verifySyntax({ body: { str_test_syntax: value } })
@@ -392,7 +427,7 @@ const ActionButtons = ({
     const target_id = e.target.offsetParent.id
     const str_test_syntax = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
     if (target_id === 'process_stage_name') {
-      await testStageName({ params: { stage_name: str_test_syntax } })
+      await testSyntaxStageName({ params: { stage_name: str_test_syntax } })
         .then(async (response) => {
           if (response.error) {
             toast.error(response.message);
@@ -475,44 +510,85 @@ const ActionButtons = ({
     const target_id = e.target.offsetParent.id
     const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
 
-    await evaluateSemantics({ body: { str_test_semantic } })
-      .then(async (response) => {
-        if (response.error) {
-          toast.error(response.message);
-          await getSemanticsErrorMessages({ params: { error_message_uuid: response.list_error_no } })
-            .then((errorMessages) => {
-              modals.open({
-                title: 'Semantic errors',
-                children: (
-                  <>
-                    {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
-                      <List key={index} type="ordered" withPadding>
-                        <List.Item>{index + 1}. {error_message}</List.Item>
-                      </List>
-                    ))}
-                    <Flex gap={16} justify={'end'} mt="md">
-                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-                        Close
-                      </Button>
-                    </Flex>
-                  </>
-                ),
-                overlayProps: {
-                  backgroundOpacity: 0.55,
-                  blur: 10,
-                },
-                radius: 'md',
-              })
-            }).catch((error) => {
-              toast.error('Failed to get error messages' + '\n' + error);
-            });
-        } else {
-          toast.success(response.message);
-        }
 
-      }).catch((error) => {
-        toast.error('Failed to verify syntax' + '\n' + error);
-      });
+    if (target_id === 'process_stage_name') {
+      await testSemanticStageName({ params: { stage_name: str_test_semantic } })
+        .then(async (response) => {
+          if (response.error) {
+            toast.error(response.message);
+            await getSyntaxErrorMessages({ params: { error_message_uuid: response.uuid_error } })
+              .then((errorMessages) => {
+                modals.open({
+                  title: 'Syntax errors',
+                  children: (
+                    <>
+                      {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
+                        <List key={index} type="ordered" withPadding>
+                          <List.Item>{index + 1}. {error_message}</List.Item>
+                        </List>
+                      ))}
+                      <Flex gap={16} justify={'end'} mt="md">
+                        <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                          Close
+                        </Button>
+                      </Flex>
+                    </>
+                  ),
+                  overlayProps: {
+                    backgroundOpacity: 0.55,
+                    blur: 10,
+                  },
+                  radius: 'md',
+                })
+              }).catch((error) => {
+                toast.error('Failed to get error messages' + '\n' + error);
+              });
+          } else {
+            toast.success(response.message);
+          }
+        }).catch((error) => {
+          toast.error('Failed to test stage name' + '\n' + error);
+        });
+    } else {
+      await evaluateSemantics({ body: { str_test_semantic } })
+        .then(async (response) => {
+          if (response.error) {
+            toast.error(response.message);
+            await getSemanticsErrorMessages({ params: { error_message_uuid: response.list_error_no } })
+              .then((errorMessages) => {
+                modals.open({
+                  title: 'Semantic errors',
+                  children: (
+                    <>
+                      {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
+                        <List key={index} type="ordered" withPadding>
+                          <List.Item>{index + 1}. {error_message}</List.Item>
+                        </List>
+                      ))}
+                      <Flex gap={16} justify={'end'} mt="md">
+                        <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                          Close
+                        </Button>
+                      </Flex>
+                    </>
+                  ),
+                  overlayProps: {
+                    backgroundOpacity: 0.55,
+                    blur: 10,
+                  },
+                  radius: 'md',
+                })
+              }).catch((error) => {
+                toast.error('Failed to get error messages' + '\n' + error);
+              });
+          } else {
+            toast.success(response.message);
+          }
+
+        }).catch((error) => {
+          toast.error('Failed to evaluate semantics' + '\n' + error);
+        });
+    }
 
   };
   return (
