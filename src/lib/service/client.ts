@@ -269,6 +269,35 @@ export const getStageInfo = async ({
   return data;
 };
 
+export const getDiagramData = async ({
+  cycle_id,
+  apps_label,
+  datasource_type = 'database'
+}: {
+  cycle_id: string;
+  apps_label: string;
+  datasource_type?: string;
+}) => {
+  const endpoint = `/businessProcess/diagramData?cycle_id=${cycle_id}&app_type=${apps_label}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['diagramdata'] },
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to fetch diagram data.');
+  // }
+  const data = await response.json();
+  return data;
+}
+
 export const updateCycle = async ({
   cycle_uuid,
   body
@@ -467,6 +496,45 @@ export const testSemanticStageName = async ({ params }: { params: { stage_name: 
 export const reloadBizProcess = async (baseUrlIndex = 0): Promise<{ message: string }> => {
   const baseUrl = [process.env.NEXT_PUBLIC_M1_API_URL, process.env.NEXT_PUBLIC_M2_API_URL]
 
+  async function uploadNCreate(baseUrl: string | undefined) {
+    const uploadTableProcessPath = `/businessProcess/uploadTableProcess/`;
+    const reCreateProcessPath = `/businessProcess/reCreateProcess`;
+    const uploadTableProcessPathUrl = `${baseUrl}${uploadTableProcessPath}`;
+    const reCreateProcessPathUrl = `${baseUrl}${reCreateProcessPath}`;
+
+    return await fetch(uploadTableProcessPathUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      },
+      next: { tags: ['uploadtableprocess'] }
+    }).then(async (response) => {
+      if (!response.ok) {
+        throw new Error('Failed to reload business process (uploadTableProcess).');
+      }
+
+      return await fetch(reCreateProcessPathUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+        },
+        next: { tags: ['recreateprocess'] }
+      }).then(async (response) => {
+        if (!response.ok) {
+          throw new Error('Failed to reload business process (reCreateProcess).');
+        }
+
+        return {
+          url: baseUrl,
+          message: 'Business process reloaded successfully.',
+          result: await (await response.json()).result
+        };
+      });
+    });
+  }
+
   if (baseUrlIndex >= baseUrl.length) {
     return { message: 'Business process reloaded successfully.' };
   }
@@ -477,46 +545,6 @@ export const reloadBizProcess = async (baseUrlIndex = 0): Promise<{ message: str
   // Call recursively with the next index
   return reloadBizProcess(baseUrlIndex + 1);
 };
-
-
-async function uploadNCreate(baseUrl: string | undefined) {
-  const uploadTableProcessPath = `/businessProcess/uploadTableProcess/`;
-  const reCreateProcessPath = `/businessProcess/reCreateProcess`;
-  const uploadTableProcessPathUrl = `${baseUrl}${uploadTableProcessPath}`;
-  const reCreateProcessPathUrl = `${baseUrl}${reCreateProcessPath}`;
-
-  return await fetch(uploadTableProcessPathUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
-    },
-    next: { tags: ['uploadtableprocess'] }
-  }).then(async (response) => {
-    if (!response.ok) {
-      throw new Error('Failed to reload business process (uploadTableProcess).');
-    }
-
-    return await fetch(reCreateProcessPathUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
-      },
-      next: { tags: ['recreateprocess'] }
-    }).then(async (response) => {
-      if (!response.ok) {
-        throw new Error('Failed to reload business process (reCreateProcess).');
-      }
-
-      return {
-        url: baseUrl,
-        message: 'Business process reloaded successfully.',
-        result: await (await response.json()).result
-      };
-    });
-  });
-}
 
 export const duplicateCycle = async ({
   cycle_id,
