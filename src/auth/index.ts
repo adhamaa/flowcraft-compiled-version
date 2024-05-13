@@ -109,6 +109,9 @@ export const authConfig = {
     //   return params.session
     // },
     async redirect({ url, baseUrl }: { url: string, baseUrl: string }) {
+      console.log('url:', url)
+      console.log('baseUrl:', baseUrl)
+      baseUrl = process.env.NEXT_PUBLIC_BASE_URL as string;
       const isRelativeUrl = url.startsWith("/");
       if (isRelativeUrl) {
         return `${baseUrl}${url}`;
