@@ -196,7 +196,7 @@ function customAdapter(): Adapter {
 
     return undefined
   };
-
+  // @ts-ignore
   return {
     ...adapter,
   };
