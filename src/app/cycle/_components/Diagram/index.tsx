@@ -8,15 +8,13 @@ import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation';
 import * as React from 'react';
-import ReactFlow, { EdgeChange, NodeChange, applyEdgeChanges, applyNodeChanges } from 'reactflow';
+import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, ReactFlowProvider } from 'reactflow';
 import { useShallow } from 'zustand/react/shallow';
-import 'reactflow/dist/style.css';
 import useDiagramStore, { RFState } from '@/store/Diagram';
+import 'reactflow/dist/style.css';
+import '@/components/reactflow/style.css';
+import DevTools from '@/components/reactflow/Devtools';
 
-interface UseDiagramProps {
-  edges?: any[];
-  nodes?: any[];
-}
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -24,6 +22,7 @@ const selector = (state: RFState) => ({
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   onConnect: state.onConnect,
+  fetchNodesEdges: state.fetchNodesEdges,
 });
 
 const Diagram = () => {
@@ -35,12 +34,20 @@ const Diagram = () => {
   const [opened, { open, close, toggle }] = useDisclosure(false);
 
 
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useDiagramStore(
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges } = useDiagramStore(
     useShallow(selector),
   );
 
+  const fitViewOptions: FitViewOptions = {
+    padding: 0.2,
+  };
+
+  const defaultEdgeOptions: DefaultEdgeOptions = {
+    animated: true,
+  };
+
   return (
-    <>
+    <ReactFlowProvider>
       <Modal
         centered
         opened={opened}
@@ -54,13 +61,34 @@ const Diagram = () => {
       >
         {/* here where you put the Diagram (reactflow) */}
         {/* <Image src='/Diagram.png' width={1000} height={1000} alt='diagram' className='object-cover' /> */}
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          fitView
-        />
+        <div style={{ height: '100vh' }}>
+          {/* <Button
+            type='button'
+            classNames={{
+              root: 'absolute top-4 right-0 m-4 z-10',
+            }}
+            onClick={() => fetchNodesEdges({
+              cycle_id: "2",
+              apps_label: "SP"
+            })}
+          >Fetch Nodes and Edges</Button> */}
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            fitView
+            fitViewOptions={fitViewOptions}
+            defaultEdgeOptions={defaultEdgeOptions}
+          // nodeTypes={nodeTypes}
+          >
+            <Background />
+            <Controls />
+
+            <DevTools />
+          </ReactFlow>
+        </div>
 
       </Modal>
 
@@ -73,13 +101,10 @@ const Diagram = () => {
         size="sm"
         fz={14}
         onClick={async () => {
-          await getDiagramData({
+          await fetchNodesEdges({
             cycle_id: cycle_id as string,
             apps_label: selected_app as string
           })
-            .then((diagramResponse) => {
-              
-            })
             .catch((error) => toast.error(error.message))
             .finally(() => open())
         }}
@@ -89,7 +114,7 @@ const Diagram = () => {
       >
         Business Process Diagram
       </Button>
-    </>
+    </ReactFlowProvider>
   )
 
 
