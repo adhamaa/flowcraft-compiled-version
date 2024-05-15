@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { LoginCredentials, signIn } from '../_action';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '@/lib/validation';
+import { AuthError } from 'next-auth';
 
 function SigninForm() {
 
@@ -18,8 +19,9 @@ function SigninForm() {
   const onSubmit = async ({ email, password }: any) => {
     try {
       await signIn({ email, password } as LoginCredentials)
-    } catch (error: any) {
-      toast.error(error.message)
+    } catch (error: unknown) {
+      toast.error('Invalid email or password. Please try again.')
+      toast.error((error as AuthError).message)
     }
   }
 
