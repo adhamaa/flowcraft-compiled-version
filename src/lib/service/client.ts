@@ -303,7 +303,7 @@ export const updateCycle = async ({
   body
 }: {
   cycle_uuid: string;
-  body: { cycle_active: number; cycle_description: string };
+  body: { cycle_active?: number; cycle_description: string };
 }) => {
   const endpoint = `/businessProcessTmp/updateCycle?cycle_uuid=${cycle_uuid}`;
   const url = `${baseUrl}${endpoint}`;
@@ -325,6 +325,33 @@ export const updateCycle = async ({
   clientRevalidateTag('cyclelist');
   return await response.json();
 };
+
+export const updateStatusCycle = async ({
+  cycle_id,
+  status_code
+}: {
+  cycle_id: string;
+  status_code: string;
+}) => {
+  const endpoint = `/businessProcessTmp/updateStatusCycle?cycle_id=${cycle_id}&status_code=${status_code}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['updatestatuscycle'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to update cycle status.');
+  // }
+  clientRevalidateTag('cyclelist');
+  return await response.json();
+}
 
 export const updateStage = async ({
   stage_uuid,

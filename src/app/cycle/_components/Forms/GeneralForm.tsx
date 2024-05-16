@@ -8,7 +8,7 @@ import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
 import { useForm } from "react-hook-form";
 import { Radio, TextInput } from 'react-hook-form-mantine';
-import { getStatusRefList, updateCycle } from '@/lib/service/client';
+import { getStatusRefList, updateCycle, updateStatusCycle } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import useDiagram from '../Diagram';
@@ -95,22 +95,41 @@ const GeneralFormContent = ({
             </Button>
             <Button onClick={
               async () => {
-                await updateCycle({
-                  cycle_uuid: data.cycle_uuid,
-                  body: {
-                    cycle_active: formdata.cycle_active,
-                    cycle_description: formdata.cycle_description
-                  }
-                }).then(() => {
-                  toast.success(message`Cycle ${compareStates((data.cycle_active).toString(), formdata.cycle_active)} and ${compareStates(data.cycle_description, formdata.cycle_description)} updated successfully`);
-                }).catch((error) => {
-                  toast.error('Failed to update cycle' + "\n" + error);
-                }).finally(() => {
+                if (!hasStatusChange && !hasDescriptionChange) {
+                  toast.error('No changes detected');
                   modals.closeAll();
-                  toggleEdit()
-                });
+                  toggleEdit();
+                } else if (hasStatusChange || hasDescriptionChange) {
+                  try {
+                    await Promise.all([
+                      updateStatusCycle({
+                        cycle_id: data.cycle_id.toString(),
+                        status_code: formdata.cycle_active
+                      }),
+                      updateCycle({
+                        cycle_uuid: data.cycle_uuid,
+                        body: {
+                          cycle_description: formdata.cycle_description
+                        }
+                      })
+                    ]);
 
-              }} color='#895CF3' radius='md'>
+                    toast.success(`Cycle and description updated successfully`);
+                  } catch (error) {
+                    toast.error('Failed to update cycle and description' + "\n" + error);
+                  }
+
+                  modals.closeAll();
+                  toggleEdit();
+                  window.location.reload();
+                } else {
+                  toast.error('Failed to update cycle and description');
+                  modals.closeAll();
+                  toggleEdit();
+                }
+
+              }
+            } color='#895CF3' radius='md'>
               Yes
             </Button>
           </Flex>
