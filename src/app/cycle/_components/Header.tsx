@@ -31,6 +31,13 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
     }
   }, [isLight]);
 
+  const menulist = [
+    { value: "cycle", label: "Cycle", disabled: false },
+    { value: "maintenance", label: "Maintenance", disabled: true },
+    { value: "documentation", label: "Documentation", disabled: false },
+    { value: "about", label: "About", disabled: true },
+  ]
+
   return (
     <header className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-8 gap-4 w-screen', className)}>
       <h1
@@ -48,12 +55,36 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
         value={activeTab as string}
         onChange={(value) => router.push(`/${value}`)}>
         <Tabs.List>
-          {[
-            { value: "cycle", label: "Cycle", disabled: false },
-            { value: "maintenance", label: "Maintenance", disabled: true },
-            { value: "documentation", label: "Documentation", disabled: true },
-            { value: "about", label: "About", disabled: true },
-          ].map((tab) => (
+          {menulist.map((tab) => ["Documentation"].includes(tab.label) ? (
+            <Menu
+              shadow="md"
+              width={200}
+              trigger="click-hover"
+            >
+              <Menu.Target>
+                <Tabs.Tab key={tab.value} value={tab.value} disabled={tab.disabled}>
+                  {tab.label}
+                </Tabs.Tab>
+              </Menu.Target>
+
+              <Menu.Dropdown>
+
+                {[{
+                  label: "White Paper",
+                  value: "white-paper",
+                  disabled: false,
+                  onClick: () => window.open("/pdf/BizProcessWhitePaper.pdf", "_blank")
+                }].map(({ label, value, disabled, onClick }) => <Menu.Item
+                  component="button"
+                  onClick={onClick}
+                  disabled={disabled}
+                  value={value}
+                >
+                  {label}
+                </Menu.Item>)}
+              </Menu.Dropdown>
+            </Menu>
+          ) : (
             <Tabs.Tab key={tab.value} value={tab.value} disabled={tab.disabled}>
               {tab.label}
             </Tabs.Tab>
@@ -153,7 +184,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
           offLabel={<Icon width={24} icon="line-md:sunny-outline-to-moon-loop-transition" />}
         />}
       </div>
-    </header>
+    </header >
   )
 }
 

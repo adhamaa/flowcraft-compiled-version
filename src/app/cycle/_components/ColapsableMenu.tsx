@@ -123,8 +123,6 @@ export default function ColapsableMenu({
                 }
               >Stages</Tabs.Tab>
 
-              {/* {sideMenuLayer === 2 && <FooterButton {...{isSideMenuCollapse}} isCollapse onClick={() => { }} />
-              } */}
             </Tabs.List>}
             <Tabs.Panel value="general">
               <GeneralForm data={cycleInfo as CycleData} />
@@ -183,11 +181,11 @@ const FooterButton = ({ isAdd, isCollapse, isSideMenuCollapse, onClick }: { isAd
         fz={16}
         {...(isAdd && {
           leftSection:
-            < Icon className='cursor-pointer rounded' icon="ic:round-plus" width="1.5rem" height="1.5rem" />
+            < Icon className='cursor-pointer rounded' icon="ic:round-plus" width="1.75rem" />
         })}
         onClick={onClick}
       >
-        {isAdd && "Add stage"}
+        {isAdd && "Restructure"}
         {isCollapse && <Icon
           icon="tabler:chevron-down"
           width="3rem"

@@ -1,8 +1,8 @@
 'use client';
 
 import { Icon } from '@iconify-icon/react';
-import { Button, Flex, Input, List, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { ActionIcon, Button, CopyButton, Flex, Input, List, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import HeaderForm from './HeaderForm';
@@ -213,215 +213,6 @@ const EditFormContent = ({
     })
   }
 
-  React.useEffect(() => {
-    if (data) {
-      setValue('process_stage_name', data.process_stage_name);
-      setValue('updated_datetime', data.updated_datetime);
-      setValue('list_previous', data.list_previous);
-      setValue('list_next_stage', data.list_next_stage);
-      setValue('list_user', JSON.stringify(data.list_user, null, 2));
-      setValue('list_pbt', JSON.stringify(data.list_pbt, null, 2));
-      setValue('list_role', JSON.stringify(data.list_role, null, 2));
-      setValue('list_requirement', JSON.stringify(data.list_requirement, null, 2));
-      setValue('list_action', JSON.stringify(data.list_action, null, 2));
-      setValue('list_entry_condition', JSON.stringify(data.list_entry_condition, null, 2));
-      setValue('list_exit_condition', JSON.stringify(data.list_exit_condition, null, 2));
-    }
-  }, [data, setValue])
-
-  return (
-    <ScrollArea.Autosize mah={768}>
-      <form
-        className='space-y-4 py-4'
-        onSubmit={handleSubmit(onSaveSubmit)}
-      >
-        <HeaderForm type='edit' {...{ toggleEdit, isEdit, toggleExpand }} />
-        {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
-          <Input.Wrapper key={index} label={label} classNames={{
-            root: 'px-14',
-            label: '!text-sm !font-semibold',
-          }}>
-            <LabelTooltip label={label} />
-            <TextInput
-              name={name}
-              defaultValue={value}
-              control={control}
-              disabled={disabled}
-              classNames={{
-                input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-              }} />
-            {!disabled && <ActionButtons {...{ name, value, toggleEdit, handleSubmit }} />}
-          </Input.Wrapper>
-        ) : ['List of previous stage', 'List of next stage'].includes(label) ? (
-          <Input.Wrapper key={index} label={label} classNames={{
-            root: 'px-14',
-            label: '!text-sm !font-semibold',
-          }}>
-            <LabelTooltip label={label} />
-            <TableStages data={value as stagesData} />
-          </Input.Wrapper>
-        ) : (
-          <Input.Wrapper
-            key={index}
-            label={label}
-            classNames={{
-              root: 'px-14',
-              label: '!text-sm !font-semibold',
-            }}>
-            <LabelTooltip label={label} />
-            <TextareaHeader />
-            <JsonInput
-              name={name}
-              defaultValue={JSON.stringify(value, null, 2)}
-              control={control}
-              disabled={disabled}
-              formatOnBlur
-              autosize
-              minRows={4}
-              classNames={{
-                input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-              }}
-            />
-            {!disabled && <ActionButtons  {...{ name, value, toggleEdit, handleSubmit }} />}
-          </Input.Wrapper>
-        ))}
-      </form >
-    </ScrollArea.Autosize>
-  )
-}
-
-const TableStages = ({ data }: { data: stagesData; }) => {
-  const [tableData, setTableData] = React.useState<stagesData>([]);
-
-  const columns: MRT_ColumnDef<stagesData[0]>[] = [
-    {
-      header: 'Stage Name',
-      accessorFn: (originalRow) => originalRow.process_stage_name,
-    },
-    {
-      header: 'Date created',
-      accessorFn: (originalRow) => originalRow.created_datetime,
-    },
-  ];
-  const table = useMantineReactTable({
-    columns,
-    data: React.useMemo(() => tableData, [tableData]),
-    // initialState: {
-    //   pagination: { pageSize: 5, pageIndex: 0 },
-    // },
-    // enableStickyHeader: true,
-    // mantineTableContainerProps: {
-    //   mah: '40'
-    // },
-    mantinePaginationProps: {
-      rowsPerPageOptions: ['5', '10', '15'],
-      showRowsPerPage: false,
-    },
-    paginationDisplayMode: 'pages',
-  });
-
-  React.useEffect(() => {
-    if (data) {
-      setTableData(data);
-    }
-  }, [data]);
-
-  return (
-    <Stack>
-      <TextareaHeader isTable {...{ table }} />
-      <Table
-        captionSide="top"
-        fz="md"
-        highlightOnHover
-        horizontalSpacing='xl'
-        verticalSpacing="xs"
-        withRowBorders={false}
-        m="0"
-        mih={150}
-        classNames={{
-          table: 'bg-[#F1F4F5]',
-          // thead: 'sticky bg-[#F1F4F5]/95',
-          th: 'border-b border-[#E0E0E0]',
-        }}
-      >
-        <ScrollArea.Autosize mah={150} classNames={{
-          thumb: '!bg-[#BDBDBD] z-10',
-        }}>
-          <Table.Thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Tr key={headerGroup.id} >
-                {headerGroup.headers.map((header) => (
-                  <Table.Th key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                        header.column.columnDef.Header ??
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                  </Table.Th>
-                ))}
-              </Table.Tr>
-            ))}
-          </Table.Thead>
-
-          {!tableData.length ? (
-            <Table.Tbody>
-              <Table.Tr >
-                <Table.Td colSpan={2} classNames={{
-                  td: 'text-center text-black/30',
-                }}>
-                  No Data Found
-                </Table.Td>
-              </Table.Tr>
-            </Table.Tbody>
-          ) : (
-            <Table.Tbody>
-              {table.getRowModel().rows.map((row) => (
-                <Table.Tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <Table.Td key={cell.id}>
-                      <MRT_TableBodyCellValue cell={cell} table={table} />
-                    </Table.Td>
-                  ))}
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          )}
-        </ScrollArea.Autosize>
-      </Table>
-    </Stack>
-  )
-}
-
-export const TextareaHeader = ({ isTable, table }: {
-  isTable?: boolean;
-  table?: any;
-}) => (
-  <div className={clsx('flex bg-[#D9D9D9] rounded-t-lg mt-4 min-h-10', isTable && ' -mb-4')}>
-    <Flex justify="space-between" align="center" classNames={{
-      root: 'py-1 px-2 pr-4 w-full',
-    }}>
-      {isTable && <MRT_TablePagination table={table} classNames={{
-        root: '',
-        control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[#895CF3] !hover:text-white/90 !hover:!border-[#895CF3] !transition-all !duration-300 !ease-in-out',
-      }} />}
-      {!isTable && <Icon icon="ph:code-bold" width="1.2rem" height="1.2rem" className='ml-auto cursor-pointer text-black/70 hover:text-black/50' />}
-    </Flex>
-  </div >
-)
-
-const ActionButtons = ({
-  name,
-  value,
-  toggleEdit,
-  handleSubmit
-}: {
-  name?: string;
-  value?: string | string[] | number | boolean | undefined | null | any[] | Record<string, any> | Record<string, any>[];
-  toggleEdit: () => void;
-  handleSubmit: UseFormHandleSubmit<FieldValues, undefined>;
-}) => {
   //! to TEST the syntax of the stage name or the syntax of the JSON string
   const onSyntaxSubmit = async (formdata: any, e: any) => {
     const target_id = e.target.offsetParent.id
@@ -506,11 +297,9 @@ const ActionButtons = ({
     }
   }
 
-  const onSemanticsSubmit = async (formdata: any, e: any) => {
+  const onSemanticSubmit = async (formdata: any, e: any) => {
     const target_id = e.target.offsetParent.id
     const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
-
-
     if (target_id === 'process_stage_name') {
       await testSemanticStageName({ params: { stage_name: str_test_semantic } })
         .then(async (response) => {
@@ -589,24 +378,334 @@ const ActionButtons = ({
           toast.error('Failed to evaluate semantics' + '\n' + error);
         });
     }
-
   };
-  return (
 
+  React.useEffect(() => {
+    if (data) {
+      setValue('process_stage_name', data.process_stage_name);
+      setValue('updated_datetime', data.updated_datetime);
+      setValue('list_previous', data.list_previous);
+      setValue('list_next_stage', data.list_next_stage);
+      setValue('list_user', JSON.stringify(data.list_user, null, 2));
+      setValue('list_pbt', JSON.stringify(data.list_pbt, null, 2));
+      setValue('list_role', JSON.stringify(data.list_role, null, 2));
+      setValue('list_requirement', JSON.stringify(data.list_requirement, null, 2));
+      setValue('list_action', JSON.stringify(data.list_action, null, 2));
+      setValue('list_entry_condition', JSON.stringify(data.list_entry_condition, null, 2));
+      setValue('list_exit_condition', JSON.stringify(data.list_exit_condition, null, 2));
+    }
+  }, [data, setValue])
+
+  const max_h_768 = useMediaQuery('(max-height: 768px)');
+
+  return (
+    <ScrollArea.Autosize mah={max_h_768 ? 700 : 768}>
+      <form
+        className={clsx('space-y-8 py-4', max_h_768 && 'pb-8')}
+        onSubmit={handleSubmit(onSaveSubmit)}
+      >
+        <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} />
+        {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
+          <Input.Wrapper key={index} label={label} classNames={{
+            root: 'px-14 space-y-4',
+            label: '!text-sm !font-semibold',
+          }}>
+            <LabelTooltip label={label} />
+            <TextInput
+              name={name}
+              defaultValue={value}
+              control={control}
+              disabled={disabled}
+              classNames={{
+                input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+              }}
+              rightSection={!disabled &&
+                <SaveActions {...{
+                  name,
+                  disabled,
+                  onCancel: toggleEdit
+                }} />}
+            />
+            {!disabled && <SyntaxSemanticActions {...{
+              name,
+              value,
+              toggleEdit,
+              onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
+              onSemanticSubmit: handleSubmit(onSemanticSubmit)
+            }} />}
+          </Input.Wrapper>
+        ) : ['List of previous stage', 'List of next stage'].includes(label) ? (
+          <Input.Wrapper key={index} label={label} classNames={{
+            root: 'px-14',
+            label: '!text-sm !font-semibold',
+          }}>
+            <LabelTooltip label={label} />
+            <TableStages data={value as stagesData} />
+          </Input.Wrapper>
+        ) : (
+          <Input.Wrapper
+            key={index}
+            label={label}
+            classNames={{
+              root: 'px-14',
+              label: '!text-sm !font-semibold',
+            }}>
+            <LabelTooltip label={label} />
+            <TextareaHeader
+              actionsButton={
+                <SaveActions {...{
+                  name,
+                  copyValue: JSON.stringify(value, null, 2),
+                  disabled,
+                  onCancel: toggleEdit
+                }} />} />
+            <JsonInput
+              name={name}
+              defaultValue={JSON.stringify(value, null, 2)}
+              control={control}
+              disabled={disabled}
+              formatOnBlur
+              autosize
+              minRows={4}
+              classNames={{
+                input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+              }}
+            />
+            {!disabled && <SyntaxSemanticActions  {...{
+              name,
+              value,
+              toggleEdit,
+              onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
+              onSemanticSubmit: handleSubmit(onSemanticSubmit)
+            }} />}
+          </Input.Wrapper>
+        ))}
+      </form >
+    </ScrollArea.Autosize>
+  )
+}
+
+const TableStages = ({ data }: { data: stagesData; }) => {
+  const [tableData, setTableData] = React.useState<stagesData>([]);
+
+  const columns: MRT_ColumnDef<stagesData[0]>[] = [
+    {
+      header: 'Stage Name',
+      accessorFn: (originalRow) => originalRow.process_stage_name,
+    },
+    {
+      header: 'Date created',
+      accessorFn: (originalRow) => originalRow.created_datetime,
+    },
+  ];
+  const table = useMantineReactTable({
+    columns,
+    data: React.useMemo(() => tableData, [tableData]),
+    // initialState: {
+    //   pagination: { pageSize: 5, pageIndex: 0 },
+    // },
+    // enableStickyHeader: true,
+    // mantineTableContainerProps: {
+    //   mah: '40'
+    // },
+    mantinePaginationProps: {
+      rowsPerPageOptions: ['5', '10', '15'],
+      showRowsPerPage: false,
+    },
+    paginationDisplayMode: 'pages',
+  });
+
+  React.useEffect(() => {
+    if (data) {
+      setTableData(data);
+    }
+  }, [data]);
+
+  return (
+    <Stack>
+      <TextareaHeader {...{ table }} />
+      <Table
+        captionSide="top"
+        fz="md"
+        highlightOnHover
+        horizontalSpacing='xl'
+        verticalSpacing="xs"
+        withRowBorders={false}
+        m="0"
+        mih={150}
+        classNames={{
+          table: 'bg-[#F1F4F5]',
+          // thead: 'sticky bg-[#F1F4F5]/95',
+          th: 'border-b border-[#E0E0E0]',
+        }}
+      >
+        <ScrollArea.Autosize mah={150} classNames={{
+          thumb: '!bg-[#BDBDBD] z-10',
+        }}>
+          <Table.Thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <Table.Tr key={headerGroup.id} >
+                {headerGroup.headers.map((header) => (
+                  <Table.Th key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.Header ??
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                  </Table.Th>
+                ))}
+              </Table.Tr>
+            ))}
+          </Table.Thead>
+
+          {!tableData.length ? (
+            <Table.Tbody>
+              <Table.Tr >
+                <Table.Td colSpan={2} classNames={{
+                  td: 'text-center text-black/30',
+                }}>
+                  No Data Found
+                </Table.Td>
+              </Table.Tr>
+            </Table.Tbody>
+          ) : (
+            <Table.Tbody>
+              {table.getRowModel().rows.map((row) => (
+                <Table.Tr key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <Table.Td key={cell.id}>
+                      <MRT_TableBodyCellValue cell={cell} table={table} />
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          )}
+        </ScrollArea.Autosize>
+      </Table>
+    </Stack>
+  )
+}
+
+export const TextareaHeader = ({ table, actionsButton }: {
+  table?: any;
+  actionsButton?: React.ReactNode;
+}) => {
+  const isTable = !!table
+  return (
+    <div className={clsx(
+      'relative flex bg-[#D9D9D9] rounded-t-lg mt-4 min-h-10',
+      isTable && '-mb-4'
+    )}>
+      <Flex justify="space-between" align="center" classNames={{
+        root: 'py-1 px-2 pr-4 w-full',
+      }}>
+        {isTable && <MRT_TablePagination table={table} classNames={{
+          root: '',
+          control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[#895CF3] !hover:text-white/90 !hover:!border-[#895CF3] !transition-all !duration-300 !ease-in-out',
+        }} />}
+        {actionsButton}
+      </Flex>
+    </div >
+  )
+}
+
+const SyntaxSemanticActions = ({
+  name,
+  onSyntaxSubmit,
+  onSemanticSubmit,
+}: {
+  name?: string;
+  onSyntaxSubmit: (formdata: any, e: any) => void;
+  onSemanticSubmit: (formdata: any, e: any) => void;
+}) => {
+
+  return (
     <div className="text-right ml-auto space-x-4 mt-4" >
-      <Button color='#DC3545' radius='md' className="!font-normal" onClick={toggleEdit}>Cancel</Button>
-      <Button key={name} id={name} type='submit' color='#28A745' radius='md' className="!font-normal"
-      >Save</Button>
-      <Button key={name} id={name} color='#1C1454' radius='md' className="!font-normal"
-        onClick={handleSubmit(onSyntaxSubmit)}
+      <Button id={name} color='#895CF3' radius='md' className="!font-normal"
+        onClick={onSyntaxSubmit as never}
       >Verify syntax</Button>
-      <Button key={name} id={name} color='#FF6347' radius='md' className="!font-normal"
-        onClick={handleSubmit(onSemanticsSubmit)}>Evaluate semantics
+      <Button id={name} color='#895CF3' radius='md' className="!font-normal"
+        onClick={onSemanticSubmit as never}>Evaluate semantics
       </Button>
     </div >
-
   )
 };
+
+const SaveActions = ({ name, copyValue, disabled, onCancel }: {
+  name: string;
+  copyValue?: string;
+  disabled?: boolean;
+  onCancel?: () => void;
+}) => {
+  return disabled ? null :
+    (
+      <div className={clsx(
+        'flex items-center ml-auto space-x-1',
+        name === 'process_stage_name' && 'absolute right-0'
+      )}>
+        <Tooltip label="Save">
+          <ActionIcon
+            id={name}
+            component='button'
+            type='submit'
+            // disabled
+            variant="transparent"
+            bg="#F1F5F9"
+            color='black'
+            size="lg"
+            radius="md"
+            aria-label="Settings">
+            <Icon icon="heroicons-outline:check" width="1.2rem" className='border p-2 rounded-lg text-black/70 hover:text-black/50' />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Cancel">
+          <ActionIcon
+            id={name}
+            // disabled
+            variant="transparent"
+            bg="#F1F5F9"
+            color='black'
+            size="lg"
+            radius="md"
+            aria-label="Settings"
+            onClick={onCancel}
+          >
+            <Icon icon="heroicons-outline:x" width="1.2rem" className='border p-2 rounded-lg text-black/70 hover:text-black/50' />
+          </ActionIcon>
+        </Tooltip>
+        <div className="pl-1 flex gap-1 items-center">
+          {!['process_stage_name', 'updated_datetime'].includes(name) &&
+            <CopyButton value={copyValue as string} timeout={2000}>
+              {({ copied, copy }) => (
+                <Tooltip label={copied ? 'Copied' : 'Copy'}>
+                  <ActionIcon
+                    // disabled
+                    color={copied ? 'teal' : 'gray'} variant="subtle" size="lg"
+                    radius="md" onClick={copy}>
+                    {copied ? (
+                      <Icon icon="heroicons-outline:check" width="1.2rem" height="1.2rem" className='text-black/70 hover:text-black/50' />
+                    ) : (
+                      <Icon icon="heroicons-outline:document-duplicate" width="1.2rem" height="1.2rem" className='text-black/70 hover:text-black/50' />
+                    )}
+                  </ActionIcon>
+                </Tooltip>
+              )}
+            </CopyButton>}
+          {!['process_stage_name', 'updated_datetime'].includes(name) &&
+            <ActionIcon
+              // disabled
+              color='gray' variant="subtle" size="lg"
+              radius="md">
+              <Icon icon="ph:code-bold" width="1.2rem" height="1.2rem" className='text-black/70 hover:text-black/50' />
+            </ActionIcon>}
+        </div>
+      </div>
+    )
+
+}
 
 const LabelTooltip = ({
   onMouseEnter,

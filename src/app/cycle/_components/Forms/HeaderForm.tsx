@@ -1,11 +1,19 @@
 import { Icon } from '@iconify-icon/react';
-import { Button } from '@mantine/core';
+import { Button, ButtonFactory, ButtonProps } from '@mantine/core';
 import clsx from 'clsx';
 import { useSearchParams } from 'next/navigation';
-import * as React from 'react'
+import * as React from 'react';
+
+type CustomButtonProps = ButtonProps & {
+  label: string;
+  type: 'button' | 'submit';
+  onClick: () => void;
+  canShow: boolean;
+  icon?: React.ReactNode;
+}
 
 const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
-  type: 'edit' | 'general';
+  type: 'stages' | 'general';
   toggleExpand: () => void;
   toggleEdit?: () => void;
   isEdit?: boolean;
@@ -15,124 +23,135 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
   const datasource_type = searchParams.get('data_source');
 
   if (!type) throw new Error('type is required');
+
+  const buttons = [
+    {
+      label: 'Duplicate',
+      type: 'button',
+      disabled: type === 'stages' && !isEdit,
+      canShow: datasource_type === 'database' && type === 'stages' && !isEdit,
+      onClick: () => { },
+
+      variant: "filled",
+      color: "#F1F5F9",
+      c: "#0F172A",
+      radius: "md",
+      size: "sm",
+      fz: 14,
+      classNames: {
+        root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+      },
+      icon: <Icon width='1rem' icon="heroicons-outline:duplicate" />,
+    },
+    {
+      label: 'Delete',
+      type: 'button',
+      disabled: true,
+      canShow: datasource_type === 'database' && !isEdit,
+      onClick: () => { },
+
+      variant: "filled",
+      color: "#F1F5F9",
+      c: "#0F172A",
+      radius: "md",
+      size: "sm",
+      fz: 14,
+      classNames: {
+        root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+      },
+      icon: <Icon width='1rem' icon="heroicons-outline:trash" />,
+    },
+    {
+      label: 'Edit',
+      type: 'button',
+      disabled: false,
+      canShow: datasource_type === 'database' && !isEdit,
+      onClick: toggleEdit as () => void,
+
+      variant: "filled",
+      color: "#895CF3",
+      radius: "md",
+      size: "sm",
+      fz: 14,
+      classNames: {
+        root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+      },
+      icon: <Icon width='1rem' icon="heroicons-outline:pencil-alt" />,
+    },
+    {
+      label: 'Close',
+      type: 'button',
+      disabled: false,
+      canShow: (datasource_type === 'database' && type === 'stages' && isEdit) as boolean,
+      onClick: toggleEdit as () => void,
+
+      variant: "white",
+      color: "#F1F5F9",
+      c: "#0F172A",
+      radius: "md",
+      size: "sm",
+      fz: 14,
+      classNames: {
+        root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+      },
+      // icon: <Icon width='1rem' icon="bi:arrow-right" />,
+    },
+    {
+      label: 'Save',
+      type: 'submit',
+      disabled: false,
+      canShow: (datasource_type === 'database' && type === 'general' && isEdit) as boolean,
+      onClick: () => { },
+
+      variant: "filled",
+      color: "#895CF3",
+      radius: "md",
+      size: "sm",
+      fz: 14,
+      classNames: {
+        root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+      },
+      // icon: <Icon width='1rem' icon="bi:arrow-right" />,
+    },
+    {
+      label: 'Cancel',
+      type: 'button',
+      disabled: false,
+      canShow: (datasource_type === 'database' && type === 'general' && isEdit) as boolean,
+      onClick: toggleEdit as () => void,
+
+      variant: "white",
+      color: "#F1F5F9",
+      c: "#0F172A",
+      radius: "md",
+      size: "sm",
+      fz: 14,
+      classNames: {
+        root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+      },
+      // icon: <Icon width='1rem' icon="bi:arrow-right" />,
+    }
+  ] satisfies CustomButtonProps[];
+
   return (
     <div className={clsx('flex px-14 py-6 items-center border-b', 'justify-end')}>
-
       {datasource_type === 'database' && (
         <>
-          {isFullscreen && <Button color='#895CF3' radius='md' classNames={{
-            root: '!p-2 mr-auto'
-          }} onClick={toggleExpand}>
-            <Icon icon="solar:maximize-outline" width="1rem" height="1rem" />
-          </Button>}
-          {!isEdit ?
-            <div className='flex gap-4'>
-              {type === 'edit' && <Button
-                disabled
-                variant='filled'
-                color='#F1F5F9'
-                c='#0F172A'
-                radius='md'
-                size="sm"
-                fz={14}
-                onClick={() => { }}
-                classNames={{
-                  root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-                }}
-              >
-                Duplicate
-              </Button>}
+          <div className="flex gap-4">
+            {buttons.map(({ label, canShow, icon, ...btn }, index) => canShow && (
               <Button
-                disabled
-                variant='filled'
-                color='#F1F5F9'
-                c='#0F172A'
-                radius='md'
-                size="sm"
-                fz={14}
-                onClick={() => { }}
-                classNames={{
-                  root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-                }}
+                key={index}
+                {...btn}
+                leftSection={icon}
               >
-                Delete
+                {label}
               </Button>
-              <Button
-                // disabled
-                variant='filled'
-                color='#F1F5F9'
-                c='#0F172A'
-                radius='md'
-                size="sm"
-                fz={14}
-                onClick={toggleEdit}
-                classNames={{
-                  root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-                }}
-              >
-                Edit
-              </Button>
-            </div> :
-            <div className='flex gap-4'>
-              {type === 'edit' ? <Button
-                // disabled
-                variant='white'
-                color='#F1F5F9'
-                c='#0F172A'
-                radius='md'
-                size="sm"
-                fz={14}
-                onClick={toggleEdit}
-                classNames={{
-                  root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-                }}
-              >
-                Close
-              </Button> :
-                <>
-                  <Button
-                    type='submit'
-                    // disabled
-                    variant='filled'
-                    color='#895CF3'
-                    // c='#0F172A'
-                    radius='md'
-                    size="sm"
-                    fz={14}
-                    // onClick={toggleEdit}
-                    classNames={{
-                      root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-                    }}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    // disabled
-                    variant='white'
-                    color='#F1F5F9'
-                    c='#0F172A'
-                    radius='md'
-                    size="sm"
-                    fz={14}
-                    onClick={toggleEdit}
-                    classNames={{
-                      root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              }
-            </div>
-          }
-          {/* {toggleEdit && <div className='flex gap-4'>
-          <Button color={!isEdit ? '#007BFF' : '#DC3545'} radius='md' onClick={toggleEdit}>{!isEdit ? 'Edit' : 'Close'}</Button>
-          {type === 'general' && <Button type='submit' color={!isEdit ? '#28A745' : '#28A745'} display={!isEdit ? 'none' : 'block'} radius='md' onClick={toggleEdit}>{!isEdit ? '' : 'Save'}</Button>}
-        </div>} */}
+            ))}
+          </div>
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default HeaderForm
+export default HeaderForm;

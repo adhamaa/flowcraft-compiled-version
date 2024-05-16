@@ -1,7 +1,7 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
 import { Button, Flex, Group, Input, Modal, ScrollArea, Text } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import Image from 'next/image';
 import * as React from 'react'
 import { CycleData } from '../HomeContent';
@@ -14,6 +14,7 @@ import { modals } from '@mantine/modals';
 import useDiagram from '../Diagram';
 import Diagram from '../Diagram';
 import ReactFlow, { EdgeChange, NodeChange, applyEdgeChanges, applyNodeChanges } from 'reactflow';
+import clsx from 'clsx';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
@@ -166,10 +167,12 @@ const GeneralFormContent = ({
     getStatusList();
   }, [])
 
+  const max_h_768 = useMediaQuery('(max-height: 768px)');
+
   return (
-    <ScrollArea.Autosize mah={768}>
+    <ScrollArea.Autosize mah={max_h_768 ? 700 : 768}>
       <form
-        className='space-y-4 py-4'
+        className={clsx('space-y-4 py-4', max_h_768 && 'pb-8')}
         onSubmit={handleSubmit(onSubmit)}
         onError={(e) => console.log(e)}
       >
@@ -211,7 +214,7 @@ const GeneralFormContent = ({
               control={control}
               disabled={disabled}
               classNames={{
-                input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+                input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
               }} />
           </Input.Wrapper>
         ))}

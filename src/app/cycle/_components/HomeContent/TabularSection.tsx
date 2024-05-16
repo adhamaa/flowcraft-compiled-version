@@ -33,10 +33,6 @@ const TabularSection = ({ opened,
 
   const [activeTab, setActiveTab] = React.useState<string | null>(data_source || 'database')
 
-  const [id, setId] = React.useState<number | null>(null);
-  console.log('id:', id)
-
-
   const tripleDotMenu = [
     {
       group: 'crud',
@@ -118,26 +114,10 @@ const TabularSection = ({ opened,
     {
       header: 'Cycle Name',
       accessorFn: (originalRow) => originalRow.cycle_name,
-      // Cell: ({ cell, row }) => {
-      //   const handleClick = () => router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''));
-      //   return (
-      //     <div className='flex gap-2 items-center cursor-pointer' onClick={handleClick}>
-      //       <span className='hover:underline'>{cell.getValue() as string}</span>
-      //     </div>
-      //   )
-      // },
     },
     {
       header: 'Cycle ID',
       accessorFn: (originalRow) => originalRow.cycle_id,
-      // Cell: ({ cell, row }) => {
-      //   const handleClick = () => router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''));
-      //   return (
-      //     <div className='flex gap-2 items-center cursor-pointer w-20' onClick={handleClick}>
-      //       <p className='hover:underline'>{cell.getValue() as string}</p>
-      //     </div>
-      //   )
-      // },
     },
     {
       header: 'Applications',
