@@ -6,7 +6,7 @@ import { CycleData } from ".";
 import Image from "next/image";
 import clsx from "clsx";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from "mantine-react-table";
+import { MRT_Cell, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_Row, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, MantineReactTable, flexRender, useMantineReactTable } from "mantine-react-table";
 import { ActionIcon, Button, Flex, Menu, Stack, Table, Tabs, Text, Tooltip } from "@mantine/core";
 import { Icon } from "@iconify-icon/react";
 import { duplicateCycle, reloadBizProcess } from '@/lib/service/client';
@@ -33,13 +33,16 @@ const TabularSection = ({ opened,
 
   const [activeTab, setActiveTab] = React.useState<string | null>(data_source || 'database')
 
+  const [id, setId] = React.useState<number | null>(null);
+  console.log('id:', id)
+
 
   const tripleDotMenu = [
     {
       group: 'crud',
       menu: [
-        { label: 'Add new cycle', onClick: () => console.log('reload') },
-        { label: 'Delete cycle', onClick: () => console.log('Delete') },
+        { label: 'Add new cycle', onClick: () => console.log('reload'), disabled: true },
+        { label: 'Delete cycle', onClick: () => console.log('Delete'), disabled: true },
         {
           label: 'Duplicate cycle', onClick: async ({
             original: {
@@ -86,15 +89,15 @@ const TabularSection = ({ opened,
               },
               radius: 'md',
             });
-          }
+          }, disabled: false
         },
 
       ],
     }, {
       group: 'reset',
       menu: [
-        { label: 'Reload Business Process', onClick: () => console.log('Reload') },
-        { label: 'Optimize business process ', onClick: () => console.log('Optimize') },
+        { label: 'Reload Business Process', onClick: () => console.log('Reload'), disabled: true },
+        { label: 'Optimize business process ', onClick: () => console.log('Optimize'), disabled: true },
       ],
     }
   ]
@@ -115,26 +118,26 @@ const TabularSection = ({ opened,
     {
       header: 'Cycle Name',
       accessorFn: (originalRow) => originalRow.cycle_name,
-      Cell: ({ cell, row }) => {
-        const handleClick = () => router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''));
-        return (
-          <div className='flex gap-2 items-center cursor-pointer' onClick={handleClick}>
-            <span className='hover:underline'>{cell.getValue() as string}</span>
-          </div>
-        )
-      },
+      // Cell: ({ cell, row }) => {
+      //   const handleClick = () => router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''));
+      //   return (
+      //     <div className='flex gap-2 items-center cursor-pointer' onClick={handleClick}>
+      //       <span className='hover:underline'>{cell.getValue() as string}</span>
+      //     </div>
+      //   )
+      // },
     },
     {
       header: 'Cycle ID',
       accessorFn: (originalRow) => originalRow.cycle_id,
-      Cell: ({ cell, row }) => {
-        const handleClick = () => router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''));
-        return (
-          <div className='flex gap-2 items-center cursor-pointer w-20' onClick={handleClick}>
-            <p className='hover:underline'>{cell.getValue() as string}</p>
-          </div>
-        )
-      },
+      // Cell: ({ cell, row }) => {
+      //   const handleClick = () => router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''));
+      //   return (
+      //     <div className='flex gap-2 items-center cursor-pointer w-20' onClick={handleClick}>
+      //       <p className='hover:underline'>{cell.getValue() as string}</p>
+      //     </div>
+      //   )
+      // },
     },
     {
       header: 'Applications',
@@ -166,6 +169,8 @@ const TabularSection = ({ opened,
     pageSize: 10, //customize the default page size
   });
 
+  const handleCellClick = (cell: MRT_Cell<CycleData>, row: MRT_Row<CycleData>) => cell.column.id !== 'mrt-row-actions' && router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''))
+
   const table = useMantineReactTable({
     columns,
     data: React.useMemo(() => tableData, [tableData]),
@@ -177,6 +182,10 @@ const TabularSection = ({ opened,
       showGlobalFilter: true,
     },
     enableRowActions: true,
+    enableSorting: false,
+    enableTopToolbar: false,
+    enableBottomToolbar: false,
+    enableColumnActions: false,
     positionActionsColumn: 'last',
     displayColumnDefOptions: {
       'mrt-row-actions': {
@@ -200,7 +209,7 @@ const TabularSection = ({ opened,
           {tripleDotMenu.map((menuLayer) => (
             <div key={menuLayer.group}>
               {menuLayer.menu.map((menu) => (
-                <Menu.Item key={menu.label} onClick={() => menu.onClick(row)}>
+                <Menu.Item key={menu.label} onClick={() => menu.onClick(row)} disabled={menu.disabled}>
                   {menu.label}
                 </Menu.Item>
               ))}
@@ -218,13 +227,18 @@ const TabularSection = ({ opened,
       showRowsPerPage: false,
     },
     paginationDisplayMode: 'pages',
+
+    mantinePaperProps: {
+      classNames: {
+        root: '!border-none !shadow-none w-full px-16'
+      },
+    },
     mantineTableBodyRowProps: ({ row }) => ({
-      onClick: (event) => {
-        console.info(event, row.id);
-      },
-      sx: {
-        cursor: 'pointer', //you might want to change the cursor too when adding an onClick
-      },
+      classNames: { tr: '' },
+    }),
+    mantineTableBodyCellProps: ({ cell, row }) => ({
+      onClick: () => handleCellClick(cell, row),
+      classNames: { td: cell.column.id !== 'mrt-row-actions' && 'cursor-pointer' } as never,
     }),
   });
 
@@ -361,7 +375,6 @@ const TabularSection = ({ opened,
                   </ActionIcon>
                 </Tooltip>
               </div>
-
             </Flex>
 
             <Tabs
@@ -402,8 +415,10 @@ const TabularSection = ({ opened,
               ))} */}
             </Tabs>
 
-            <div className="overflow-auto w-screen">
-              <Table
+            <div className="relative overflow-auto w-screen">
+              <div className='absolute top-12 border w-full border-black/5 z-50' />
+              <MantineReactTable table={table} />
+              {/* <Table
                 captionSide="top"
                 fz="md"
                 highlightOnHover
@@ -438,14 +453,14 @@ const TabularSection = ({ opened,
                   {table.getRowModel().rows.map((row) => (
                     <Table.Tr key={row.id}>
                       {row.getVisibleCells().map((cell) => (
-                        <Table.Td key={cell.id}>
+                        <td key={cell.id}>
                           <MRT_TableBodyCellValue cell={cell} table={table} />
-                        </Table.Td>
+                        </td>
                       ))}
                     </Table.Tr>
                   ))}
                 </Table.Tbody>
-              </Table>
+              </Table> */}
             </div>
             <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
           </Stack>
