@@ -175,7 +175,6 @@ export const authConfig = {
     // updateAge: 24 * 60 * 60, // 24 hours
   },
   basePath: BASE_PATH,
-  // secret: process.env.NEXTAUTH_SECRET,
 } satisfies NextAuthConfig
 
 export const { handlers, auth, signOut, signIn } = NextAuth({ adapter: CustomAdapter, ...authConfig })

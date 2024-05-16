@@ -8,9 +8,12 @@ import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
 import { useForm } from "react-hook-form";
 import { Radio, TextInput } from 'react-hook-form-mantine';
-import { getStatusRefList, updateCycle } from '@/lib/service/client';
+import { getStatusRefList, updateCycle, updateStatusCycle } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
+import useDiagram from '../Diagram';
+import Diagram from '../Diagram';
+import ReactFlow, { EdgeChange, NodeChange, applyEdgeChanges, applyNodeChanges } from 'reactflow';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
@@ -92,22 +95,41 @@ const GeneralFormContent = ({
             </Button>
             <Button onClick={
               async () => {
-                await updateCycle({
-                  cycle_uuid: data.cycle_uuid,
-                  body: {
-                    cycle_active: formdata.cycle_active,
-                    cycle_description: formdata.cycle_description
-                  }
-                }).then(() => {
-                  toast.success(message`Cycle ${compareStates((data.cycle_active).toString(), formdata.cycle_active)} and ${compareStates(data.cycle_description, formdata.cycle_description)} updated successfully`);
-                }).catch((error) => {
-                  toast.error('Failed to update cycle' + "\n" + error);
-                }).finally(() => {
+                if (!hasStatusChange && !hasDescriptionChange) {
+                  toast.error('No changes detected');
                   modals.closeAll();
-                  toggleEdit()
-                });
+                  toggleEdit();
+                } else if (hasStatusChange || hasDescriptionChange) {
+                  try {
+                    await Promise.all([
+                      updateStatusCycle({
+                        cycle_id: data.cycle_id.toString(),
+                        status_code: formdata.cycle_active
+                      }),
+                      updateCycle({
+                        cycle_uuid: data.cycle_uuid,
+                        body: {
+                          cycle_description: formdata.cycle_description
+                        }
+                      })
+                    ]);
 
-              }} color='#895CF3' radius='md'>
+                    toast.success(`Cycle and description updated successfully`);
+                  } catch (error) {
+                    toast.error('Failed to update cycle and description' + "\n" + error);
+                  }
+
+                  modals.closeAll();
+                  toggleEdit();
+                  window.location.reload();
+                } else {
+                  toast.error('Failed to update cycle and description');
+                  modals.closeAll();
+                  toggleEdit();
+                }
+
+              }
+            } color='#895CF3' radius='md'>
               Yes
             </Button>
           </Flex>
@@ -144,22 +166,8 @@ const GeneralFormContent = ({
     getStatusList();
   }, [])
 
-
   return (
     <ScrollArea.Autosize mah={768}>
-      <Modal
-        centered
-        opened={diagramOpened}
-        onClose={diagramClose}
-        radius='lg'
-        transitionProps={{ transition: 'fade', duration: 200 }}
-        closeButtonProps={{
-          icon: <Icon icon="mingcute:close-fill" width="1.2rem" height="1.2rem" className='!text-[#895CF3]' />,
-        }}
-        size="lg"
-      >
-        <Image src='/Diagram.png' width={1000} height={1000} alt='diagram' className='object-cover' />
-      </Modal>
       <form
         className='space-y-4 py-4'
         onSubmit={handleSubmit(onSubmit)}
@@ -167,23 +175,9 @@ const GeneralFormContent = ({
       >
         {/* <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button> */}
         <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
-        <div className="flex justify-end py-2 px-14">{diagramToggle &&
-          <Button
-            // disabled
-            variant='filled'
-            color='#F1F5F9'
-            c='#0F172A'
-            radius='md'
-            size="sm"
-            fz={14}
-            onClick={diagramToggle}
-            classNames={{
-              root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-            }}
-          >
-            Business Process Diagram
-          </Button>
-        }</div>
+        <div className="flex justify-end py-2 px-14">
+          <Diagram />
+        </div>
 
         {InputList?.map(({ name, label, value, disabled }, index) => ['Status'].includes(label) ? (
           <Input.Wrapper key={index} label={label} classNames={{

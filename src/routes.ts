@@ -10,7 +10,7 @@ export type PublicRoutes = typeof publicRoutes;
  * These routes used to redirect the authenticated users to the /settings
  * @type {string[]}
  */
-export const authRoutes = ["/auth/login", "/auth/register"];
+export const authRoutes = ["/auth/signin", "/auth/signup"];
 export type AuthRoutes = typeof authRoutes;
 
 /**
