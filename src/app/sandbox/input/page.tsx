@@ -4,7 +4,7 @@ import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Button, CopyButton, Flex, InputWrapper, Overlay, Stack, Tooltip, __InputStylesNames } from '@mantine/core';
 import clsx from 'clsx';
 import * as React from 'react'
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { Input, PasswordInput, TextInput, } from 'react-hook-form-mantine'
 import type { InputProps } from 'react-hook-form-mantine'
 
@@ -57,26 +57,20 @@ function InputPagesTesting() {
     }
   ]
 
-
-  const onSubmit = (data: any, e: any) => {
-    const target_id = e.nativeEvent.submitter.id || (e.target as HTMLInputElement).id || ((e.target as HTMLInputElement).childNodes[0] as any).id;
-    console.log('target_id:', target_id)
-    const dataById = data[target_id];
-    // handleToggle()
-  }
-
   return (
     <div className='p-10 container max-w-xl m-auto'>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack classNames={{
-          root: 'bg-white p-4 py-10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out',
-        }}
-        >
-          {InputList.map((input, index) => (
-            <InputWithOverlay key={index} {...input} />
-          ))}
-        </Stack>
-      </form>
+      <FormProvider {...method}>
+        <form>
+          <Stack classNames={{
+            root: 'bg-white p-4 py-10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out',
+          }}
+          >
+            {InputList.map((input, index) => (
+              <InputWithOverlay key={index} {...input} />
+            ))}
+          </Stack>
+        </form>
+      </FormProvider>
     </div >
   )
 }
@@ -87,12 +81,21 @@ const InputWithOverlay = (props: InputProps<any> & {
   label?: string;
   type: string;
   setFocus: any;
-  handleSubmit: any;
 }) => {
+  const { handleSubmit } = useFormContext();
 
   const [disabled, setDisabled] = React.useState(true);
 
   const handleToggle = () => setDisabled(!disabled)
+
+  const onSubmit = (data: any, e: any) => {
+    const target_id = e?.nativeEvent?.submitter?.id
+      || e?.target?.offsetParent?.id
+      || e?.target?.id
+      || e.target?.childNodes?.[0]?.id;
+    const dataById = data[target_id];
+    handleToggle()
+  }
 
   React.useEffect(() => {
     if (!disabled) {
@@ -121,6 +124,7 @@ const InputWithOverlay = (props: InputProps<any> & {
         rightSection={!disabled && <SaveActions {...{
           name: props.name,
           disabled,
+          onSave: handleSubmit(onSubmit),
           onCancel: handleToggle
         }} />
         }
@@ -133,12 +137,14 @@ const InputWithOverlay = (props: InputProps<any> & {
 };
 
 
-const SaveActions = ({ name, copyValue, disabled, onCancel }: {
+const SaveActions = ({ name, copyValue, disabled, onSave, onCancel }: {
   name: string;
   copyValue?: string;
   disabled?: boolean;
+  onSave: () => void;
   onCancel?: () => void;
 }) => {
+
   return disabled ? null :
     (
       <div className={clsx(
@@ -148,8 +154,8 @@ const SaveActions = ({ name, copyValue, disabled, onCancel }: {
         <Tooltip label="Save">
           <ActionIcon
             id={name}
-            component='button'
-            type='submit'
+            // component='button'
+            // type='submit'
             // disabled
             variant="transparent"
             bg="#F1F5F9"
@@ -157,6 +163,7 @@ const SaveActions = ({ name, copyValue, disabled, onCancel }: {
             size="lg"
             radius="md"
             aria-label="Settings"
+            onClick={onSave}
           >
             <Icon icon="heroicons-outline:check" width="1.2rem" className='border p-2 rounded-lg text-black/70 hover:text-black/50' />
           </ActionIcon>
