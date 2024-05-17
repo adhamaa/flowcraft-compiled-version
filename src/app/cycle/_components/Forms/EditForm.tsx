@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@iconify-icon/react';
-import { ActionIcon, Button, CopyButton, Flex, Input, List, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, CopyButton, Flex, InputWrapper, List, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
@@ -406,7 +406,7 @@ const EditFormContent = ({
       >
         <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} />
         {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
-          <Input.Wrapper key={index} label={label} classNames={{
+          <InputWrapper key={index} label={label} classNames={{
             root: 'px-14 space-y-4',
             label: '!text-sm !font-semibold',
           }}>
@@ -433,17 +433,17 @@ const EditFormContent = ({
               onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
               onSemanticSubmit: handleSubmit(onSemanticSubmit)
             }} />}
-          </Input.Wrapper>
+          </InputWrapper>
         ) : ['List of previous stage', 'List of next stage'].includes(label) ? (
-          <Input.Wrapper key={index} label={label} classNames={{
+          <InputWrapper key={index} label={label} classNames={{
             root: 'px-14',
             label: '!text-sm !font-semibold',
           }}>
             <LabelTooltip label={label} />
             <TableStages data={value as stagesData} />
-          </Input.Wrapper>
+          </InputWrapper>
         ) : (
-          <Input.Wrapper
+          <InputWrapper
             key={index}
             label={label}
             classNames={{
@@ -478,7 +478,7 @@ const EditFormContent = ({
               onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
               onSemanticSubmit: handleSubmit(onSemanticSubmit)
             }} />}
-          </Input.Wrapper>
+          </InputWrapper>
         ))}
       </form >
     </ScrollArea.Autosize>

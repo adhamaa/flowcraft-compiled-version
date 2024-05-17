@@ -1,10 +1,11 @@
 'use client';
 
 import { Icon } from '@iconify-icon/react';
-import { ActionIcon, Button, Flex, InputWrapper, Overlay, Stack } from '@mantine/core';
+import { ActionIcon, Button, CopyButton, Flex, InputWrapper, Overlay, Stack, Tooltip, __InputStylesNames } from '@mantine/core';
+import clsx from 'clsx';
 import * as React from 'react'
 import { useForm } from 'react-hook-form';
-import { Input, } from 'react-hook-form-mantine'
+import { Input, PasswordInput, TextInput, } from 'react-hook-form-mantine'
 import type { InputProps } from 'react-hook-form-mantine'
 
 function InputPagesTesting() {
@@ -14,7 +15,7 @@ function InputPagesTesting() {
   const InputList = [
     {
       name: 'username',
-      placeholder: 'Username',
+      label: 'Username',
       // defaultValue: 'adhamaa',
       type: 'text',
       control: method.control,
@@ -23,12 +24,12 @@ function InputPagesTesting() {
       radius: 'md',
       classNames: {
         wrapper: 'w-full',
-        input: 'disabled:bg-gray-100 disabled:cursor-pointer',
+        input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
       }
     },
     {
       name: 'email',
-      placeholder: 'Email',
+      label: 'Email',
       // defaultValue: '',
       type: 'email',
       control: method.control,
@@ -37,12 +38,12 @@ function InputPagesTesting() {
       radius: 'md',
       classNames: {
         wrapper: 'w-full',
-        input: 'disabled:bg-gray-100 disabled:cursor-pointer',
+        input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
       }
     },
     {
       name: 'password',
-      placeholder: 'Password',
+      label: 'Password',
       // defaultValue: '',
       type: 'password',
       control: method.control,
@@ -51,17 +52,30 @@ function InputPagesTesting() {
       radius: 'md',
       classNames: {
         wrapper: 'w-full',
-        input: 'disabled:bg-gray-100 disabled:cursor-pointer',
+        input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
       }
     }
   ]
 
+
+  const onSubmit = (data: any, e: any) => {
+    const target_id = e.nativeEvent.submitter.id || (e.target as HTMLInputElement).id || ((e.target as HTMLInputElement).childNodes[0] as any).id;
+    console.log('target_id:', target_id)
+    const dataById = data[target_id];
+    // handleToggle()
+  }
+
   return (
-    <div className='p-10 container max-w-96 m-auto'>
-      <form>
-        {InputList.map((input, index) => (
-          <InputWithOverlay {...input} />
-        ))}
+    <div className='p-10 container max-w-xl m-auto'>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack classNames={{
+          root: 'bg-white p-4 py-10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out',
+        }}
+        >
+          {InputList.map((input, index) => (
+            <InputWithOverlay key={index} {...input} />
+          ))}
+        </Stack>
       </form>
     </div >
   )
@@ -70,7 +84,7 @@ function InputPagesTesting() {
 export default InputPagesTesting
 
 const InputWithOverlay = (props: InputProps<any> & {
-  placeholder?: string;
+  label?: string;
   type: string;
   setFocus: any;
   handleSubmit: any;
@@ -80,13 +94,6 @@ const InputWithOverlay = (props: InputProps<any> & {
 
   const handleToggle = () => setDisabled(!disabled)
 
-  const onSubmit = (data: any, e: Event) => {
-    const target_id = (e.target as HTMLInputElement).id || ((e.target as HTMLInputElement).childNodes[0] as any).id;
-    const dataById = data[target_id];
-    console.log('dataById:' + target_id + " -", dataById)
-    handleToggle()
-  }
-
   React.useEffect(() => {
     if (!disabled) {
       props.setFocus(props.name);
@@ -95,40 +102,107 @@ const InputWithOverlay = (props: InputProps<any> & {
 
 
   return (
-    <Stack classNames={{
-      root: 'bg-white p-4 my-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out',
+    <InputWrapper classNames={{
+      root: 'relative flex flex-col px-14 space-y-4',
+      label: '!text-sm !font-semibold',
     }}
+      label={props.label}
     >
-      <InputWrapper classNames={{
-        root: 'relative flex flex-col',
-        label: 'text-gray-600 my-2',
-      }}
-        label={props.placeholder}
-      >
-        <Input
-          id={props.name}
-          disabled={disabled}
-          name={props.name}
-          // @ts-ignore
-          placeholder={props.placeholder}
-          type={props.type || 'text'}
-          defaultValue={props.defaultValue}
-          control={props.control}
-          radius={props.radius || 'md'}
-          classNames={props.classNames}
-        />
-        {disabled && <Overlay color="transparent" backgroundOpacity={0} blur={0} onClick={handleToggle} classNames={{
-          root: 'cursor-pointer h-full rounded-lg',
-        }} />}
-      </InputWrapper>
-      {!disabled && <Flex justify='end' align='center' gap='sm'>
-        <ActionIcon variant="default" color="#895CF3" size="lg" radius="md" aria-label="Settings" onClick={props.handleSubmit(onSubmit)}>
-          <Icon id={props.name} className='cursor-pointer rounded' icon="heroicons-solid:check" width="1rem" height="1rem" />
-        </ActionIcon>
-        <ActionIcon variant="default" color="#895CF3" size="lg" radius="md" aria-label="Settings" onClick={handleToggle}>
-          <Icon className='cursor-pointer rounded' icon="heroicons-solid:x" width="1rem" height="1rem" />
-        </ActionIcon>
-      </Flex>}
-    </Stack>
+      <TextInput
+        id={props.name}
+        disabled={disabled}
+        name={props.name}
+        type={props.type}
+        placeholder={props.label}
+        control={props.control}
+        radius={props.radius || 'md'}
+        classNames={{ ...props.classNames }}
+        rightSectionWidth={72}
+        rightSection={!disabled && <SaveActions {...{
+          name: props.name,
+          disabled,
+          onCancel: handleToggle
+        }} />
+        }
+      />
+      {disabled && <Overlay color="transparent" backgroundOpacity={0} blur={0} onClick={handleToggle} classNames={{
+        root: 'cursor-pointer h-full rounded-lg',
+      }} />}
+    </InputWrapper>
   )
 };
+
+
+const SaveActions = ({ name, copyValue, disabled, onCancel }: {
+  name: string;
+  copyValue?: string;
+  disabled?: boolean;
+  onCancel?: () => void;
+}) => {
+  return disabled ? null :
+    (
+      <div className={clsx(
+        'flex items-center ml-auto space-x-1',
+        name === 'process_stage_name' && 'absolute right-0'
+      )}>
+        <Tooltip label="Save">
+          <ActionIcon
+            id={name}
+            component='button'
+            type='submit'
+            // disabled
+            variant="transparent"
+            bg="#F1F5F9"
+            color='black'
+            size="lg"
+            radius="md"
+            aria-label="Settings"
+          >
+            <Icon icon="heroicons-outline:check" width="1.2rem" className='border p-2 rounded-lg text-black/70 hover:text-black/50' />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Cancel">
+          <ActionIcon
+            id={name}
+            // disabled
+            variant="transparent"
+            bg="#F1F5F9"
+            color='black'
+            size="lg"
+            radius="md"
+            aria-label="Settings"
+            onClick={onCancel}
+          >
+            <Icon icon="heroicons-outline:x" width="1.2rem" className='border p-2 rounded-lg text-black/70 hover:text-black/50' />
+          </ActionIcon>
+        </Tooltip>
+        <div className="pl-1 flex gap-1 items-center">
+          {!['username', 'email', 'password'].includes(name) &&
+            <CopyButton value={copyValue as string} timeout={2000}>
+              {({ copied, copy }) => (
+                <Tooltip label={copied ? 'Copied' : 'Copy'}>
+                  <ActionIcon
+                    // disabled
+                    color={copied ? 'teal' : 'gray'} variant="subtle" size="lg"
+                    radius="md" onClick={copy}>
+                    {copied ? (
+                      <Icon icon="heroicons-outline:check" width="1.2rem" height="1.2rem" className='text-black/70 hover:text-black/50' />
+                    ) : (
+                      <Icon icon="heroicons-outline:document-duplicate" width="1.2rem" height="1.2rem" className='text-black/70 hover:text-black/50' />
+                    )}
+                  </ActionIcon>
+                </Tooltip>
+              )}
+            </CopyButton>}
+          {!['username', 'email', 'password'].includes(name) &&
+            <ActionIcon
+              // disabled
+              color='gray' variant="subtle" size="lg"
+              radius="md">
+              <Icon icon="ph:code-bold" width="1.2rem" height="1.2rem" className='text-black/70 hover:text-black/50' />
+            </ActionIcon>}
+        </div>
+      </div>
+    )
+
+}
