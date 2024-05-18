@@ -57,6 +57,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
         <Tabs.List>
           {menulist.map((tab) => ["Documentation"].includes(tab.label) ? (
             <Menu
+              key={tab.value}
               shadow="md"
               width={200}
               trigger="click-hover"
@@ -74,14 +75,16 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
                   value: "white-paper",
                   disabled: false,
                   onClick: () => window.open("/pdf/BizProcessWhitePaper.pdf", "_blank")
-                }].map(({ label, value, disabled, onClick }) => <Menu.Item
-                  component="button"
-                  onClick={onClick}
-                  disabled={disabled}
-                  value={value}
-                >
-                  {label}
-                </Menu.Item>)}
+                }].map(({ label, value, disabled, onClick }) =>
+                  <Menu.Item
+                    key={value}
+                    component="button"
+                    onClick={onClick}
+                    disabled={disabled}
+                    value={value}
+                  >
+                    {label}
+                  </Menu.Item>)}
               </Menu.Dropdown>
             </Menu>
           ) : (

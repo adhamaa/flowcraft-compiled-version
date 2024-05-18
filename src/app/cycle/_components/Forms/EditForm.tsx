@@ -9,7 +9,7 @@ import HeaderForm from './HeaderForm';
 import { StageInfoData } from '../HomeContent';
 import { FieldValues, UseFormHandleSubmit, useForm } from 'react-hook-form';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
-import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, flexRender, useMantineReactTable } from 'mantine-react-table';
+import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, MantineReactTable, flexRender, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
 import { evaluateSemantics, getSemanticsErrorMessages, getSyntaxErrorMessages, testSemanticStageName, testSyntaxStageName, updateStage, verifySyntax } from '@/lib/service/client';
 import toast from '@/components/toast';
@@ -20,6 +20,44 @@ type stagesData = {
   created_datetime: string;
 }[];
 
+const mock_list_next_stage = [
+  {
+    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
+    "process_stage_name": "RGO-02-01-Engineer"
+  },
+  {
+    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
+    "process_stage_name": "RGO-02-02-Manager"
+  },
+  {
+    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
+    "process_stage_name": "RGO-02-03-CEO"
+  },
+  {
+    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
+    "process_stage_name": "RGO-02-04-CTO"
+  },
+  {
+    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
+    "process_stage_name": "RGO-02-05-CFO"
+  },
+  {
+    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
+    "process_stage_name": "RGO-02-06-COO"
+  },
+  {
+    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
+    "process_stage_name": "RGO-02-07-CTO"
+  },
+  {
+    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
+    "process_stage_name": "RGO-02-08-CFO"
+  },
+  {
+    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
+    "process_stage_name": "RGO-02-09-COO"
+  }
+]
 
 const EditForm = ({
   data
@@ -67,7 +105,7 @@ const EditFormContent = ({
     { name: 'process_stage_name', label: 'Stage name', value: data?.process_stage_name, disabled: !isEdit }, // this is a string
     { name: 'updated_datetime', label: 'Last edited date', value: data?.updated_datetime, disabled: true }, // this is a date string
     { name: 'list_previous', label: 'List of previous stage', value: data?.list_previous, disabled: true }, // this is a list
-    { name: 'list_next_stage', label: 'List of next stage', value: data?.list_next_stage, disabled: true }, // this is a list
+    { name: 'list_next_stage', label: 'List of next stage', value: mock_list_next_stage || data?.list_next_stage, disabled: true }, // this is a list
     { name: 'list_user', label: 'Users', value: data?.list_user, disabled: !isEdit }, // this is a list
     { name: 'list_pbt', label: 'PBT', value: data?.list_pbt, disabled: !isEdit }, // this is a list
     { name: 'list_role', label: 'Roles', value: data?.list_role, disabled: !isEdit },
@@ -406,10 +444,13 @@ const EditFormContent = ({
       >
         <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} />
         {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
-          <InputWrapper key={index} label={label} classNames={{
-            root: 'px-14 space-y-4',
-            label: '!text-sm !font-semibold',
-          }}>
+          <InputWrapper
+            key={index}
+            label={label}
+            classNames={{
+              root: 'px-14 space-y-4',
+              label: '!text-sm !font-semibold',
+            }}>
             <LabelTooltip label={label} />
             <TextInput
               name={name}
@@ -417,7 +458,7 @@ const EditFormContent = ({
               control={control}
               disabled={disabled}
               classNames={{
-                input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+                input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
               }}
               rightSection={!disabled &&
                 <SaveActions {...{
@@ -486,6 +527,10 @@ const EditFormContent = ({
 }
 
 const TableStages = ({ data }: { data: stagesData; }) => {
+  const [pagination, setPagination] = React.useState({
+    pageSize: 5,
+    pageIndex: 0,
+  });
   const [tableData, setTableData] = React.useState<stagesData>([]);
 
   const columns: MRT_ColumnDef<stagesData[0]>[] = [
@@ -498,21 +543,36 @@ const TableStages = ({ data }: { data: stagesData; }) => {
       accessorFn: (originalRow) => originalRow.created_datetime,
     },
   ];
+
   const table = useMantineReactTable({
     columns,
     data: React.useMemo(() => tableData, [tableData]),
-    // initialState: {
-    //   pagination: { pageSize: 5, pageIndex: 0 },
-    // },
-    // enableStickyHeader: true,
-    // mantineTableContainerProps: {
-    //   mah: '40'
-    // },
+    initialState: { density: 'xs' },
+    onPaginationChange: setPagination,
+    state: { pagination },
+    enableSorting: false,
+    enableTopToolbar: false,
+    enableBottomToolbar: false,
+    enableColumnActions: false,
+    enableStickyHeader: true,
+    mantineTableContainerProps: {
+      mah: '150',
+      px: '32',
+    },
     mantinePaginationProps: {
       rowsPerPageOptions: ['5', '10', '15'],
       showRowsPerPage: false,
     },
     paginationDisplayMode: 'pages',
+
+    mantinePaperProps: {
+      classNames: {
+        root: '!border-none !shadow-none w-full'
+      },
+    },
+    mantineTableBodyRowProps: ({ row }) => ({
+      classNames: { tr: '!border-none' },
+    }),
   });
 
   React.useEffect(() => {
@@ -524,7 +584,8 @@ const TableStages = ({ data }: { data: stagesData; }) => {
   return (
     <Stack>
       <TextareaHeader {...{ table }} />
-      <Table
+      <MantineReactTable table={table} />
+      {/* <Table
         captionSide="top"
         fz="md"
         highlightOnHover
@@ -584,7 +645,7 @@ const TableStages = ({ data }: { data: stagesData; }) => {
             </Table.Tbody>
           )}
         </ScrollArea.Autosize>
-      </Table>
+      </Table> */}
     </Stack>
   )
 }
@@ -602,10 +663,17 @@ export const TextareaHeader = ({ table, actionsButton }: {
       <Flex justify="space-between" align="center" classNames={{
         root: 'py-1 px-2 pr-4 w-full',
       }}>
-        {isTable && <MRT_TablePagination table={table} classNames={{
-          root: '',
-          control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[#895CF3] !hover:text-white/90 !hover:!border-[#895CF3] !transition-all !duration-300 !ease-in-out',
-        }} />}
+        {isTable &&
+          <MRT_TablePagination
+            autoContrast
+            table={table}
+            color='#895CF3'
+            classNames={{
+              root: '',
+              control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[#895CF3] !hover:text-white/90 !hover:!border-[#895CF3] !transition-all !duration-300 !ease-in-out',
+
+            }}
+          />}
         {actionsButton}
       </Flex>
     </div >

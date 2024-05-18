@@ -214,7 +214,7 @@ const TabularSection = ({ opened,
       },
     },
     mantineTableBodyRowProps: ({ row }) => ({
-      classNames: { tr: '' },
+      classNames: { tr: '!border-none' },
     }),
     mantineTableBodyCellProps: ({ cell, row }) => ({
       onClick: () => handleCellClick(cell, row),

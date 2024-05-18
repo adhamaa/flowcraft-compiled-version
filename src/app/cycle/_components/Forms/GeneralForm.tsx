@@ -183,10 +183,13 @@ const GeneralFormContent = ({
         </div>
 
         {InputList?.map(({ name, label, value, disabled }, index) => ['Status'].includes(label) ? (
-          <Input.Wrapper key={index} label={label} classNames={{
-            root: 'px-14 space-y-4',
-            label: '!text-sm !font-semibold',
-          }}>
+          <Input.Wrapper
+            key={index}
+            label={label}
+            classNames={{
+              root: 'px-14 space-y-4',
+              label: '!text-sm !font-semibold',
+            }}>
             <Radio.Group
               name={name}
               control={control}
