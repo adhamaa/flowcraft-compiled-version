@@ -178,49 +178,51 @@ const GeneralFormContent = ({
       >
         {/* <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button> */}
         <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
-        <div className="flex justify-end py-2 px-14">
-          <Diagram />
-        </div>
 
-        {InputList?.map(({ name, label, value, disabled }, index) => ['Status'].includes(label) ? (
-          <Input.Wrapper
-            key={index}
-            label={label}
-            classNames={{
+        <div className="container mx-auto">
+          <div className="flex justify-end py-2 px-14">
+            <Diagram />
+          </div>
+          {InputList?.map(({ name, label, value, disabled }, index) => ['Status'].includes(label) ? (
+            <Input.Wrapper
+              key={index}
+              label={label}
+              classNames={{
+                root: 'px-14 space-y-4',
+                label: '!text-sm !font-semibold',
+              }}>
+              <Radio.Group
+                name={name}
+                control={control}
+                defaultValue={value?.toString()}
+              >
+                <Group>
+                  {statusRefList?.map((status: StatusRef) => (
+                    <Radio.Item
+                      key={status.uuid}
+                      disabled={disabled}
+                      value={status.code}
+                      label={<span className='capitalize'>{status.descriptions}</span>} />
+                  ))}
+                </Group>
+              </Radio.Group>
+            </Input.Wrapper>
+          ) : (
+            <Input.Wrapper key={index} label={label} classNames={{
               root: 'px-14 space-y-4',
               label: '!text-sm !font-semibold',
             }}>
-            <Radio.Group
-              name={name}
-              control={control}
-              defaultValue={value?.toString()}
-            >
-              <Group>
-                {statusRefList?.map((status: StatusRef) => (
-                  <Radio.Item
-                    key={status.uuid}
-                    disabled={disabled}
-                    value={status.code}
-                    label={<span className='capitalize'>{status.descriptions}</span>} />
-                ))}
-              </Group>
-            </Radio.Group>
-          </Input.Wrapper>
-        ) : (
-          <Input.Wrapper key={index} label={label} classNames={{
-            root: 'px-14 space-y-4',
-            label: '!text-sm !font-semibold',
-          }}>
-            <TextInput
-              name={name}
-              defaultValue={value}
-              control={control}
-              disabled={disabled}
-              classNames={{
-                input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-              }} />
-          </Input.Wrapper>
-        ))}
+              <TextInput
+                name={name}
+                defaultValue={value}
+                control={control}
+                disabled={disabled}
+                classNames={{
+                  input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+                }} />
+            </Input.Wrapper>
+          ))}
+        </div>
       </form>
     </ScrollArea.Autosize >
   )

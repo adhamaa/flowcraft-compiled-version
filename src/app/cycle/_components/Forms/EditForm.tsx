@@ -61,7 +61,7 @@ const EditFormContent = ({
 }) => {
   const searchParams = useSearchParams();
   const stage_uuid = searchParams.get('stage_uuid');
-  
+
   const InputList = [
     { name: 'process_stage_name', label: 'Stage name', value: data?.process_stage_name, disabled: !isEdit }, // this is a string
     { name: 'updated_datetime', label: 'Last edited date', value: data?.updated_datetime, disabled: true }, // this is a date string
@@ -404,84 +404,86 @@ const EditFormContent = ({
         onSubmit={handleSubmit(onSaveSubmit)}
       >
         <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} />
-        {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
-          <InputWrapper
-            key={index}
-            label={label}
-            classNames={{
-              root: 'px-14 space-y-4',
-              label: '!text-sm !font-semibold',
-            }}>
-            <LabelTooltip label={label} />
-            <TextInput
-              name={name}
-              defaultValue={value}
-              control={control}
-              disabled={disabled}
+        <div className="container mx-auto">
+          {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
+            <InputWrapper
+              key={index}
+              label={label}
               classNames={{
-                input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-              }}
-              rightSection={!disabled &&
-                <SaveActions {...{
-                  name,
-                  disabled,
-                  onCancel: toggleEdit
-                }} />}
-            />
-            {!disabled && <SyntaxSemanticActions {...{
-              name,
-              value,
-              toggleEdit,
-              onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
-              onSemanticSubmit: handleSubmit(onSemanticSubmit)
-            }} />}
-          </InputWrapper>
-        ) : ['List of previous stage', 'List of next stage'].includes(label) ? (
-          <InputWrapper key={index} label={label} classNames={{
-            root: 'px-14',
-            label: '!text-sm !font-semibold',
-          }}>
-            <LabelTooltip label={label} />
-            <TableStages data={value as stagesData} />
-          </InputWrapper>
-        ) : (
-          <InputWrapper
-            key={index}
-            label={label}
-            classNames={{
+                root: 'px-14 space-y-4',
+                label: '!text-sm !font-semibold',
+              }}>
+              <LabelTooltip label={label} />
+              <TextInput
+                name={name}
+                defaultValue={value}
+                control={control}
+                disabled={disabled}
+                classNames={{
+                  input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+                }}
+                rightSection={!disabled &&
+                  <SaveActions {...{
+                    name,
+                    disabled,
+                    onCancel: toggleEdit
+                  }} />}
+              />
+              {!disabled && <SyntaxSemanticActions {...{
+                name,
+                value,
+                toggleEdit,
+                onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
+                onSemanticSubmit: handleSubmit(onSemanticSubmit)
+              }} />}
+            </InputWrapper>
+          ) : ['List of previous stage', 'List of next stage'].includes(label) ? (
+            <InputWrapper key={index} label={label} classNames={{
               root: 'px-14',
               label: '!text-sm !font-semibold',
             }}>
-            <LabelTooltip label={label} />
-            <TextareaHeader
-              actionsButton={
-                <SaveActions {...{
-                  name,
-                  copyValue: JSON.stringify(value, null, 2),
-                  disabled,
-                  onCancel: toggleEdit
-                }} />} />
-            <JsonInput
-              name={name}
-              defaultValue={JSON.stringify(value, null, 2)}
-              control={control}
-              disabled={disabled}
-              formatOnBlur
-              autosize
-              minRows={4}
+              <LabelTooltip label={label} />
+              <TableStages data={value as stagesData} />
+            </InputWrapper>
+          ) : (
+            <InputWrapper
+              key={index}
+              label={label}
               classNames={{
-                input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-              }}
-            />
-            {!disabled && <SyntaxSemanticActions  {...{
-              name,
-              value,
-              toggleEdit,
-              onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
-              onSemanticSubmit: handleSubmit(onSemanticSubmit)
-            }} />}
-          </InputWrapper>
-        ))}
+                root: 'px-14',
+                label: '!text-sm !font-semibold',
+              }}>
+              <LabelTooltip label={label} />
+              <TextareaHeader
+                actionsButton={
+                  <SaveActions {...{
+                    name,
+                    copyValue: JSON.stringify(value, null, 2),
+                    disabled,
+                    onCancel: toggleEdit
+                  }} />} />
+              <JsonInput
+                name={name}
+                defaultValue={JSON.stringify(value, null, 2)}
+                control={control}
+                disabled={disabled}
+                formatOnBlur
+                autosize
+                minRows={4}
+                classNames={{
+                  input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+                }}
+              />
+              {!disabled && <SyntaxSemanticActions  {...{
+                name,
+                value,
+                toggleEdit,
+                onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
+                onSemanticSubmit: handleSubmit(onSemanticSubmit)
+              }} />}
+            </InputWrapper>
+          ))}
+        </div>
       </form >
     </ScrollArea.Autosize>
   )

@@ -137,7 +137,10 @@ export default function ColapsableMenu({
                 defaultValue={menu.children[0].value}
                 orientation="vertical"
                 classNames={{
-                  root: 'h-full',
+                  root: clsx(
+                    'h-full',
+                    // isSideMenuCollapse && 'justify-center'
+                  ),
                   tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
                   tabLabel: '~text-md/lg',
                   panel: ''
@@ -153,7 +156,12 @@ export default function ColapsableMenu({
                 </Tabs.List>}
 
                 {menu.children.map((child) => (
-                  <Tabs.Panel key={child.value} value={child.value}>
+                  <Tabs.Panel key={child.value} value={child.value}
+                    classNames={{
+                      panel: clsx(
+                        // isSideMenuCollapse && 'container'
+                      )
+                    }}>
                     {child.content
                       || child.children
                       && (
