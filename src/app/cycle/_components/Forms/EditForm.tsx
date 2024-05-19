@@ -20,45 +20,6 @@ type stagesData = {
   created_datetime: string;
 }[];
 
-const mock_list_next_stage = [
-  {
-    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
-    "process_stage_name": "RGO-02-01-Engineer"
-  },
-  {
-    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
-    "process_stage_name": "RGO-02-02-Manager"
-  },
-  {
-    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
-    "process_stage_name": "RGO-02-03-CEO"
-  },
-  {
-    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
-    "process_stage_name": "RGO-02-04-CTO"
-  },
-  {
-    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
-    "process_stage_name": "RGO-02-05-CFO"
-  },
-  {
-    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
-    "process_stage_name": "RGO-02-06-COO"
-  },
-  {
-    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
-    "process_stage_name": "RGO-02-07-CTO"
-  },
-  {
-    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
-    "process_stage_name": "RGO-02-08-CFO"
-  },
-  {
-    "created_datetime": "Wed, 07 Jun 2023 06:45:16 GMT",
-    "process_stage_name": "RGO-02-09-COO"
-  }
-]
-
 const EditForm = ({
   data
 }: {
@@ -105,7 +66,7 @@ const EditFormContent = ({
     { name: 'process_stage_name', label: 'Stage name', value: data?.process_stage_name, disabled: !isEdit }, // this is a string
     { name: 'updated_datetime', label: 'Last edited date', value: data?.updated_datetime, disabled: true }, // this is a date string
     { name: 'list_previous', label: 'List of previous stage', value: data?.list_previous, disabled: true }, // this is a list
-    { name: 'list_next_stage', label: 'List of next stage', value: mock_list_next_stage || data?.list_next_stage, disabled: true }, // this is a list
+    { name: 'list_next_stage', label: 'List of next stage', value: data?.list_next_stage, disabled: true }, // this is a list
     { name: 'list_user', label: 'Users', value: data?.list_user, disabled: !isEdit }, // this is a list
     { name: 'list_pbt', label: 'PBT', value: data?.list_pbt, disabled: !isEdit }, // this is a list
     { name: 'list_role', label: 'Roles', value: data?.list_role, disabled: !isEdit },
