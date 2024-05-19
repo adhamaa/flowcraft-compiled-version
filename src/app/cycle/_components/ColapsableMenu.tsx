@@ -77,6 +77,33 @@ export default function ColapsableMenu({
   }, [cycle_id, datasource_type, selected_app, stage_uuid])
 
 
+  const sideMenuList = [
+    {
+      name: 'Cycle', value: 'cycle', icon: 'heroicons-outline:refresh',
+      children: [
+        {
+          name: 'General Information',
+          value: 'general',
+          onClick: () => router.replace(pathname + '?' + removeQueryString('stage_uuid')),
+          content: <GeneralForm data={cycleInfo as CycleData} />
+        },
+        {
+          name: 'Stages',
+          value: 'stages',
+          onClick: async () => {
+            router.push(pathname + '?' + createQueryString('stage_uuid', stageData[0]?.stage_uuid as string));
+          },
+          children: stageData.map((stage) => ({
+            name: stage.stage_name,
+            value: stage.stage_uuid,
+            content: <EditForm data={stageInfo as StageInfoData} />
+          }))
+        }
+      ]
+    },
+
+  ];
+
   return (
     <aside
       className={clsx(
@@ -91,46 +118,23 @@ export default function ColapsableMenu({
       }}>
         <Tabs.List>
           <></>
-          <Tabs.Tab value="cycle" className=''>
-            {/* <ActionIcon variant="filled" color="#895CF3" size="lg" radius="md" aria-label="Settings" >
+          {sideMenuList.map((menu) => (
+            <Tabs.Tab key={menu.value} value={menu.value} className=''>
+              {/* <ActionIcon variant="filled" color="#895CF3" size="lg" radius="md" aria-label="Settings" >
               <Icon className='cursor-pointer rounded' icon="heroicons-outline:refresh" width="1rem" height="1rem" />
             </ActionIcon> */}
-            Cycle
-          </Tabs.Tab>
+              {menu.name}
+            </Tabs.Tab>
+          ))}
 
           <FooterButton {...{ isSideMenuCollapse }} isCollapse onClick={toggleSideMenuCollapse} />{/* ! main collapse button */}
-
         </Tabs.List>
-        <Tabs.Panel value="cycle">
-          <Tabs defaultValue="general" orientation="vertical" classNames={{
-            root: 'h-full',
-            tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
-            tabLabel: '~text-md/lg',
-            panel: ''
-          }}>
-            {!isSideMenuCollapse && <Tabs.List>
-              <></>
-              <Tabs.Tab
-                value="general"
-                onClick={() => router.replace(pathname + '?' + removeQueryString('stage_uuid'))
-                }>General Information</Tabs.Tab>
-              <Tabs.Tab
-                value="stages"
-                onClick={
-                  async () => {
-                    router.push(pathname + '?' + createQueryString('stage_uuid', stageData[0]?.stage_uuid as string));
-                  }
-                }
-              >Stages</Tabs.Tab>
-
-            </Tabs.List>}
-            <Tabs.Panel value="general">
-              <GeneralForm data={cycleInfo as CycleData} />
-            </Tabs.Panel>
-            <Tabs.Panel value="stages" >
+        {sideMenuList.map((menu) => {
+          return (
+            <Tabs.Panel key={menu.value} value={menu.value}>
               <Tabs
                 // keepMounted={false}
-                defaultValue={stageData[0]?.stage_uuid ?? ''}
+                defaultValue={menu.children[0].value}
                 orientation="vertical"
                 classNames={{
                   root: 'h-full',
@@ -138,35 +142,66 @@ export default function ColapsableMenu({
                   tabLabel: '~text-md/lg',
                   panel: ''
                 }}
-                onChange={async (value) => {
-                  router.push(pathname + '?' + createQueryString('stage_uuid', value as string));
-                }}
               >
-                {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
-                {!isSideMenuCollapse && (!!stageData.length && <Tabs.List>
+                {!isSideMenuCollapse && <Tabs.List>
                   <></>
-                  <ScrollArea.Autosize mah={768}>
-                    {stageData?.map((stage) => (
-                      <Tabs.Tab
-                        key={stage.stage_uuid}
-                        value={stage.stage_uuid}>
-                        {stage.stage_name}
-                      </Tabs.Tab>
-                    ))}
+                  {menu.children.map((child) => (
+                    <Tabs.Tab key={child.value} value={child.value} onClick={child.onClick}>
+                      {child.name}
+                    </Tabs.Tab>
+                  ))}
+                </Tabs.List>}
 
-                  </ScrollArea.Autosize>
+                {menu.children.map((child) => (
+                  <Tabs.Panel key={child.value} value={child.value}>
+                    {child.content
+                      || child.children
+                      && (
+                        <Tabs
+                          // keepMounted={false}
+                          defaultValue={child.children[0]?.value ?? ''}
+                          orientation="vertical"
+                          classNames={{
+                            root: 'h-full',
+                            tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                            tabLabel: '~text-md/lg',
+                            panel: ''
+                          }}
+                          onChange={async (value) => {
+                            router.push(pathname + '?' + createQueryString('stage_uuid', value as string));
+                          }}
+                        >
+                          {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
+                          {!isSideMenuCollapse
+                            && (!!stageData.length
+                              && <Tabs.List>
+                                <></>
+                                <ScrollArea.Autosize mah={768}>
+                                  {child.children?.map((stage) => (
+                                    <Tabs.Tab
+                                      key={stage.value}
+                                      value={stage.value}>
+                                      {stage.name}
+                                    </Tabs.Tab>
+                                  ))}
 
-                  <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => { }} />
-                </Tabs.List>)}
-                {stageData?.map((stage) => (
-                  <Tabs.Panel key={stage.stage_uuid} value={stage.stage_uuid}>
-                    <EditForm data={stageInfo as StageInfoData} />
+                                </ScrollArea.Autosize>
+
+                                <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => { }} />
+                              </Tabs.List>)}
+                          {child.children?.map((stage) => (
+                            <Tabs.Panel key={stage.value} value={stage.value}>
+                              {stage.content}
+                            </Tabs.Panel>
+                          ))}
+                        </Tabs>
+                      )}
                   </Tabs.Panel>
                 ))}
               </Tabs>
             </Tabs.Panel>
-          </Tabs>
-        </Tabs.Panel>
+          )
+        })}
       </Tabs >
     </aside >
   );
