@@ -15,6 +15,7 @@ import useDiagram from '../Diagram';
 import Diagram from '../Diagram';
 import ReactFlow, { EdgeChange, NodeChange, applyEdgeChanges, applyNodeChanges } from 'reactflow';
 import clsx from 'clsx';
+import { LabelTooltip } from './_helper';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
@@ -179,7 +180,7 @@ const GeneralFormContent = ({
         {/* <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button> */}
         <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
 
-        <div className="container mx-auto">
+        <div className="container mx-auto space-y-8 py-4">
           <div className="flex justify-end py-2 px-14">
             <Diagram />
           </div>
@@ -191,6 +192,7 @@ const GeneralFormContent = ({
                 root: 'px-14 space-y-4',
                 label: '!text-sm !font-semibold',
               }}>
+              <LabelTooltip label={label} />
               <Radio.Group
                 name={name}
                 control={control}
@@ -212,6 +214,7 @@ const GeneralFormContent = ({
               root: 'px-14 space-y-4',
               label: '!text-sm !font-semibold',
             }}>
+              <LabelTooltip label={label} />
               <TextInput
                 name={name}
                 defaultValue={value}

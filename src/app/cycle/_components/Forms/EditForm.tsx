@@ -14,6 +14,7 @@ import clsx from 'clsx';
 import { evaluateSemantics, getSemanticsErrorMessages, getSyntaxErrorMessages, testSemanticStageName, testSyntaxStageName, updateStage, verifySyntax } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
+import { LabelTooltip } from './_helper';
 
 type stagesData = {
   process_stage_name: string;
@@ -404,7 +405,7 @@ const EditFormContent = ({
         onSubmit={handleSubmit(onSaveSubmit)}
       >
         <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} />
-        <div className="container mx-auto">
+        <div className="container mx-auto space-y-8 py-4">
           {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
             <InputWrapper
               key={index}
@@ -735,18 +736,4 @@ const SaveActions = ({ name, copyValue, disabled, onCancel }: {
       </div>
     )
 
-}
-
-const LabelTooltip = ({
-  onMouseEnter,
-  label
-}: {
-  onMouseEnter?: () => void;
-  label?: string;
-}) => {
-  return (
-    <Tooltip label={label}>
-      <Icon icon="mingcute:information-fill" width="0.7rem" height="0.7rem" className='mb-1 cursor-pointer text-black/80 hover:text-black/70' onMouseEnter={onMouseEnter} />
-    </Tooltip>
-  )
 }
