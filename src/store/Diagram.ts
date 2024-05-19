@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import superjson from 'superjson' //  can use anything: serialize-javascript, devalue, etc.
+import { PersistStorage, persist } from 'zustand/middleware'
+
 import {
   Connection,
   Edge,
@@ -33,60 +36,87 @@ export type RFState = {
   updateNodeColor: (nodeId: string, color: string) => void;
 };
 
+const storage: PersistStorage<RFState> = {
+  getItem: (name) => {
+    const str = localStorage.getItem(name)
+    if (!str) return null
+    return superjson.parse(str)
+  },
+  setItem: (name, value) => {
+    localStorage.setItem(name, superjson.stringify(value))
+  },
+  removeItem: (name) => localStorage.removeItem(name),
+}
+
+
 // this is our useStore hook that we can use in our components to get parts of the store and call actions
-const useDiagramStore = create<RFState>((set, get) => {
-  return {
-    nodes: initialNodes,
-    edges: initialEdges,
-    onNodesChange: (changes: NodeChange[]) => {
-      set({
-        nodes: applyNodeChanges(changes, get().nodes),
-      });
-    },
-    onEdgesChange: (changes: EdgeChange[]) => {
-      set({
-        edges: applyEdgeChanges(changes, get().edges),
-      });
-    },
-    onConnect: (connection: Connection) => {
-      set({
-        edges: addEdge(connection, get().edges),
-      });
-    },
-    setNodes: (nodes: Node[]) => {
-      set({ nodes });
-    },
-    setEdges: (edges: Edge[]) => {
-      set({ edges });
-    },
-    fetchNodesEdges: async ({
-      cycle_id,
-      apps_label,
-    }: {
-      cycle_id: string;
-      apps_label: string;
-    }) => {
-      const data = await getDiagramData({
-        cycle_id,
-        apps_label
-      });
-
-      set({ nodes: data.nodes });
-      set({ edges: data.edges });
-    },
-    updateNodeColor: (nodeId: string, color: string) => {
-      set({
-        nodes: get().nodes.map((node) => {
-          if (node.id === nodeId) {
-            // it's important to create a new object here, to inform React Flow about the changes
-            node.data = { ...node.data, color };
+const useDiagramStore = create<RFState>()(
+  persist(
+    (set, get) => {
+      return {
+        nodes: initialNodes,
+        edges: initialEdges,
+        onNodesChange: (changes: NodeChange[]) => {
+          set({
+            nodes: applyNodeChanges(changes, get().nodes),
+          });
+        },
+        onEdgesChange: (changes: EdgeChange[]) => {
+          set({
+            edges: applyEdgeChanges(changes, get().edges),
+          });
+        },
+        onConnect: (connection: Connection) => {
+          set({
+            edges: addEdge(connection, get().edges),
+          });
+        },
+        setNodes: (nodes: Node[]) => {
+          set({ nodes });
+        },
+        setEdges: (edges: Edge[]) => {
+          set({ edges });
+        },
+        fetchNodesEdges: async ({
+          cycle_id,
+          apps_label,
+        }: {
+          cycle_id: string;
+          apps_label: string;
+        }) => {
+          // check if storage has the data
+          const storedData = storage.getItem('diagram-storage');
+          if (storedData) {
+            return;
+          } else {
+            // if not, fetch from the server
+            const diagramData = await getDiagramData({ cycle_id, apps_label });
+            // and then set the data to the store
+            set({
+              nodes: diagramData.nodes,
+              edges: diagramData.edges,
+            });
           }
+        },
+        updateNodeColor: (nodeId: string, color: string) => {
+          set({
+            nodes: get().nodes.map((node) => {
+              if (node.id === nodeId) {
+                // it's important to create a new object here, to inform React Flow about the changes
+                node.data = { ...node.data, color };
+              }
 
-          return node;
-        }),
-      });
+              return node;
+            }),
+          });
+        },
+      }
     },
-  }
-});
+    {
+      name: 'diagram-storage',
+      storage,
+    },
+  ),
+);
 
 export default useDiagramStore;

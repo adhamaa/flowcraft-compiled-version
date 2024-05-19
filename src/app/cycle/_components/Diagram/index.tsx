@@ -8,13 +8,19 @@ import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation';
 import * as React from 'react';
-import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, ReactFlowProvider } from 'reactflow';
+import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, Handle, Node, ReactFlowProvider } from 'reactflow';
 import { useShallow } from 'zustand/react/shallow';
 import useDiagramStore, { RFState } from '@/store/Diagram';
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
 import DevTools from '@/components/reactflow/Devtools';
 
+export enum Position {
+  Left = "left",
+  Top = "top",
+  Right = "right",
+  Bottom = "bottom"
+}
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -24,6 +30,58 @@ const selector = (state: RFState) => ({
   onConnect: state.onConnect,
   fetchNodesEdges: state.fetchNodesEdges,
 });
+
+const nodeTypes = {
+  Start: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }; }) => {
+    return (
+      <div className='flex flex-col justify-center'>
+        <img
+          src='/business_process/BPD-start.svg'
+          alt='start-icon'
+          className=' mx-auto w-32 h-32'
+        />
+        <div className='flex justify-center w-max px-2 py-2 rounded-md  border shadow-md shadow-safwa-gray-4 border-black bg-white'>
+          <span>{node.data.label}</span>
+        </div>
+        {/* this is the blackdot for edges connection*/}
+        <Handle type='source' position={Position.Bottom} className='opacity-0' />
+      </div>
+    )
+  },
+  End: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }; }) => {
+    return (
+      <div className='flex flex-col items-center justify-center w-48'>
+        <Handle type='target' position={Position.Top} className='opacity-0' />
+        <Handle type='source' position={Position.Bottom} className='opacity-0' />
+        <Handle
+          type='source'
+          position={Position.Left}
+          className='opacity-0'
+          id='a'
+        />
+        <Handle type='source' position={Position.Right} className='opacity-0' />
+        <div className='flex flex-col items-center justify-center w-48'>
+          <img
+            src='/business_process/LastStage.svg'
+            alt=''
+            className='w-40 h-w-40 z-10'
+          />
+          <div className='flex justify-center px-2 py-1 -mt-2 rounded-md border w-max shadow-md shadow-safwa-gray-4 border-black bg-[#c8c2f4]'>
+            {/* <div className='absolute -left-3 -top-1 w-10 h-10 rounded-full bg-[#c7e1fa]'></div> */}
+            <span className='truncate'>{node.data.label}</span>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  default: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }; }) => {
+    return (
+      <div>
+        HELLO WORLD!
+      </div>
+    )
+  },
+};
 
 const Diagram = () => {
   const params = useParams();
@@ -62,31 +120,24 @@ const Diagram = () => {
         {/* here where you put the Diagram (reactflow) */}
         {/* <Image src='/Diagram.png' width={1000} height={1000} alt='diagram' className='object-cover' /> */}
         <div style={{ height: '100vh' }}>
-          {/* <Button
-            type='button'
-            classNames={{
-              root: 'absolute top-4 right-0 m-4 z-10',
-            }}
-            onClick={() => fetchNodesEdges({
-              cycle_id: "2",
-              apps_label: "SP"
-            })}
-          >Fetch Nodes and Edges</Button> */}
           <ReactFlow
             nodes={nodes}
             edges={edges}
+            onInit={(instance) => {
+              console.log('initialize reactflow', !!instance)
+            }}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            fitView
+            fitView={true}
             fitViewOptions={fitViewOptions}
             defaultEdgeOptions={defaultEdgeOptions}
-          // nodeTypes={nodeTypes}
+            nodeTypes={nodeTypes}
           >
+            <Controls className='z-50 border' />
             <Background />
-            <Controls />
 
-            <DevTools />
+            {/* <DevTools /> */}
           </ReactFlow>
         </div>
 
