@@ -61,7 +61,7 @@ const EditFormContent = ({
 }) => {
   const searchParams = useSearchParams();
   const stage_uuid = searchParams.get('stage_uuid');
-
+  
   const InputList = [
     { name: 'process_stage_name', label: 'Stage name', value: data?.process_stage_name, disabled: !isEdit }, // this is a string
     { name: 'updated_datetime', label: 'Last edited date', value: data?.updated_datetime, disabled: true }, // this is a date string
@@ -622,7 +622,7 @@ export const TextareaHeader = ({ table, actionsButton }: {
       isTable && '-mb-4'
     )}>
       <Flex justify="space-between" align="center" classNames={{
-        root: clsx('py-1 px-2 w-full', isTable && '!p-0'),
+        root: clsx('py-1 px-2 w-full', isTable && '!py-0'),
       }}>
         {isTable &&
           <MRT_TablePagination
