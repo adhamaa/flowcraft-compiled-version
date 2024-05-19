@@ -661,7 +661,7 @@ export const TextareaHeader = ({ table, actionsButton }: {
       isTable && '-mb-4'
     )}>
       <Flex justify="space-between" align="center" classNames={{
-        root: 'py-1 px-2 pr-4 w-full',
+        root: clsx('py-1 px-2 w-full', isTable && '!p-0'),
       }}>
         {isTable &&
           <MRT_TablePagination
@@ -670,8 +670,7 @@ export const TextareaHeader = ({ table, actionsButton }: {
             color='#895CF3'
             classNames={{
               root: '',
-              control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[#895CF3] !hover:text-white/90 !hover:!border-[#895CF3] !transition-all !duration-300 !ease-in-out',
-
+              // control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[#895CF3] !hover:text-white/90 !hover:!border-[#895CF3] !transition-all !duration-300 !ease-in-out',
             }}
           />}
         {actionsButton}

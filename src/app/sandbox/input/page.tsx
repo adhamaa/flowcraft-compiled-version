@@ -119,7 +119,11 @@ const InputWithOverlay = (props: InputProps<any> & {
         placeholder={props.label}
         control={props.control}
         radius={props.radius || 'md'}
-        classNames={{ ...props.classNames }}
+        classNames={{
+          wrapper: 'w-full',
+          input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+          ...props.classNames
+        }}
         rightSectionWidth={72}
         rightSection={!disabled && <SaveActions {...{
           name: props.name,
