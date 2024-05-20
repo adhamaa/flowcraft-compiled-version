@@ -791,39 +791,40 @@ const Diagram = () => {
 
   const refineNodes = nodes.map((node) => {
     function getNodeType(node: Record<string, any>) {
-      if (node.type === 'Start') {
+      const { type, data } = node;
+      const { label, listEntCondition, listExtCondition } = data || {};
+
+      if (type === 'Start') {
         return 'Start';
       }
-      if (node.type === 'End' && node.data?.label === 'FCA-01-01-Financial-Controller') {
-        return 'End';
-      }
-      if (node.type === 'End' && node.data?.label !== 'FCA-01-01-Financial-Controller') {
-        if (!isObjectEmpty(node.data?.listEntCondition) &&
-          !isObjectEmpty(node.data?.listExtCondition
-          )) {
+
+      if (type === 'End') {
+        if (label === 'FCA-01-01-Financial-Controller') {
+          return 'End';
+        }
+
+        const hasEntry = !isObjectEmpty(listEntCondition);
+        const hasExit = !isObjectEmpty(listExtCondition);
+
+        if (hasEntry && hasExit) {
           return 'WithEntryAndExit';
         }
-        if (isObjectEmpty(
-          node.data?.listEntCondition) &&
-          !isObjectEmpty(
-            node.data?.listExtCondition)) {
+        if (!hasEntry && hasExit) {
           return 'WithExit';
         }
-        if (!isObjectEmpty(
-          node.data?.listEntCondition) &&
-          isObjectEmpty(
-            node.data?.listExtCondition)) {
+        if (hasEntry && !hasExit) {
           return 'WithEntry';
         }
         return 'default';
       }
     }
+
     return {
       ...node,
-      position: node.position,
       type: getNodeType(node),
-    }
+    };
   });
+
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
