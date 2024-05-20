@@ -143,7 +143,7 @@ const Diagram = () => {
 
       </Modal>
 
-      <Button
+      {/* <Button
         // disabled
         variant='filled'
         color='#F1F5F9'
@@ -164,7 +164,7 @@ const Diagram = () => {
         }}
       >
         Business Process Diagram
-      </Button>
+      </Button> */}
     </ReactFlowProvider>
   )
 
