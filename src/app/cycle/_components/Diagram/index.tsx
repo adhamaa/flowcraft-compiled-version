@@ -3,7 +3,7 @@
 import toast from '@/components/toast';
 import { getDiagramData } from '@/lib/service/client';
 import { Icon } from '@iconify-icon/react';
-import { Modal, Button } from '@mantine/core';
+import { Modal, Button, Popover, Accordion } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -14,6 +14,11 @@ import useDiagramStore, { RFState } from '@/store/Diagram';
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
 import DevTools from '@/components/reactflow/Devtools';
+import { isObjectEmpty } from '@/lib/helper';
+import { createPortal } from 'react-dom';
+import clsx from 'clsx';
+import { motion } from 'framer-motion';
+
 
 export enum Position {
   Left = "left",
@@ -31,6 +36,32 @@ const selector = (state: RFState) => ({
   fetchNodesEdges: state.fetchNodesEdges,
 });
 
+function DataChecker(data: any) {
+  // Check if 'data' exists and includes a list with only a string with a star ('*'). If so, return 'Any'
+  if (data && data.includes('*')) {
+    return (
+      <div className='flex items-center'>
+        <div className='w-2 h-2 bg-black rounded-full'></div>
+        <span className='pl-2'>Any</span>
+      </div>
+    );
+  }
+}
+
+function RoleChecker(role: string[] | undefined) {
+  if (role && role.includes('*')) {
+    return (
+      <img
+        src='/business_process/anyUser.png'
+        alt='icon'
+        className='absolute border -left-9 -top-1 w-10 h-10 rounded-full object-cover'
+      />
+    );
+  }
+  // if none of the checking above is satisfied, then return null
+  return null;
+}
+
 const nodeTypes = {
   Start: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }; }) => {
     return (
@@ -47,6 +78,654 @@ const nodeTypes = {
         <Handle type='source' position={Position.Bottom} className='opacity-0' />
       </div>
     )
+  },
+  WithEntry: (node: { data: { label: any; listEntCondition: any; listExtCondition: any; }; }) => {
+    const [opened, setOpened] = React.useState(false);
+    // const [clicked, setClicked] = React.useState(false);
+
+    const label = node.data.label;
+    const listEntCondition = node.data.listEntCondition;
+    const listExtCondition = node.data.listExtCondition;
+    return (
+      <div
+        className='flex flex-col items-center justify-center w-48'
+      // style={{ zIndex: zIndex }}
+      >
+        <div>
+          <div className='flex items-center justify-center w-48'>
+            <Handle type='target' position={Position.Top} className='opacity-0' />
+            <Handle
+              type='source'
+              position={Position.Bottom}
+              className='opacity-0'
+            />
+            <div className='relative flex justify-center px-2 py-1 rounded-md border w-max shadow-md shadow-safwa-gray-4 border-black bg-[#c8c2f4]'>
+              <Popover
+                opened={opened}
+                closeOnClickOutside
+                clickOutsideEvents={['click']}
+                onClose={() => setOpened(false)}
+              >
+                <Popover.Target>
+                  <span
+                    className='absolute top-0 -right-10 cursor-pointer'
+                    onClick={() => setOpened(true)}
+                  >
+                    <Icon
+                      icon='material-symbols:list-alt-rounded'
+                      className='w-8 h-8 text-safwa-blue-1'
+                    />
+                  </span>
+                </Popover.Target>
+                {createPortal(
+                  <Popover.Dropdown className='shadow-md max-h-96'>
+                    <span
+                      className='absolute right-1 top-1 cursor-pointer'
+                      onClick={() => setOpened(false)}
+                    >
+                      <Icon
+                        icon='ep:close-bold'
+                        className='w-6 h-6 text-safwa-red-2'
+                      />
+                    </span>
+                    <div className='pt-4 min-w-52 space-y-4 !z-100'>
+                      {/* List */}
+                      {/* {list && (
+                        <Accordion className='m-0 p-0'>
+                          <Accordion.Item value='list' className='border-b-0'>
+                            <Accordion.Control className=''>
+                              <div className='flex space-x-4'>
+                                <span>
+                                  <Icon
+                                    icon='clarity:list-line'
+                                    className='w-8 h-8 text-safwa-blue-1'
+                                  />
+                                </span>
+                                <span className='font-semibold text-safwa-blue-1'>
+                                  {list[0]?.pbt_name
+                                    ? 'List of PBT'
+                                    : list[0]?.category
+                                      ? 'Category'
+                                      : ''}
+                                </span>
+                              </div>
+                            </Accordion.Control>
+                            <Accordion.Panel className='flex'>
+                              <span className='ml-3 w-1 bg-safwa-gray-4 h-auto'></span>
+                              <ul className='space-y-4 scrollbar-custom overflow-y-scroll max-h-32'>
+                                {list?.map(
+                                  (
+                                    item: {
+                                      pbt_name: Array<string>;
+                                      category: Array<string>;
+                                    },
+                                    id: number
+                                  ) => (
+                                    <li
+                                      key={id}
+                                      className='flex relative item-center space-x-4'
+                                    >
+                                      <span className='absolute left-0 top-2 w-2 h-2 rounded-full bg-black'></span>
+                                      <span>
+                                        {item?.pbt_name || item?.category}
+                                      </span>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </Accordion.Panel>
+                          </Accordion.Item>
+                        </Accordion>
+                      )} */}
+                      {/* accordion that contain the list of user on this specific stage */}
+                      <Accordion>
+                        <Accordion.Item value='user' className='border-b-0'>
+                          {/* accordion button */}
+                          <Accordion.Control>
+                            <div className='flex space-x-4 items-center'>
+                              <span>
+                                <Icon
+                                  icon='eos-icons:role-binding-outlined'
+                                  className='w-8 h-8 text-safwa-blue-1'
+                                />
+                              </span>
+                              <span className='font-semibold text-safwa-blue-1'>
+                                List of users on this stage
+                              </span>
+                            </div>
+                          </Accordion.Control>
+                          {/* accordion content */}
+                          <Accordion.Panel>
+                            <span className='ml-2'>
+                              {/* this check if either the input data return '*' or an array in the listEntCondition
+                               * user on entry condition will be deleted in the near future
+                               */}
+                              {Array.isArray(listEntCondition?.user_id) ? (
+                                listEntCondition.user_id.includes('*') ? (
+                                  <span className='relative flex space-x-4 items-center'>
+                                    <span className='absolute w-2 h-2 rounded-full bg-black'></span>
+                                    <span>Any</span>
+                                  </span>
+                                ) : (
+                                  <ul className='space-y-4'>
+                                    {listEntCondition.user_id.map(
+                                      (
+                                        userId: string | Array<string>,
+                                        id: number
+                                      ) => (
+                                        <li
+                                          key={id}
+                                          className='relative flex items-center'
+                                        >
+                                          <span className='absolute w-2 h-2 bg-black rounded-full'></span>
+                                          <span className='pl-4'>{userId}</span>
+                                        </li>
+                                      )
+                                    )}
+                                  </ul>
+                                )
+                              ) : listEntCondition?.user_id === '*' ? (
+                                'Any'
+                              ) : (
+                                listEntCondition?.user_id
+                              )}
+                            </span>
+                          </Accordion.Panel>
+                        </Accordion.Item>
+                      </Accordion>
+                      {/* Requirement */}
+                      {/* {listRequirement && (
+                        <div className='flex items-center'>
+                          <span>
+                            <Icon
+                              className='w-8 h-8 text-safwa-blue-1'
+                              icon='streamline:interface-file-clipboard-check-checkmark-edit-task-edition-checklist-check-success-clipboard-form'
+                            />
+                          </span>
+                          <span>
+                            Requirement:{' '}
+                            {listRequirement.chk_doc.includes('*')
+                              ? 'Any'
+                              : listRequirement.chk_doc.map(
+                                (item: Array<string>) => item
+                              )}
+                          </span>
+                        </div>
+                      )} */}
+                    </div>
+                  </Popover.Dropdown>,
+                  document.body
+                )}
+              </Popover>
+              <span className='truncate'>{label}</span>
+            </div>
+            {/* <span className='h-[9rem]'></span> */}
+          </div>
+        </div>
+        <Handle
+          type='source'
+          position={Position.Left}
+          className='opacity-0'
+          id='a'
+        />
+        <Handle
+          type='source'
+          position={Position.Right}
+          className='opacity-0'
+          id='b'
+        />
+      </div>
+    );
+  },
+  WithExit: (node: { data: { label: any; action: any; listEntCondition: any; listExtCondition: any; }; }) => {
+    const [infoOpened, setInfoOpened] = React.useState(false);
+
+    const label = node.data.label;
+    const action = node.data.action;
+    const listEntCondition = node.data.listEntCondition;
+    const listExtCondition = node.data.listExtCondition;
+
+    return (
+      <div className='flex flex-col items-center justify-center w-48 !-z-10'>
+        <div className='flex justify-center w-48'>
+          <div className='relative flex justify-center px-2 py-1 rounded-md border w-max shadow-md shadow-safwa-gray-4 border-black bg-[#c8c2f4]'>
+            {/* <div className='absolute -left-3 -top-1 w-10 h-10 rounded-full bg-[#c7e1fa]'></div> */}
+            {RoleChecker(
+              listExtCondition?.verifyrole_by ||
+              listExtCondition?.approverole_by ||
+              listExtCondition?.checkrole_by
+            )}
+            <span className='truncate'>{label}</span>
+          </div>
+        </div>
+        <Handle type='target' position={Position.Top} className='opacity-0' />
+        <Handle type='source' position={Position.Bottom} className='opacity-0' />
+        <div className='relative flex items-center justify-center w-[95px] h-[95px]'>
+          <Handle
+            type='source'
+            position={Position.Left}
+            className='opacity-0'
+            id='a'
+          />
+          <Handle type='source' position={Position.Right} className='opacity-0' />
+          <div
+            className={clsx(
+              action === 'Verified'
+                ? 'bg-[#ADD8E6]'
+                : action === 'Checked'
+                  ? 'bg-[#FFECB3]'
+                  : action === 'Approved'
+                    ? 'bg-[#90EE90]'
+                    : '',
+              'absolute h-[70px] w-[70px] rotate-45 border rounded-sm border-black shadow-md shadow-safwa-gray-4'
+            )}
+          ></div>
+
+          <span className='z-10'>{action}</span>
+          <Popover
+            opened={infoOpened}
+            clickOutsideEvents={['click']}
+            closeOnClickOutside
+            onClose={() => setInfoOpened(false)}
+          >
+            <Popover.Target>
+              <span
+                className='absolute bottom-3 cursor-pointer'
+                onClick={() => setInfoOpened(true)}
+              >
+                <Icon
+                  icon='mdi:information-variant-circle'
+                  className='w-6 h-6 text-safwa-blue-1'
+                />
+              </span>
+            </Popover.Target>
+            {createPortal(
+              <Popover.Dropdown className='shadow-md max-h-96'>
+                <div className='flex flex-col'>
+                  <span
+                    className='absolute top-2 right-2'
+                    onClick={() => setInfoOpened(false)}
+                  >
+                    <Icon
+                      icon='iconamoon:close-fill'
+                      className='w-8 h-8 cursor-pointer text-safwa-red-3'
+                    />
+                  </span>
+                  <Accordion>
+                    {/* action role accordion */}
+                    <Accordion.Item value='Action' className='border-b-0'>
+                      <Accordion.Control className='pr-2'>
+                        <span className='font-semibold text-safwa-blue-1'>
+                          List of role:
+                        </span>
+                      </Accordion.Control>
+                      <Accordion.Panel>
+                        {/* refer to the function itself to know how it works :) */}
+                        {DataChecker(
+                          listExtCondition?.verifyrole_by ||
+                          listExtCondition?.checkrole_by ||
+                          listExtCondition?.approverole_by
+                        )}
+                      </Accordion.Panel>
+                    </Accordion.Item>
+
+                    {/* person in charge of the action accordion */}
+                    <Accordion.Item value='User' className='border-b-0'>
+                      <Accordion.Control className='pr-2'>
+                        <span className='font-semibold text-safwa-blue-1'>
+                          Person in charge:
+                        </span>
+                      </Accordion.Control>{' '}
+                      <Accordion.Panel className='max-h-32 overflow-y-scroll scrollbar-custom'>
+                        {/* refer to the function itself to know how it works :) */}
+                        {DataChecker(
+                          listExtCondition?.verifyuser_by ||
+                          listExtCondition?.checkuser_by ||
+                          listExtCondition?.approveuser_by
+                        )}
+                      </Accordion.Panel>
+                    </Accordion.Item>
+                    {/* document's accordion */}
+                    <Accordion.Item value='Document' className='border-b-0'>
+                      <Accordion.Control className='pr-2'>
+                        <span className='font-semibold text-safwa-blue-1'>
+                          List of document:
+                        </span>
+                      </Accordion.Control>{' '}
+                      <Accordion.Panel>
+                        {/* refer to the function itself to know how it works :) */}
+                        {DataChecker(listExtCondition?.chk_doc)}
+                      </Accordion.Panel>
+                    </Accordion.Item>
+                  </Accordion>
+                </div>
+              </Popover.Dropdown>,
+              document.body
+            )}
+          </Popover>
+        </div>
+      </div>
+    );
+  },
+  WithEntryAndExit: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; action: any; listEntCondition: any; listExtCondition: any; }; }) => {
+    const [opened, setOpened] = React.useState(false);
+    // const [clicked, setClicked] = React.useState(false);
+    const [infoOpened, setInfoOpened] = React.useState(false);
+
+    const label = node.data.label;
+    const action = node.data.action;
+    const listEntCondition = node.data.listEntCondition;
+    const listExtCondition = node.data.listExtCondition;
+
+
+    return (
+      <>
+        <div className='flex flex-col items-center justify-center w-48 '>
+          <div className='flex items-center justify-center w-48'>
+            <div className='relative flex justify-center px-2 py-1 rounded-md border w-max shadow-md shadow-safwa-gray-4  border-black bg-safwa-purple-2'>
+              {RoleChecker(
+                listExtCondition?.verifyrole_by ||
+                listExtCondition?.approverole_by ||
+                listExtCondition?.checkrole_by
+              )}
+
+              <span className='truncate'>{label}</span>
+              {/* ------ listEntCondition - a button that contain all the requirement for entry ----- */}
+              <Popover
+                opened={opened}
+                closeOnClickOutside
+                clickOutsideEvents={['click']}
+                onClose={() => setOpened(false)}
+              >
+                <Popover.Target>
+                  <motion.span
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                    className='absolute top-0 -right-9 cursor-pointer'
+                    onClick={() => setOpened(true)}
+                  >
+                    <Icon
+                      icon='material-symbols:list-alt-rounded'
+                      className='w-8 h-8 text-safwa-blue-1'
+                    />
+                  </motion.span>
+                </Popover.Target>
+                {createPortal(
+                  <Popover.Dropdown className='shadow-md max-h-96'>
+                    <span
+                      className='absolute right-1 top-1 cursor-pointer'
+                      onClick={() => setOpened(false)}
+                    >
+                      <Icon
+                        icon='ep:close-bold'
+                        className='w-6 h-6 text-safwa-red-2'
+                      />
+                    </span>
+                    <div className='pt-4 min-w-52 space-y-4 !z-100'>
+                      {/* List */}
+                      {/* {list && (
+                        <Accordion className='m-0 p-0'>
+                          <Accordion.Item value='list' className='border-b-0'>
+                            <Accordion.Control className=''>
+                              <div className='flex space-x-4'>
+                                <span>
+                                  <Icon
+                                    icon='clarity:list-line'
+                                    className='w-8 h-8 text-safwa-blue-1'
+                                  />
+                                </span>
+                                <span className='font-semibold text-safwa-blue-1'>
+                                  {list[0]?.pbt_name
+                                    ? 'List of PBT'
+                                    : list[0]?.category
+                                      ? 'Categories'
+                                      : ''}
+                                </span>
+                              </div>
+                            </Accordion.Control>
+                            <Accordion.Panel className='flex'>
+                              <span className='ml-3 w-1 bg-safwa-gray-4 h-auto'></span>
+                              <ul className='space-y-4 scrollbar-custom overflow-y-scroll max-h-32'>
+                                {list?.map(
+                                  (
+                                    item: {
+                                      pbt_name: Array<string>;
+                                      category: Array<string>;
+                                    },
+                                    id: number
+                                  ) => (
+                                    <li
+                                      key={id}
+                                      className='flex relative item-center space-x-4'
+                                    >
+                                      <span className='absolute left-0 top-2 w-2 h-2 rounded-full bg-black'></span>
+                                      <span>
+                                        {item?.pbt_name || item?.category}
+                                      </span>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </Accordion.Panel>
+                          </Accordion.Item>
+                        </Accordion>
+                      )} */}
+                      {/* accordion that contain the list of user on this specific stage */}
+                      <Accordion>
+                        <Accordion.Item value='user' className='border-b-0'>
+                          {/* accordion button */}
+                          <Accordion.Control>
+                            <div className='flex space-x-4 items-center'>
+                              <span>
+                                <Icon
+                                  icon='eos-icons:role-binding-outlined'
+                                  className='w-8 h-8 text-safwa-blue-1'
+                                />
+                              </span>
+                              <span className='font-semibold text-safwa-blue-1'>
+                                List of users on this stage
+                              </span>
+                            </div>
+                          </Accordion.Control>
+                          {/* accordion content */}
+                          <Accordion.Panel>
+                            <span className='ml-2'>
+                              {/* this check if either the input data return '*' or an array in the listEntCondition
+                             * user on entry condition will be deleted in the near future
+                             */}
+                              {Array.isArray(listEntCondition?.user_id) ? (
+                                listEntCondition.user_id.includes('*') ? (
+                                  <span className='relative flex space-x-4 items-center'>
+                                    <span className='absolute w-2 h-2 rounded-full bg-black'></span>
+                                    <span>Any</span>
+                                  </span>
+                                ) : (
+                                  <ul className='space-y-4'>
+                                    {listEntCondition.user_id.map(
+                                      (
+                                        userId: string | Array<string>,
+                                        id: number
+                                      ) => (
+                                        <li
+                                          key={id}
+                                          className='relative flex items-center'
+                                        >
+                                          <span className='absolute w-2 h-2 bg-black rounded-full'></span>
+                                          <span className='pl-4'>{userId}</span>
+                                        </li>
+                                      )
+                                    )}
+                                  </ul>
+                                )
+                              ) : listEntCondition?.user_id === '*' ? (
+                                'Any'
+                              ) : (
+                                listEntCondition?.user_id
+                              )}
+                            </span>
+                          </Accordion.Panel>
+                        </Accordion.Item>
+                      </Accordion>
+                      {/* Requirement */}
+                      {/* {listRequirement && (
+                        <div className='flex items-center'>
+                          <span>
+                            <Icon
+                              className='w-8 h-8 text-safwa-blue-1'
+                              icon='streamline:interface-file-clipboard-check-checkmark-edit-task-edition-checklist-check-success-clipboard-form'
+                            />
+                          </span>
+                          <span>
+                            Requirement:{' '}
+                            {listRequirement.chk_doc.includes('*')
+                              ? 'Any'
+                              : listRequirement.chk_doc.map(
+                                (item: Array<string>) => item
+                              )}
+                          </span>
+                        </div>
+                      )} */}
+                    </div>
+                  </Popover.Dropdown>,
+                  document.body
+                )}
+              </Popover>
+            </div>
+          </div>
+          <Handle type='target' position={Position.Top} className='opacity-0' />
+          <Handle
+            type='source'
+            position={Position.Bottom}
+            className='opacity-0'
+          />
+          <div className='relative flex items-center justify-center w-[95px] h-[95px]'>
+            <Handle
+              type='source'
+              position={Position.Left}
+              className='opacity-0'
+              id='a'
+            />
+            <Handle
+              type='source'
+              position={Position.Right}
+              className='opacity-0'
+              id='b'
+            />
+            <div
+              className={clsx(
+                action === 'Verified'
+                  ? 'bg-[#ADD8E6]'
+                  : action === 'Approved'
+                    ? 'bg-[#90EE90]'
+                    : action === 'Checked'
+                      ? 'bg-[#FFECB3]'
+                      : '',
+                'absolute h-[70px] w-[70px] rotate-45 border rounded-sm shadow-md shadow-safwa-gray-4 border-black'
+              )}
+            ></div>
+            <span
+              className={clsx(
+                action === 'Verified'
+                  ? ''
+                  : action === 'Checked'
+                    ? ''
+                    : action === 'Approved'
+                      ? ''
+                      : '',
+                'z-10'
+              )}
+            >
+              {action}
+            </span>
+
+            {/* popover in condition, basically it contain everything from list exit condition (listExtCondition) */}
+            <Popover
+              opened={infoOpened}
+              closeOnClickOutside={true}
+              onClose={() => setInfoOpened(false)}
+              clickOutsideEvents={['click']}
+            >
+              <Popover.Target>
+                <motion.span
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                  className='absolute top-[4.5rem] z-10 cursor-pointer hover:scale-125'
+                  onClick={() => setInfoOpened(true)}
+                >
+                  <Icon
+                    icon='mdi:information-variant-circle'
+                    className='w-6 h-6 text-safwa-blue-1'
+                  />
+                </motion.span>
+              </Popover.Target>
+              {createPortal(
+                <Popover.Dropdown className='shadow-md max-h-96'>
+                  <div className='flex flex-col'>
+                    <span
+                      className='absolute top-2 right-2'
+                      onClick={() => setInfoOpened(false)}
+                    >
+                      <Icon
+                        icon='iconamoon:close-fill'
+                        className='w-8 h-8 cursor-pointer text-safwa-red-3'
+                      />
+                    </span>
+                    <Accordion>
+                      {/* action role accordion */}
+                      <Accordion.Item value='Action' className='border-b-0'>
+                        <Accordion.Control className='pr-2'>
+                          <span className='font-semibold text-safwa-blue-1'>
+                            List of role:
+                          </span>
+                        </Accordion.Control>
+                        <Accordion.Panel>
+                          {/* refer to the function itself to know how it works :) */}
+                          {DataChecker(
+                            listExtCondition?.verifyrole_by ||
+                            listExtCondition?.checkrole_by ||
+                            listExtCondition?.approverole_by
+                          )}
+                        </Accordion.Panel>
+                      </Accordion.Item>
+
+                      {/* person in charge of the action accordion */}
+                      <Accordion.Item value='User' className='border-b-0'>
+                        <Accordion.Control className='pr-2'>
+                          <span className='font-semibold text-safwa-blue-1'>
+                            Person in charge:
+                          </span>
+                        </Accordion.Control>{' '}
+                        <Accordion.Panel className='max-h-32 overflow-y-scroll scrollbar-custom'>
+                          {/* refer to the function itself to know how it works :) */}
+                          {DataChecker(
+                            listExtCondition?.verifyuser_by ||
+                            listExtCondition?.checkuser_by ||
+                            listExtCondition?.approveuser_by
+                          )}
+                        </Accordion.Panel>
+                      </Accordion.Item>
+                      {/* document's accordion */}
+                      <Accordion.Item value='Document' className='border-b-0'>
+                        <Accordion.Control className='pr-2'>
+                          <span className='font-semibold text-safwa-blue-1'>
+                            List of document:
+                          </span>
+                        </Accordion.Control>{' '}
+                        <Accordion.Panel>
+                          {/* refer to the function itself to know how it works :) */}
+                          {DataChecker(listExtCondition?.chk_doc)}
+                        </Accordion.Panel>
+                      </Accordion.Item>
+                    </Accordion>
+                  </div>
+                </Popover.Dropdown>,
+                document.body
+              )}
+            </Popover>
+          </div>
+        </div>
+      </>
+    );
   },
   End: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }; }) => {
     return (
@@ -76,9 +755,23 @@ const nodeTypes = {
   },
   default: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }; }) => {
     return (
-      <div>
-        HELLO WORLD!
-      </div>
+      <>
+        <Handle type='target' position={Position.Top} className='opacity-0' />
+        <Handle
+          type='target'
+          position={Position.Left}
+          className='opacity-0'
+          id='a'
+        />
+        <Handle type='target' position={Position.Right} className='opacity-0' />
+        <div className='flex justify-center w-48'>
+          <div className='flex justify-center px-2 py-1 rounded-md border w-max border-black bg-[#c8c2f4]'>
+            {/* <div className='absolute -left-3 -top-1 w-10 h-10 rounded-full bg-[#c7e1fa]'></div> */}
+            <span className='truncate'>{node.data.label}</span>
+          </div>
+        </div>
+        <Handle type='source' position={Position.Bottom} className='opacity-0' />
+      </>
     )
   },
 };
@@ -95,6 +788,42 @@ const Diagram = () => {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges } = useDiagramStore(
     useShallow(selector),
   );
+
+  const refineNodes = nodes.map((node) => {
+    function getNodeType(node: Record<string, any>) {
+      if (node.type === 'Start') {
+        return 'Start';
+      }
+      if (node.type === 'End' && node.data?.label === 'FCA-01-01-Financial-Controller') {
+        return 'End';
+      }
+      if (node.type === 'End' && node.data?.label !== 'FCA-01-01-Financial-Controller') {
+        if (!isObjectEmpty(node.data?.listEntCondition) &&
+          !isObjectEmpty(node.data?.listExtCondition
+          )) {
+          return 'WithEntryAndExit';
+        }
+        if (isObjectEmpty(
+          node.data?.listEntCondition) &&
+          !isObjectEmpty(
+            node.data?.listExtCondition)) {
+          return 'WithExit';
+        }
+        if (!isObjectEmpty(
+          node.data?.listEntCondition) &&
+          isObjectEmpty(
+            node.data?.listExtCondition)) {
+          return 'WithEntry';
+        }
+        return 'default';
+      }
+    }
+    return {
+      ...node,
+      position: node.position,
+      type: getNodeType(node),
+    }
+  });
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
@@ -121,11 +850,8 @@ const Diagram = () => {
         {/* <Image src='/Diagram.png' width={1000} height={1000} alt='diagram' className='object-cover' /> */}
         <div style={{ height: '100vh' }}>
           <ReactFlow
-            nodes={nodes}
+            nodes={refineNodes}
             edges={edges}
-            onInit={(instance) => {
-              console.log('initialize reactflow', !!instance)
-            }}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
@@ -143,7 +869,7 @@ const Diagram = () => {
 
       </Modal>
 
-      {/* <Button
+      <Button
         // disabled
         variant='filled'
         color='#F1F5F9'
@@ -164,7 +890,7 @@ const Diagram = () => {
         }}
       >
         Business Process Diagram
-      </Button> */}
+      </Button>
     </ReactFlowProvider>
   )
 
