@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import HeaderForm from './HeaderForm';
 import { StageInfoData } from '../HomeContent';
-import { FieldValues, UseFormHandleSubmit, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, MantineReactTable, flexRender, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
@@ -15,8 +15,11 @@ import { evaluateSemantics, getSemanticsErrorMessages, getSyntaxErrorMessages, t
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import { LabelTooltip } from './_helper';
+import SaveActions from '@/components/form/SaveActions';
+import InputWithOverlay from '@/components/form/InputWithOverlay';
+import SyntaxSemanticActions from '@/components/form/SyntaxSemanticActions';
 
-type stagesData = {
+export type stagesData = {
   process_stage_name: string;
   created_datetime: string;
 }[];
@@ -49,6 +52,179 @@ const EditForm = ({
 
 export default EditForm
 
+
+
+//! to TEST the syntax of the stage name or the syntax of the JSON string
+export const onSyntaxSubmit = async (formdata: any, e: any) => {
+  const target_id = e.target.offsetParent.id
+  console.log('target_id:', target_id)
+  const str_test_syntax = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
+  console.log('str_test_syntax:', str_test_syntax)
+  if (target_id === 'process_stage_name') {
+    await testSyntaxStageName({ params: { stage_name: str_test_syntax } })
+      .then(async (response) => {
+        if (response.error) {
+          toast.error(response.message);
+          await getSyntaxErrorMessages({ params: { error_message_uuid: response.uuid_error } })
+            .then((errorMessages) => {
+              modals.open({
+                title: 'Syntax errors',
+                children: (
+                  <>
+                    {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
+                      <List key={index} type="ordered" withPadding>
+                        <List.Item>{index + 1}. {error_message}</List.Item>
+                      </List>
+                    ))}
+                    <Flex gap={16} justify={'end'} mt="md">
+                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                        Close
+                      </Button>
+                    </Flex>
+                  </>
+                ),
+                overlayProps: {
+                  backgroundOpacity: 0.55,
+                  blur: 10,
+                },
+                radius: 'md',
+              })
+            }).catch((error) => {
+              toast.error('Failed to get error messages' + '\n' + error);
+            });
+        } else {
+          toast.success(response.message);
+        }
+      }).catch((error) => {
+        toast.error('Failed to test stage name' + '\n' + error);
+      });
+  } else {
+    await verifySyntax({ body: { str_test_syntax } })
+      .then(async (response) => {
+        if (response.error) {
+          toast.error(response.message);
+          await getSyntaxErrorMessages({ params: { error_message_uuid: response.list_error_no } })
+            .then((errorMessages) => {
+              modals.open({
+                title: 'Syntax errors',
+                children: (
+                  <>
+                    {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
+                      <List key={index} type="ordered" withPadding>
+                        <List.Item>{index + 1}. {error_message}</List.Item>
+                      </List>
+                    ))}
+                    <Flex gap={16} justify={'end'} mt="md">
+                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                        Close
+                      </Button>
+                    </Flex>
+                  </>
+                ),
+                overlayProps: {
+                  backgroundOpacity: 0.55,
+                  blur: 10,
+                },
+                radius: 'md',
+              })
+            }).catch((error) => {
+              toast.error('Failed to get error messages' + '\n' + error);
+            });
+        } else {
+          toast.success(response.message);
+        }
+
+      }).catch((error) => {
+        toast.error('Failed to verify syntax' + '\n' + error);
+      });
+  }
+}
+
+export const onSemanticSubmit = async (formdata: any, e: any) => {
+  const target_id = e.target.offsetParent.id
+  console.log('target_id:', target_id)
+  const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
+  console.log('str_test_semantic:', str_test_semantic)
+  if (target_id === 'process_stage_name') {
+    await testSemanticStageName({ params: { stage_name: str_test_semantic } })
+      .then(async (response) => {
+        if (response.error) {
+          toast.error(response.message);
+          await getSemanticsErrorMessages({ params: { error_message_uuid: response.uuid_error } })
+            .then((errorMessages) => {
+              modals.open({
+                title: 'Semantic errors',
+                children: (
+                  <>
+                    {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
+                      <List key={index} type="ordered" withPadding>
+                        <List.Item>{index + 1}. {error_message}</List.Item>
+                      </List>
+                    ))}
+                    <Flex gap={16} justify={'end'} mt="md">
+                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                        Close
+                      </Button>
+                    </Flex>
+                  </>
+                ),
+                overlayProps: {
+                  backgroundOpacity: 0.55,
+                  blur: 10,
+                },
+                radius: 'md',
+              })
+            }).catch((error) => {
+              toast.error('Failed to get error messages' + '\n' + error);
+            });
+        } else {
+          toast.success(response.message);
+        }
+      }).catch((error) => {
+        toast.error('Failed to test stage name' + '\n' + error);
+      });
+  } else {
+    await evaluateSemantics({ body: { str_test_semantic } })
+      .then(async (response) => {
+        if (response.error) {
+          toast.error(response.message);
+          await getSemanticsErrorMessages({ params: { error_message_uuid: response.list_error_no } })
+            .then((errorMessages) => {
+              modals.open({
+                title: 'Semantic errors',
+                children: (
+                  <>
+                    {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
+                      <List key={index} type="ordered" withPadding>
+                        <List.Item>{index + 1}. {error_message}</List.Item>
+                      </List>
+                    ))}
+                    <Flex gap={16} justify={'end'} mt="md">
+                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                        Close
+                      </Button>
+                    </Flex>
+                  </>
+                ),
+                overlayProps: {
+                  backgroundOpacity: 0.55,
+                  blur: 10,
+                },
+                radius: 'md',
+              })
+            }).catch((error) => {
+              toast.error('Failed to get error messages' + '\n' + error);
+            });
+        } else {
+          toast.success(response.message);
+        }
+
+      }).catch((error) => {
+        toast.error('Failed to evaluate semantics' + '\n' + error);
+      });
+  }
+};
+
 const EditFormContent = ({
   data,
   toggleEdit,
@@ -64,20 +240,22 @@ const EditFormContent = ({
   const stage_uuid = searchParams.get('stage_uuid');
 
   const InputList = [
-    { name: 'process_stage_name', label: 'Stage name', value: data?.process_stage_name, disabled: !isEdit }, // this is a string
-    { name: 'updated_datetime', label: 'Last edited date', value: data?.updated_datetime, disabled: true }, // this is a date string
-    { name: 'list_previous', label: 'List of previous stage', value: data?.list_previous, disabled: true }, // this is a list
-    { name: 'list_next_stage', label: 'List of next stage', value: data?.list_next_stage, disabled: true }, // this is a list
-    { name: 'list_user', label: 'Users', value: data?.list_user, disabled: !isEdit }, // this is a list
-    { name: 'list_pbt', label: 'PBT', value: data?.list_pbt, disabled: !isEdit }, // this is a list
-    { name: 'list_role', label: 'Roles', value: data?.list_role, disabled: !isEdit },
-    { name: 'list_requirement', label: 'Requirements', value: data?.list_requirement, disabled: !isEdit }, // this is a list
-    { name: 'list_action', label: 'Action', value: data?.list_action, disabled: !isEdit }, // this is a list
-    { name: 'list_entry_condition', label: 'Entry condition', value: data?.list_entry_condition, disabled: !isEdit },
-    { name: 'list_exit_condition', label: 'Exit condition', value: data?.list_exit_condition, disabled: !isEdit }
+    { name: 'process_stage_name', label: 'Stage name', type: 'text', value: data?.process_stage_name, disabled: false }, // this is a string
+    { name: 'updated_datetime', label: 'Last edited date', type: 'text', value: data?.updated_datetime, disabled: true }, // this is a date string
+    { name: 'list_previous', label: 'List of previous stage', type: null, value: data?.list_previous, disabled: true }, // this is a list
+    { name: 'list_next_stage', label: 'List of next stage', type: null, value: data?.list_next_stage, disabled: true }, // this is a list
+    { name: 'list_user', label: 'Users', type: 'json', value: data?.list_user, disabled: false }, // this is a list
+    { name: 'list_pbt', label: 'PBT', type: 'json', value: data?.list_pbt, disabled: false }, // this is a list
+    { name: 'list_role', label: 'Roles', type: 'json', value: data?.list_role, disabled: false },
+    { name: 'list_requirement', label: 'Requirements', type: 'json', value: data?.list_requirement, disabled: false }, // this is a list
+    { name: 'list_action', label: 'Action', type: 'json', value: data?.list_action, disabled: false }, // this is a list
+    { name: 'list_entry_condition', label: 'Entry condition', type: 'json', value: data?.list_entry_condition, disabled: false },
+    { name: 'list_exit_condition', label: 'Exit condition', type: 'json', value: data?.list_exit_condition, disabled: false }
   ];
 
-  const { control, handleSubmit, setValue } = useForm();
+
+  const methods = useForm();
+  const { control, handleSubmit, setValue } = methods;
 
   //! to SAVE the changes made to the stage and TEST the syntax of the stage name or the syntax of the JSON string
   const onSaveSubmit = async (formdata: any, e: any) => {
@@ -213,173 +391,6 @@ const EditFormContent = ({
     })
   }
 
-  //! to TEST the syntax of the stage name or the syntax of the JSON string
-  const onSyntaxSubmit = async (formdata: any, e: any) => {
-    const target_id = e.target.offsetParent.id
-    const str_test_syntax = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
-    if (target_id === 'process_stage_name') {
-      await testSyntaxStageName({ params: { stage_name: str_test_syntax } })
-        .then(async (response) => {
-          if (response.error) {
-            toast.error(response.message);
-            await getSyntaxErrorMessages({ params: { error_message_uuid: response.uuid_error } })
-              .then((errorMessages) => {
-                modals.open({
-                  title: 'Syntax errors',
-                  children: (
-                    <>
-                      {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
-                        <List key={index} type="ordered" withPadding>
-                          <List.Item>{index + 1}. {error_message}</List.Item>
-                        </List>
-                      ))}
-                      <Flex gap={16} justify={'end'} mt="md">
-                        <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-                          Close
-                        </Button>
-                      </Flex>
-                    </>
-                  ),
-                  overlayProps: {
-                    backgroundOpacity: 0.55,
-                    blur: 10,
-                  },
-                  radius: 'md',
-                })
-              }).catch((error) => {
-                toast.error('Failed to get error messages' + '\n' + error);
-              });
-          } else {
-            toast.success(response.message);
-          }
-        }).catch((error) => {
-          toast.error('Failed to test stage name' + '\n' + error);
-        });
-    } else {
-      await verifySyntax({ body: { str_test_syntax } })
-        .then(async (response) => {
-          if (response.error) {
-            toast.error(response.message);
-            await getSyntaxErrorMessages({ params: { error_message_uuid: response.list_error_no } })
-              .then((errorMessages) => {
-                modals.open({
-                  title: 'Syntax errors',
-                  children: (
-                    <>
-                      {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
-                        <List key={index} type="ordered" withPadding>
-                          <List.Item>{index + 1}. {error_message}</List.Item>
-                        </List>
-                      ))}
-                      <Flex gap={16} justify={'end'} mt="md">
-                        <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-                          Close
-                        </Button>
-                      </Flex>
-                    </>
-                  ),
-                  overlayProps: {
-                    backgroundOpacity: 0.55,
-                    blur: 10,
-                  },
-                  radius: 'md',
-                })
-              }).catch((error) => {
-                toast.error('Failed to get error messages' + '\n' + error);
-              });
-          } else {
-            toast.success(response.message);
-          }
-
-        }).catch((error) => {
-          toast.error('Failed to verify syntax' + '\n' + error);
-        });
-    }
-  }
-
-  const onSemanticSubmit = async (formdata: any, e: any) => {
-    const target_id = e.target.offsetParent.id
-    const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
-    if (target_id === 'process_stage_name') {
-      await testSemanticStageName({ params: { stage_name: str_test_semantic } })
-        .then(async (response) => {
-          if (response.error) {
-            toast.error(response.message);
-            await getSemanticsErrorMessages({ params: { error_message_uuid: response.uuid_error } })
-              .then((errorMessages) => {
-                modals.open({
-                  title: 'Semantic errors',
-                  children: (
-                    <>
-                      {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
-                        <List key={index} type="ordered" withPadding>
-                          <List.Item>{index + 1}. {error_message}</List.Item>
-                        </List>
-                      ))}
-                      <Flex gap={16} justify={'end'} mt="md">
-                        <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-                          Close
-                        </Button>
-                      </Flex>
-                    </>
-                  ),
-                  overlayProps: {
-                    backgroundOpacity: 0.55,
-                    blur: 10,
-                  },
-                  radius: 'md',
-                })
-              }).catch((error) => {
-                toast.error('Failed to get error messages' + '\n' + error);
-              });
-          } else {
-            toast.success(response.message);
-          }
-        }).catch((error) => {
-          toast.error('Failed to test stage name' + '\n' + error);
-        });
-    } else {
-      await evaluateSemantics({ body: { str_test_semantic } })
-        .then(async (response) => {
-          if (response.error) {
-            toast.error(response.message);
-            await getSemanticsErrorMessages({ params: { error_message_uuid: response.list_error_no } })
-              .then((errorMessages) => {
-                modals.open({
-                  title: 'Semantic errors',
-                  children: (
-                    <>
-                      {errorMessages.map(({ error_message }: { error_message: string }, index: number) => (
-                        <List key={index} type="ordered" withPadding>
-                          <List.Item>{index + 1}. {error_message}</List.Item>
-                        </List>
-                      ))}
-                      <Flex gap={16} justify={'end'} mt="md">
-                        <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
-                          Close
-                        </Button>
-                      </Flex>
-                    </>
-                  ),
-                  overlayProps: {
-                    backgroundOpacity: 0.55,
-                    blur: 10,
-                  },
-                  radius: 'md',
-                })
-              }).catch((error) => {
-                toast.error('Failed to get error messages' + '\n' + error);
-              });
-          } else {
-            toast.success(response.message);
-          }
-
-        }).catch((error) => {
-          toast.error('Failed to evaluate semantics' + '\n' + error);
-        });
-    }
-  };
-
   React.useEffect(() => {
     if (data) {
       setValue('process_stage_name', data.process_stage_name);
@@ -400,97 +411,28 @@ const EditFormContent = ({
 
   return (
     <ScrollArea.Autosize mah={max_h_768 ? 700 : 768}>
-      <form
-        className={clsx('space-y-8 py-4', max_h_768 && 'pb-8')}
-        onSubmit={handleSubmit(onSaveSubmit)}
-      >
-        <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} />
-        <div className="container mx-auto space-y-8 py-4">
-          {InputList?.map(({ name, label, value, disabled }, index) => ['Stage name', 'Sub-stage name', 'Last edited date'].includes(label) ? (
-            <InputWrapper
-              key={index}
-              label={label}
-              classNames={{
-                root: 'px-14 space-y-4',
-                label: '!text-sm !font-semibold',
-              }}>
-              <LabelTooltip label={label} />
-              <TextInput
-                name={name}
-                defaultValue={value}
-                control={control}
-                disabled={disabled}
-                classNames={{
-                  input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-                }}
-                rightSection={!disabled &&
-                  <SaveActions {...{
-                    name,
-                    disabled,
-                    onCancel: toggleEdit
-                  }} />}
+      <FormProvider {...methods}>
+        <form
+          className={clsx('space-y-8 py-4', max_h_768 && 'pb-8')}
+          onSubmit={handleSubmit(onSaveSubmit)}
+        >
+          {/* <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} /> */}
+          <h1 className="text-2xl font-semibold px-14 pt-8">Stage Information</h1>
+          <div className="container mx-auto space-y-8 py-4">
+            {InputList?.map((inputProps, index) => (
+              <InputWithOverlay
+                key={index}
+                {...inputProps}
               />
-              {!disabled && <SyntaxSemanticActions {...{
-                name,
-                value,
-                toggleEdit,
-                onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
-                onSemanticSubmit: handleSubmit(onSemanticSubmit)
-              }} />}
-            </InputWrapper>
-          ) : ['List of previous stage', 'List of next stage'].includes(label) ? (
-            <InputWrapper key={index} label={label} classNames={{
-              root: 'px-14',
-              label: '!text-sm !font-semibold',
-            }}>
-              <LabelTooltip label={label} />
-              <TableStages data={value as stagesData} />
-            </InputWrapper>
-          ) : (
-            <InputWrapper
-              key={index}
-              label={label}
-              classNames={{
-                root: 'px-14',
-                label: '!text-sm !font-semibold',
-              }}>
-              <LabelTooltip label={label} />
-              <TextareaHeader
-                actionsButton={
-                  <SaveActions {...{
-                    name,
-                    copyValue: JSON.stringify(value, null, 2),
-                    disabled,
-                    onCancel: toggleEdit
-                  }} />} />
-              <JsonInput
-                name={name}
-                defaultValue={JSON.stringify(value, null, 2)}
-                control={control}
-                disabled={disabled}
-                formatOnBlur
-                autosize
-                minRows={4}
-                classNames={{
-                  input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-                }}
-              />
-              {!disabled && <SyntaxSemanticActions  {...{
-                name,
-                value,
-                toggleEdit,
-                onSyntaxSubmit: handleSubmit(onSyntaxSubmit),
-                onSemanticSubmit: handleSubmit(onSemanticSubmit)
-              }} />}
-            </InputWrapper>
-          ))}
-        </div>
-      </form >
+            ))}
+          </div>
+        </form >
+      </FormProvider>
     </ScrollArea.Autosize>
   )
 }
 
-const TableStages = ({ data }: { data: stagesData; }) => {
+export const TableStages = ({ data }: { data: stagesData; }) => {
   const [pagination, setPagination] = React.useState({
     pageSize: 5,
     pageIndex: 0,
@@ -643,97 +585,6 @@ export const TextareaHeader = ({ table, actionsButton }: {
   )
 }
 
-const SyntaxSemanticActions = ({
-  name,
-  onSyntaxSubmit,
-  onSemanticSubmit,
-}: {
-  name?: string;
-  onSyntaxSubmit: (formdata: any, e: any) => void;
-  onSemanticSubmit: (formdata: any, e: any) => void;
-}) => {
 
-  return (
-    <div className="text-right ml-auto space-x-4 mt-4" >
-      <Button id={name} color='#895CF3' radius='md' className="!font-normal"
-        onClick={onSyntaxSubmit as never}
-      >Verify syntax</Button>
-      <Button id={name} color='#895CF3' radius='md' className="!font-normal"
-        onClick={onSemanticSubmit as never}>Evaluate semantics
-      </Button>
-    </div >
-  )
-};
 
-const SaveActions = ({ name, copyValue, disabled, onCancel }: {
-  name: string;
-  copyValue?: string;
-  disabled?: boolean;
-  onCancel?: () => void;
-}) => {
-  return disabled ? null :
-    (
-      <div className={clsx(
-        'flex items-center ml-auto space-x-1',
-        name === 'process_stage_name' && 'absolute right-0'
-      )}>
-        <Tooltip label="Save">
-          <ActionIcon
-            id={name}
-            component='button'
-            type='submit'
-            // disabled
-            variant="transparent"
-            bg="#F1F5F9"
-            color='black'
-            size="lg"
-            radius="md"
-            aria-label="Settings">
-            <Icon icon="heroicons-outline:check" width="1.2rem" className='border p-2 rounded-lg text-black/70 hover:text-black/50' />
-          </ActionIcon>
-        </Tooltip>
-        <Tooltip label="Cancel">
-          <ActionIcon
-            id={name}
-            // disabled
-            variant="transparent"
-            bg="#F1F5F9"
-            color='black'
-            size="lg"
-            radius="md"
-            aria-label="Settings"
-            onClick={onCancel}
-          >
-            <Icon icon="heroicons-outline:x" width="1.2rem" className='border p-2 rounded-lg text-black/70 hover:text-black/50' />
-          </ActionIcon>
-        </Tooltip>
-        <div className="pl-1 flex gap-1 items-center">
-          {!['process_stage_name', 'updated_datetime'].includes(name) &&
-            <CopyButton value={copyValue as string} timeout={2000}>
-              {({ copied, copy }) => (
-                <Tooltip label={copied ? 'Copied' : 'Copy'}>
-                  <ActionIcon
-                    // disabled
-                    color={copied ? 'teal' : 'gray'} variant="subtle" size="lg"
-                    radius="md" onClick={copy}>
-                    {copied ? (
-                      <Icon icon="heroicons-outline:check" width="1.2rem" height="1.2rem" className='text-black/70 hover:text-black/50' />
-                    ) : (
-                      <Icon icon="heroicons-outline:document-duplicate" width="1.2rem" height="1.2rem" className='text-black/70 hover:text-black/50' />
-                    )}
-                  </ActionIcon>
-                </Tooltip>
-              )}
-            </CopyButton>}
-          {!['process_stage_name', 'updated_datetime'].includes(name) &&
-            <ActionIcon
-              // disabled
-              color='gray' variant="subtle" size="lg"
-              radius="md">
-              <Icon icon="ph:code-bold" width="1.2rem" height="1.2rem" className='text-black/70 hover:text-black/50' />
-            </ActionIcon>}
-        </div>
-      </div>
-    )
 
-}

@@ -10,6 +10,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental'
 import '@mantine/notifications/styles.css';
 import modals from '@/app/cycle/_components/Modals';
+import { Onborda, OnbordaProvider } from 'onborda';
+
 const theme = createTheme({
   fontFamily: 'inherit',
 });
@@ -64,7 +66,9 @@ export default function Providers({
           <ReactQueryStreamedHydration>
             <SideMenuProvider >
               <GlobalStateProvider>
-                {children}
+                <OnbordaProvider>
+                  {children}
+                </OnbordaProvider>
               </GlobalStateProvider>
             </SideMenuProvider>
           </ReactQueryStreamedHydration>

@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow';
 import useDiagramStore from '@/store/Diagram';
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
-import { Button, Modal, Tabs } from '@mantine/core';
+import { Button, Group, Modal, Tabs } from '@mantine/core';
 import { getDiagramData } from '@/lib/service/client';
 import { useParams, useSearchParams } from 'next/navigation';
 import toast from '@/components/toast';
@@ -16,6 +16,7 @@ import DevTools from '@/components/reactflow/Devtools';
 import Diagram from '@/app/cycle/_components/Diagram';
 import { useDisclosure } from '@mantine/hooks';
 import { Icon } from '@iconify-icon/react';
+import { nprogress, NavigationProgress } from '@mantine/nprogress';
 
 const nodeTypes = { colorChooser: ColorChooserNode };
 
@@ -42,6 +43,16 @@ const DiagramPage = () => {
   );
   return (
     <div className='grid place-items-center h-screen'>
+      <NavigationProgress />
+      <Group justify="center">
+        <Button onClick={() => nprogress.start()}>Start</Button>
+        <Button onClick={() => nprogress.stop()}>Stop</Button>
+        <Button onClick={() => nprogress.increment()}>Increment</Button>
+        <Button onClick={() => nprogress.decrement()}>Decrement</Button>
+        <Button onClick={() => nprogress.set(50)}>Set 50%</Button>
+        <Button onClick={() => nprogress.reset()}>Reset</Button>
+        <Button onClick={() => nprogress.complete()}>Complete</Button>
+      </Group>
       <Tabs variant='pills'>
         <Tabs.List>
           <Tabs.Tab value="cycle">Cycle</Tabs.Tab>
@@ -50,7 +61,10 @@ const DiagramPage = () => {
         </Tabs.List>
 
         <Tabs.Panel value="cycle" className='grid place-items-center h-96'>
-          {/* <Modal
+          <Diagram />
+        </Tabs.Panel>
+        <Tabs.Panel value="stage">
+          <Modal
             centered
             opened={opened}
             onClose={close}
@@ -85,8 +99,7 @@ const DiagramPage = () => {
             }}
           >
             Business Process Diagram
-          </Button> */}
-          <Diagram />
+          </Button>
         </Tabs.Panel>
       </Tabs >
 
@@ -109,7 +122,7 @@ const Flow = () => {
     animated: true,
   };
   return (
-    <div style={{ height: '100vh' }}>
+    <div style={{ height: '80vh', width: '100vw', display: 'grid', placeItems: 'center' }}>
       <Button
         type='button'
         classNames={{

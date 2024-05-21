@@ -11,9 +11,7 @@ import { Radio, TextInput } from 'react-hook-form-mantine';
 import { getStatusRefList, updateCycle, updateStatusCycle } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
-import useDiagram from '../Diagram';
 import Diagram from '../Diagram';
-import ReactFlow, { EdgeChange, NodeChange, applyEdgeChanges, applyNodeChanges } from 'reactflow';
 import clsx from 'clsx';
 import { LabelTooltip } from './_helper';
 

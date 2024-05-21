@@ -63,7 +63,7 @@ function RoleChecker(role: string[] | undefined) {
 }
 
 const nodeTypes = {
-  Start: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }; }) => {
+  Start: (node: { data: { label: string }; }) => {
     return (
       <div className='flex flex-col justify-center'>
         <img
@@ -79,13 +79,15 @@ const nodeTypes = {
       </div>
     )
   },
-  WithEntry: (node: { data: { label: any; listEntCondition: any; listExtCondition: any; }; }) => {
+  WithEntry: (node: { data: { label: any; listEntCondition: any; listExtCondition: any; listRequirement: any; }; }) => {
     const [opened, setOpened] = React.useState(false);
-    // const [clicked, setClicked] = React.useState(false);
 
     const label = node.data.label;
     const listEntCondition = node.data.listEntCondition;
     const listExtCondition = node.data.listExtCondition;
+    const list = listEntCondition?.pbt_data || listEntCondition?.cate_data;
+    const listRequirement = node.data.listRequirement;
+
     return (
       <div
         className='flex flex-col items-center justify-center w-48'
@@ -130,7 +132,7 @@ const nodeTypes = {
                     </span>
                     <div className='pt-4 min-w-52 space-y-4 !z-100'>
                       {/* List */}
-                      {/* {list && (
+                      {list && (
                         <Accordion className='m-0 p-0'>
                           <Accordion.Item value='list' className='border-b-0'>
                             <Accordion.Control className=''>
@@ -176,7 +178,7 @@ const nodeTypes = {
                             </Accordion.Panel>
                           </Accordion.Item>
                         </Accordion>
-                      )} */}
+                      )}
                       {/* accordion that contain the list of user on this specific stage */}
                       <Accordion>
                         <Accordion.Item value='user' className='border-b-0'>
@@ -234,7 +236,7 @@ const nodeTypes = {
                         </Accordion.Item>
                       </Accordion>
                       {/* Requirement */}
-                      {/* {listRequirement && (
+                      {listRequirement && (
                         <div className='flex items-center'>
                           <span>
                             <Icon
@@ -251,7 +253,7 @@ const nodeTypes = {
                               )}
                           </span>
                         </div>
-                      )} */}
+                      )}
                     </div>
                   </Popover.Dropdown>,
                   document.body
@@ -277,7 +279,7 @@ const nodeTypes = {
       </div>
     );
   },
-  WithExit: (node: { data: { label: any; action: any; listEntCondition: any; listExtCondition: any; }; }) => {
+  WithExit: (node: { data: { label: string; action: any; listEntCondition: any; listExtCondition: any; }; }) => {
     const [infoOpened, setInfoOpened] = React.useState(false);
 
     const label = node.data.label;
@@ -407,16 +409,16 @@ const nodeTypes = {
       </div>
     );
   },
-  WithEntryAndExit: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; action: any; listEntCondition: any; listExtCondition: any; }; }) => {
+  WithEntryAndExit: (node: { data: { label: any; action: any; listEntCondition: any; listExtCondition: any; listRequirement: any; }; }) => {
     const [opened, setOpened] = React.useState(false);
-    // const [clicked, setClicked] = React.useState(false);
     const [infoOpened, setInfoOpened] = React.useState(false);
 
     const label = node.data.label;
     const action = node.data.action;
     const listEntCondition = node.data.listEntCondition;
     const listExtCondition = node.data.listExtCondition;
-
+    const list = listEntCondition?.pbt_data || listEntCondition?.cate_data;
+    const listRequirement = node.data.listRequirement;
 
     return (
       <>
@@ -463,7 +465,7 @@ const nodeTypes = {
                     </span>
                     <div className='pt-4 min-w-52 space-y-4 !z-100'>
                       {/* List */}
-                      {/* {list && (
+                      {list && (
                         <Accordion className='m-0 p-0'>
                           <Accordion.Item value='list' className='border-b-0'>
                             <Accordion.Control className=''>
@@ -509,7 +511,7 @@ const nodeTypes = {
                             </Accordion.Panel>
                           </Accordion.Item>
                         </Accordion>
-                      )} */}
+                      )}
                       {/* accordion that contain the list of user on this specific stage */}
                       <Accordion>
                         <Accordion.Item value='user' className='border-b-0'>
@@ -567,7 +569,7 @@ const nodeTypes = {
                         </Accordion.Item>
                       </Accordion>
                       {/* Requirement */}
-                      {/* {listRequirement && (
+                      {listRequirement && (
                         <div className='flex items-center'>
                           <span>
                             <Icon
@@ -584,7 +586,7 @@ const nodeTypes = {
                               )}
                           </span>
                         </div>
-                      )} */}
+                      )}
                     </div>
                   </Popover.Dropdown>,
                   document.body
@@ -727,7 +729,7 @@ const nodeTypes = {
       </>
     );
   },
-  End: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }; }) => {
+  End: (node: { data: { label: string } }) => {
     return (
       <div className='flex flex-col items-center justify-center w-48'>
         <Handle type='target' position={Position.Top} className='opacity-0' />
@@ -753,7 +755,7 @@ const nodeTypes = {
       </div>
     )
   },
-  default: (node: { data: { label: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }; }) => {
+  default: (node: { data: { label: string } }) => {
     return (
       <>
         <Handle type='target' position={Position.Top} className='opacity-0' />
@@ -776,6 +778,35 @@ const nodeTypes = {
   },
 };
 
+function getNodeType(node: Record<string, any>) {
+  const { type, data } = node;
+  const { label, listEntCondition, listExtCondition } = data || {};
+
+  if (type === 'Start') {
+    return 'Start';
+  }
+
+  if (type === 'End') {
+    if (label === 'FCA-01-02-Payment-Process') {
+      return 'End';
+    }
+
+    const hasEntry = !isObjectEmpty(listEntCondition);
+    const hasExit = !isObjectEmpty(listExtCondition);
+
+    if (hasEntry && hasExit) {
+      return 'WithEntryAndExit';
+    }
+    if (!hasEntry && hasExit) {
+      return 'WithExit';
+    }
+    if (hasEntry && !hasExit) {
+      return 'WithEntry';
+    }
+    return 'default';
+  }
+}
+
 const Diagram = () => {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -790,41 +821,147 @@ const Diagram = () => {
   );
 
   const refineNodes = nodes.map((node) => {
-    function getNodeType(node: Record<string, any>) {
-      const { type, data } = node;
-      const { label, listEntCondition, listExtCondition } = data || {};
-
-      if (type === 'Start') {
-        return 'Start';
-      }
-
-      if (type === 'End') {
-        if (label === 'FCA-01-01-Financial-Controller') {
-          return 'End';
-        }
-
-        const hasEntry = !isObjectEmpty(listEntCondition);
-        const hasExit = !isObjectEmpty(listExtCondition);
-
-        if (hasEntry && hasExit) {
-          return 'WithEntryAndExit';
-        }
-        if (!hasEntry && hasExit) {
-          return 'WithExit';
-        }
-        if (hasEntry && !hasExit) {
-          return 'WithEntry';
-        }
-        return 'default';
-      }
-    }
-
     return {
       ...node,
       type: getNodeType(node),
     };
   });
 
+  const refineEdges = edges.map((edge) => {
+    const { source, target } = edge;
+    const sourceNode = nodes.find((node) => node.id === source);
+    const targetNode = nodes.find((node) => node.id === target);
+
+    if (!sourceNode || !targetNode) {
+      return edge;
+    }
+
+    const sourceNodeType = getNodeType(sourceNode);
+    const targetNodeType = getNodeType(targetNode);
+
+    if (sourceNodeType === 'Start' && targetNodeType === 'WithEntry') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'Start' && targetNodeType === 'WithEntryAndExit') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'Start' && targetNodeType === 'WithExit') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithEntry' && targetNodeType === 'WithEntry') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithEntry' && targetNodeType === 'WithEntryAndExit') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithEntry' && targetNodeType === 'WithExit') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithEntry' && targetNodeType === 'End') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithEntryAndExit' && targetNodeType === 'WithEntry') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithEntryAndExit' && targetNodeType === 'WithEntryAndExit') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithEntryAndExit' && targetNodeType === 'WithExit') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithEntryAndExit' && targetNodeType === 'End') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithExit' && targetNodeType === 'WithEntry') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithExit' && targetNodeType === 'WithExit') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    if (sourceNodeType === 'WithExit' && targetNodeType === 'WithEntryAndExit') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+
+    if (sourceNodeType === 'WithExit' && targetNodeType === 'End') {
+      return {
+        ...edge,
+        animated: false,
+        type: 'smoothstep',
+      };
+    }
+
+    return edge;
+  });
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
@@ -845,14 +982,14 @@ const Diagram = () => {
         closeButtonProps={{
           icon: <Icon icon="mingcute:close-fill" width="1.2rem" height="1.2rem" className='!text-[#895CF3]' />,
         }}
-        size="lg"
+        size="xl"
       >
         {/* here where you put the Diagram (reactflow) */}
         {/* <Image src='/Diagram.png' width={1000} height={1000} alt='diagram' className='object-cover' /> */}
-        <div style={{ height: '100vh' }}>
+        <div style={{ height: '80vh' }}>
           <ReactFlow
             nodes={refineNodes}
-            edges={edges}
+            edges={refineEdges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
@@ -861,10 +998,16 @@ const Diagram = () => {
             defaultEdgeOptions={defaultEdgeOptions}
             nodeTypes={nodeTypes}
           >
-            <Controls className='z-50 border' />
-            <Background />
-
+            {/* <Background /> */}
+            <Controls />
             {/* <DevTools /> */}
+
+            <span className='absolute top-3 right-3 text-xs text-safwa-gray-3'>
+              Cycle id: <span>{cycle_id}</span>
+            </span>
+            <span className='absolute right-2 bottom-1 text-[8px] text-safwa-gray-3'>
+              Powered by Schinkels Technik
+            </span>
           </ReactFlow>
         </div>
 
@@ -892,6 +1035,11 @@ const Diagram = () => {
       >
         Business Process Diagram
       </Button>
+      <style jsx global>{`
+        .react-flow__panel.right {
+          display: none;
+        }
+      `}</style>
     </ReactFlowProvider>
   )
 
