@@ -1014,7 +1014,7 @@ const Diagram = () => {
       </Modal>
 
       <Button
-        // disabled
+        disabled
         variant='filled'
         color='#F1F5F9'
         c='#0F172A'
