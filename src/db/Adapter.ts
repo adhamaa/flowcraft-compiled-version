@@ -3,7 +3,9 @@ import { Adapter, AdapterUser } from "next-auth/adapters";
 import { and, db, eq } from ".";
 import { accounts, sessions, users, verificationTokens } from "./schema/users";
 
-function customAdapter(): Adapter {
+function customAdapter(): Adapter & {
+  updateAccountLoginCount: (userId: string) => Promise<any>;
+} {
   const adapter = DrizzleAdapter(db);
 
   // Overwrite createUser method on adapter

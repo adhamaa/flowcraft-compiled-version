@@ -86,9 +86,7 @@ export const authConfig = {
       session?: Session | undefined;
     }) {
       if (params.account) {
-        const userWithLoginCount = await (CustomAdapter as AdapterUser & {
-          getUserByAccount: (account: Account) => Promise<User | null>
-        }).getUserByAccount(params.account);
+        const userWithLoginCount = await CustomAdapter.getUserByAccount!(params.account);
         const login_count = userWithLoginCount?.login_count;
 
         if (params.account.provider === "credentials") {
@@ -148,7 +146,7 @@ export const authConfig = {
       const { nextUrl } = request;
       const isLoggedIn = !!auth?.user;
       const paths = [
-        ...(process.env.WITH_AUTH === 'true' ? ["/cycle"] : []),
+        ...(process.env.WITH_AUTH ? ["/cycle"] : []),
         "/profile",
         "/documentation",
         "/maintenance"
@@ -172,7 +170,7 @@ export const authConfig = {
     },
   },
   jwt: {
-    maxAge: 60 * 60 * 24 * 30,
+    // maxAge: 60 * 1,
     // async encode(arg) {
     //   return (arg.token?.sessionId as string) ?? encode(arg);
     // },
@@ -181,6 +179,7 @@ export const authConfig = {
     async signOut(params) {
       if ("token" in params && params.token?.session_token) {
         await CustomAdapter.deleteSession?.(params.token.session_token as string);
+        await CustomAdapter.updateAccountLoginCount?.(params.token.user_id as string);
       }
     },
   },
