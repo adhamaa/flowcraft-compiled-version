@@ -1,7 +1,6 @@
 import * as React from 'react'
 import HomeContent from './_components/HomeContent'
 import { Apps_label, getApplicationList, getCycleList } from '@/lib/service/client';
-import { auth } from '@/auth';
 import { DatasourceType } from '@/constant/datasource';
 
 async function HomePage({
@@ -16,7 +15,6 @@ async function HomePage({
   }
 }) {
 
-  const session = await auth()
 
   const application = getApplicationList();
   const cycle = getCycleList({
