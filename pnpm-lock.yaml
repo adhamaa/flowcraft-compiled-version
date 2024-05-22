@@ -10,6 +10,7 @@ specifiers:
   '@mantine/modals': ^7.8.0
   '@mantine/notifications': ^7.8.0
   '@mantine/nprogress': ^7.9.2
+  '@mantine/spotlight': ^7.9.2
   '@tabler/icons-react': ^3.0.2
   '@tanstack/eslint-plugin-query': ^5.28.11
   '@tanstack/react-query': ^5.29.0
@@ -60,6 +61,7 @@ dependencies:
   '@mantine/modals': 7.9.2_4mh764ehhses5je6r4hwqslrqa
   '@mantine/notifications': 7.9.2_4mh764ehhses5je6r4hwqslrqa
   '@mantine/nprogress': 7.9.2_4mh764ehhses5je6r4hwqslrqa
+  '@mantine/spotlight': 7.9.2_4mh764ehhses5je6r4hwqslrqa
   '@tabler/icons-react': 3.4.0_react@18.3.1
   '@tanstack/react-query': 5.37.1_react@18.3.1
   '@tanstack/react-query-next-experimental': 5.37.1_hzo4rq2itdm3coyfopndtvglzm
@@ -1046,6 +1048,21 @@ packages:
 
   /@mantine/nprogress/7.9.2_4mh764ehhses5je6r4hwqslrqa:
     resolution: {integrity: sha512-o5V546cMRvqh9G/ljbME6ee9CX6rD7yG+SXLDmoJ6nv8PGk6UWALxVinM16Te1RSm/eYmibO3FpSJlDHQgX+gQ==}
+    peerDependencies:
+      '@mantine/core': 7.9.2
+      '@mantine/hooks': 7.9.2
+      react: ^18.2.0
+      react-dom: ^18.2.0
+    dependencies:
+      '@mantine/core': 7.9.2_rzqxeocqlgdnrpvjxmjsm4pvyy
+      '@mantine/hooks': 7.9.2_react@18.3.1
+      '@mantine/store': 7.9.2_react@18.3.1
+      react: 18.3.1
+      react-dom: 18.3.1_react@18.3.1
+    dev: false
+
+  /@mantine/spotlight/7.9.2_4mh764ehhses5je6r4hwqslrqa:
+    resolution: {integrity: sha512-iNz6yk2nioWz28AqZpmLQ/iwYn0Vqx5hMzmCEIcHPJIxkSxbBNktGjiFLTqb30Wht1ITelmUuBEfkWGGgyYzgg==}
     peerDependencies:
       '@mantine/core': 7.9.2
       '@mantine/hooks': 7.9.2

@@ -1,13 +1,13 @@
 'use client';
-import { Anchor, Avatar, Input, Menu, Switch, Tabs, Text, useMantineColorScheme } from "@mantine/core";
+import { Anchor, Avatar, Menu, Switch, Tabs, useMantineColorScheme } from "@mantine/core";
 import { Icon } from '@iconify-icon/react';
 import * as React from 'react'
 import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
 import { useGlobalState } from "@/hooks/useGlobalState";
-import { Session } from "next-auth";
 import { signOut } from "@/app/auth/signout/_action";
 import { useSession } from "next-auth/react";
+import SpotlightSearch from "@/components/form/SpotlightSearch";
 
 function Header({ darkmode = false, className }: { darkmode?: boolean; className?: string }) {
   const { data: session } = useSession();
@@ -108,23 +108,8 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
         >
           How To Use?
         </Anchor>
-        <Input
-          type="search"
-          leftSectionPointerEvents="auto"
-          leftSection={
-            <Icon
-              icon="mingcute:search-line"
-              width={20}
-              onClick={() => console.log("clicked search")} className="hover:text-[#895CF3] cursor-pointer" />}
-          placeholder="Search"
-          radius="md"
-          classNames={{
 
-            input: '!rounded-lg !border-none w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent focus:!bg-white transition-all duration-300 ease-in-out !bg-[#F1F4F5] placeholder:ml-8',
-
-          }}
-        />
-
+        <SpotlightSearch />
 
         <Menu
           shadow="md"

@@ -10,7 +10,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental'
 import '@mantine/notifications/styles.css';
 import modals from '@/app/cycle/_components/Modals';
-import { Onborda, OnbordaProvider } from 'onborda';
+import { OnbordaProvider } from 'onborda';
+import { useIdle } from '@mantine/hooks';
+import toast from '@/components/toast';
+import { signOut } from '@/app/auth/signout/_action';
+import { authRoutes } from '@/routes';
+import { useRouter } from 'next/navigation';
+import useKickToLogin from '@/hooks/useKickToLogin';
 
 const theme = createTheme({
   fontFamily: 'inherit',
@@ -55,8 +61,12 @@ export default function Providers({
   //       render if it suspends and there is no boundary
   const queryClient = getQueryClient()
 
-  return (
+  useKickToLogin({
+    idleTime: process.env.NEXT_PUBLIC_IDLE_TIME,
+    signoutTime: process.env.NEXT_PUBLIC_SIGNOUT_TIME,
+  })
 
+  return (
     <MantineProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <ModalsProvider modals={modals}>
