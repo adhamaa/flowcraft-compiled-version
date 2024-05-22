@@ -9,9 +9,6 @@ import { CycleData } from '@/app/cycle/_components/HomeContent';
 import { getCycleList } from '@/lib/service/client';
 import { useRouter } from 'next/navigation';
 
-
-
-// /cycle/27?selected_app=SP&data_source=database
 function SpotlightSearch() {
   const router = useRouter();
   const [cycleListSP, setCycleListSP] = React.useState<CycleData[]>([])
@@ -28,11 +25,6 @@ function SpotlightSearch() {
           label: 'Cycle Id: ' + cycle.cycle_id,
           description: `${path}`,
           onClick: () => router.push(path),
-          // leftSection: <Icon
-          //   icon="heroicons-outline:document"
-          //   width={20}
-          //   className="hover:text-[#895CF3] cursor-pointer"
-          // />,
         };
       })
     },
@@ -45,11 +37,6 @@ function SpotlightSearch() {
           label: 'Cycle Id: ' + cycle.cycle_id,
           description: `${path}`,
           onClick: () => router.push(path),
-          // leftSection: <Icon
-          //   icon="heroicons-outline:document"
-          //   width={20}
-          //   className="hover:text-[#895CF3] cursor-pointer"
-          // />,
         };
       })
     },
@@ -106,23 +93,7 @@ function SpotlightSearch() {
         />
         Search
       </UnstyledButton>
-      {/* <Input
-    type="search"
-    leftSectionPointerEvents="auto"
-    leftSection={
-      <Icon
-        icon="mingcute:search-line"
-        width={20}
-        onClick={spotlight.open}
-        className="hover:text-[#895CF3] cursor-pointer"
-      />}
-    onClick={spotlight.open}
-    placeholder="Search"
-    radius="md"
-    classNames={{
-      input: '!rounded-lg !border-none w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent focus:!bg-white transition-all duration-300 ease-in-out !bg-[#F1F4F5] placeholder:ml-8',
-    }}
-  /> */}</>
+    </>
   )
 }
 
