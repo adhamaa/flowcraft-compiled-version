@@ -1,7 +1,8 @@
 'use client';
 
+import { DatasourceType } from "@/constant/datasource";
 /* eslint-disable react-hooks/rules-of-hooks */
-import { getApplicationList, getCycleInfo, getCycleList, getStageInfo, getStageList, updateCycle } from "@/lib/service/client";
+import { Apps_label, getApplicationList, getCycleInfo, getCycleList, getStageInfo, getStageList, updateCycle } from "@/lib/service/client";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 export const useData = () => {
@@ -20,8 +21,8 @@ export const useData = () => {
           apps_label,
           datasource_type
         }: {
-          apps_label?: string;
-          datasource_type: string;
+          apps_label?: Apps_label;
+          datasource_type: DatasourceType;
         }) => {
           return useQuery({
             queryKey: ["cycles", apps_label],
@@ -36,9 +37,9 @@ export const useData = () => {
           cycle_id,
           datasource_type
         }: {
-          apps_label: string;
+          apps_label: Apps_label;
           cycle_id: string;
-          datasource_type: string;
+          datasource_type: DatasourceType;
         }) => {
           return useQuery({
             queryKey: ["cycles", apps_label, cycle_id],
@@ -57,8 +58,8 @@ export const useData = () => {
           datasource_type
         }: {
           cycle_id: string;
-          apps_label: string;
-          datasource_type: string;
+          apps_label: Apps_label;
+          datasource_type: DatasourceType;
         }) => {
           return useQuery({
             queryKey: ["stages", cycle_id, apps_label],
@@ -77,8 +78,8 @@ export const useData = () => {
         }: {
           stage_uuid: string;
           cycle_id: string;
-          apps_label: string;
-          datasource_type: string;
+          apps_label: Apps_label;
+          datasource_type: DatasourceType;
         }) => {
           return useQuery({
             queryKey: ["stages", stage_uuid, cycle_id, apps_label],

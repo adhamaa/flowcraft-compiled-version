@@ -1,4 +1,4 @@
-import {  datasource_type, getStageList } from '@/lib/service/client';
+import { Apps_label, Datasource_type, getStageList } from '@/lib/service/client';
 import * as React from 'react'
 import ColapsableMenu from '../_components/ColapsableMenu';
 
@@ -12,13 +12,13 @@ const CyclePage = async ({
   params: { cycle_id: string },
   searchParams: {
     selected_app: string;
-    data_source: datasource_type;
+    data_source: Datasource_type;
   }
 }) => {
 
   const stage = await getStageList({
     cycle_id: cycle_id,
-    apps_label: selected_app,
+    apps_label: selected_app as Apps_label,
     datasource_type: data_source
   });
 

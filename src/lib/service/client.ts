@@ -2,7 +2,8 @@
 import { clientRevalidateTag } from "./server";
 import { datasource_mapping } from "@/constant/datasource";
 
-export type datasource_type = 'database' | 'memory' | 'cache';
+export type Datasource_type = 'database' | 'memory' | 'cache';
+export type Apps_label = 'SP' | 'Client';
 // const baseUrl = process.env.NEXT_PUBLIC_M1_API_URL;
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -31,8 +32,8 @@ export const getCycleList = async ({
   apps_label,
   datasource_type = 'database'
 }: {
-  apps_label?: string;
-  datasource_type: datasource_type;
+  apps_label?: Apps_label;
+  datasource_type: Datasource_type;
 }) => {
   if (!apps_label) return [];
   if (!datasource_type) return [];
@@ -143,9 +144,9 @@ export const getCycleInfo = async ({
   cycle_id,
   datasource_type = 'database'
 }: {
-  apps_label?: string;
+  apps_label?: Apps_label;
   cycle_id?: string;
-  datasource_type: datasource_type;
+  datasource_type: Datasource_type;
 }) => {
   // if (!apps_label) return {};
   // if (!cycle_id) return {};
@@ -172,7 +173,7 @@ export const getCycleInfo = async ({
 
   const stringifyObjectValues =
     data.result?.reduce((acc: any, item: {
-      app_label: string;
+      app_label: Apps_label;
       app_name: string;
       app_sys_code: string;
       app_uuid: string;
@@ -209,8 +210,8 @@ export const getStageList = async ({
   datasource_type = 'database'
 }: {
   cycle_id: string;
-  apps_label: string;
-  datasource_type: datasource_type;
+  apps_label: Apps_label;
+  datasource_type: Datasource_type;
 }) => {
   if (!cycle_id) return [];
   if (!apps_label) return [];
@@ -242,8 +243,8 @@ export const getStageInfo = async ({
 }: {
   stage_uuid: string;
   cycle_id: string;
-  apps_label: string;
-  datasource_type: datasource_type;
+  apps_label: Apps_label;
+  datasource_type: Datasource_type;
 }) => {
   // if (!stage_uuid) return {};
   // if (!cycle_id) return {};
@@ -276,7 +277,7 @@ export const getDiagramData = async ({
   datasource_type = 'database'
 }: {
   cycle_id: string;
-  apps_label: string;
+  apps_label: Apps_label;
   datasource_type?: string;
 }) => {
   const endpoint = `/businessProcess/diagramData?cycle_id=${cycle_id}&app_type=${apps_label}`;
@@ -580,7 +581,7 @@ export const duplicateCycle = async ({
 }:
   {
     cycle_id: string;
-    apps_label: string;
+    apps_label: Apps_label;
   }) => {
   const endpoint = `/businessProcessTmp/duplicateCycle?cycle_id=${cycle_id}&app_type=${apps_label}`;
   const url = `${baseUrl}${endpoint}`;
