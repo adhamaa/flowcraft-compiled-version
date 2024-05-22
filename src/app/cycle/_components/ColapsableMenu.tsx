@@ -7,7 +7,7 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import EditForm from './Forms/EditForm';
 import GeneralForm from './Forms/GeneralForm';
 import { CycleData, StageData, StageInfoData } from './HomeContent';
-import { getCycleInfo, getStageInfo } from '@/lib/service/client';
+import { Apps_label, Datasource_type, getCycleInfo, getStageInfo } from '@/lib/service/client';
 import { useDisclosure } from '@mantine/hooks';
 
 export default function ColapsableMenu({
@@ -48,9 +48,9 @@ export default function ColapsableMenu({
   React.useEffect(() => {
     async function getCycleInfoData() {
       const cycleInfoDataRes = await getCycleInfo({
-        apps_label: selected_app as string,
+        apps_label: selected_app as Apps_label,
         cycle_id: cycle_id as string,
-        datasource_type: datasource_type as string
+        datasource_type: datasource_type as Datasource_type
       });
       setCycleInfo(cycleInfoDataRes)
     }
@@ -65,8 +65,8 @@ export default function ColapsableMenu({
       const stageInfoDataRes = await getStageInfo({
         stage_uuid: stage_uuid as string,
         cycle_id: cycle_id as string,
-        apps_label: selected_app as string,
-        datasource_type: datasource_type as string
+        apps_label: selected_app as Apps_label,
+        datasource_type: datasource_type as Datasource_type
       });
       setStageInfo(stageInfoDataRes)
     }

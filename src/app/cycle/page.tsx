@@ -1,7 +1,8 @@
 import * as React from 'react'
 import HomeContent from './_components/HomeContent'
-import { getApplicationList, getCycleList } from '@/lib/service/client';
+import { Apps_label, getApplicationList, getCycleList } from '@/lib/service/client';
 import { auth } from '@/auth';
+import { DatasourceType } from '@/constant/datasource';
 
 async function HomePage({
   searchParams: {
@@ -10,8 +11,8 @@ async function HomePage({
   }
 }: {
   searchParams: {
-    selected_app: string;
-    data_source: string;
+    selected_app: Apps_label;
+    data_source: DatasourceType;
   }
 }) {
 
