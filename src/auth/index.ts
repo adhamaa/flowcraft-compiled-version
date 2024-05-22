@@ -8,7 +8,7 @@ import { ZodError } from "zod"
 import { Fernet } from "fernet-nodejs"
 import { loginSchema } from "../lib/validation"
 import { DrizzleError } from "drizzle-orm"
-import { AdapterUser } from "next-auth/adapters"
+import { AdapterSession, AdapterUser } from "next-auth/adapters"
 import { randomUUID } from "crypto"
 
 class InvalidLoginError extends CredentialsSignin {
@@ -85,29 +85,45 @@ export const authConfig = {
       isNewUser?: boolean | undefined;
       session?: Session | undefined;
     }) {
-      if (params.account?.provider === "credentials") {
-        const expires = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000);
-        const sessionToken = randomUUID();
+      if (params.account) {
+        const userWithLoginCount = await (CustomAdapter as AdapterUser & {
+          getUserByAccount: (account: Account) => Promise<User | null>
+        }).getUserByAccount(params.account);
+        const login_count = userWithLoginCount?.login_count;
 
-        const session = await CustomAdapter.createSession!({
-          userId: params.user.id!,
-          sessionToken,
-          expires,
-        });
+        if (params.account.provider === "credentials") {
+          const expires = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000);
+          const sessionToken = randomUUID();
 
-        params.token.sessionId = session.sessionToken;
+          const session = await CustomAdapter.createSession!({
+            userId: params.user.id!,
+            sessionToken,
+            expires,
+          });
+
+
+          params.token.session_token = session.sessionToken;
+          params.token.user_id = params.user.id;
+          params.token.login_count = login_count;
+        }
       }
+
 
       return params.token;
     },
-    // async session(params: {
-    //   session: Session & { user: { id: string } };
-    //   user: User | AdapterUser;
-    // }) {
-    //   params.session.user = params.user as AdapterUser;
-    //   // params.session.user.id = params.user.id as string
-    //   return params.session
-    // },
+    async session(params: {
+      session: Session;
+      token: JWT;
+    }) {
+      if (params.session.user) {
+        params.session.user.session_token = params.token.session_token as string;
+        params.session.user.user_id = params.token.user_id as string;
+        params.session.user.login_count = params.token.login_count as number;
+      }
+      return params.session
+
+
+    },
     async redirect({ url, baseUrl }: { url: string, baseUrl: string }) {
       const isRelativeUrl = url.startsWith("/");
       if (isRelativeUrl) {
@@ -162,9 +178,9 @@ export const authConfig = {
     // },
   },
   events: {
-    async signOut(message) {
-      if ("session" in message && message.session?.sessionToken) {
-        await CustomAdapter.deleteSession!(message.session.sessionToken);
+    async signOut(params) {
+      if ("token" in params && params.token?.session_token) {
+        await CustomAdapter.deleteSession?.(params.token.session_token as string);
       }
     },
   },
@@ -182,10 +198,16 @@ export const { handlers, auth, signOut, signIn } = NextAuth({ adapter: CustomAda
 // extend nextauth types
 declare module "next-auth" {
   interface Session {
-    sessionId: string;
+    session_id: string;
+    user_id: string;
   }
 
   interface User {
     password: string;
+    session_token: string;
+    user_id: string;
+    login_count: number;
   }
+
 }
+

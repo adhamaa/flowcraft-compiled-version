@@ -92,6 +92,32 @@ function customAdapter(): Adapter {
       .then((res) => res[0])
   };
 
+  // @ts-ignore
+  // create an update for account login_count by userId
+  adapter.updateAccountLoginCount = async (userId) => {
+    const account = await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.userId, userId))
+      .then((res) => res[0] ?? null)
+
+    if (!account) {
+      return null
+    }
+
+    await db
+      .update(accounts)
+      .set({ login_count: account.login_count as number + 1 })
+      .where(eq(accounts.userId, userId))
+
+    return await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.userId, userId))
+      .then((res) => res[0])
+  };
+
+
   adapter.linkAccount = async (rawAccount) => {
     await db.insert(accounts).values(rawAccount)
   }
@@ -114,7 +140,7 @@ function customAdapter(): Adapter {
       return null
     }
 
-    return dbAccount.tbl_fc_user
+    return { ...dbAccount.tbl_fc_user, login_count: dbAccount.tbl_fc_account.login_count }
   };
 
   adapter.deleteSession = async (sessionToken) => {

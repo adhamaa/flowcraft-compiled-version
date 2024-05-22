@@ -39,6 +39,7 @@ export const accounts = mysqlTable(
     scope: varchar("scope", { length: 255 }),
     id_token: varchar("id_token", { length: 2048 }),
     session_state: varchar("session_state", { length: 255 }),
+    login_count: int("login_count"),
   },
   (account) => ({
     compoundKey: primaryKey({
