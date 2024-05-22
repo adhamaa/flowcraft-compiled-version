@@ -42,7 +42,7 @@ function SpotlightSearch() {
         const path = `/cycle/${cycle.cycle_id}?selected_app=Client&data_source=database`;
         return {
           id: cycle.cycle_id.toString(),
-          label: cycle.app_name,
+          label: 'Cycle Id: ' + cycle.cycle_id,
           description: `${path}`,
           onClick: () => router.push(path),
           // leftSection: <Icon
