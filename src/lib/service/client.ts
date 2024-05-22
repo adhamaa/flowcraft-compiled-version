@@ -2,6 +2,7 @@
 import { clientRevalidateTag } from "./server";
 import { datasource_mapping } from "@/constant/datasource";
 
+export type datasource_type = 'database' | 'memory' | 'cache';
 // const baseUrl = process.env.NEXT_PUBLIC_M1_API_URL;
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -31,7 +32,7 @@ export const getCycleList = async ({
   datasource_type = 'database'
 }: {
   apps_label?: string;
-  datasource_type: string;
+  datasource_type: datasource_type;
 }) => {
   if (!apps_label) return [];
   if (!datasource_type) return [];
@@ -144,7 +145,7 @@ export const getCycleInfo = async ({
 }: {
   apps_label?: string;
   cycle_id?: string;
-  datasource_type: string;
+  datasource_type: datasource_type;
 }) => {
   // if (!apps_label) return {};
   // if (!cycle_id) return {};
@@ -209,7 +210,7 @@ export const getStageList = async ({
 }: {
   cycle_id: string;
   apps_label: string;
-  datasource_type: string;
+  datasource_type: datasource_type;
 }) => {
   if (!cycle_id) return [];
   if (!apps_label) return [];
@@ -242,7 +243,7 @@ export const getStageInfo = async ({
   stage_uuid: string;
   cycle_id: string;
   apps_label: string;
-  datasource_type: string;
+  datasource_type: datasource_type;
 }) => {
   // if (!stage_uuid) return {};
   // if (!cycle_id) return {};

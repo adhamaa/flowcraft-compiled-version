@@ -1,4 +1,4 @@
-import { getCycleList, getStageList } from '@/lib/service/client';
+import {  datasource_type, getStageList } from '@/lib/service/client';
 import * as React from 'react'
 import ColapsableMenu from '../_components/ColapsableMenu';
 
@@ -12,7 +12,7 @@ const CyclePage = async ({
   params: { cycle_id: string },
   searchParams: {
     selected_app: string;
-    data_source: string;
+    data_source: datasource_type;
   }
 }) => {
 

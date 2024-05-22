@@ -18,6 +18,7 @@ import { LabelTooltip } from './_helper';
 import SaveActions from '@/components/form/SaveActions';
 import InputWithOverlay from '@/components/form/InputWithOverlay';
 import SyntaxSemanticActions from '@/components/form/SyntaxSemanticActions';
+import TextareaHeader from '@/components/form/TextareaHeader';
 
 export type stagesData = {
   process_stage_name: string;
@@ -57,9 +58,7 @@ export default EditForm
 //! to TEST the syntax of the stage name or the syntax of the JSON string
 export const onSyntaxSubmit = async (formdata: any, e: any) => {
   const target_id = e.target.offsetParent.id
-  console.log('target_id:', target_id)
   const str_test_syntax = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
-  console.log('str_test_syntax:', str_test_syntax)
   if (target_id === 'process_stage_name') {
     await testSyntaxStageName({ params: { stage_name: str_test_syntax } })
       .then(async (response) => {
@@ -142,9 +141,7 @@ export const onSyntaxSubmit = async (formdata: any, e: any) => {
 
 export const onSemanticSubmit = async (formdata: any, e: any) => {
   const target_id = e.target.offsetParent.id
-  console.log('target_id:', target_id)
   const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
-  console.log('str_test_semantic:', str_test_semantic)
   if (target_id === 'process_stage_name') {
     await testSemanticStageName({ params: { stage_name: str_test_semantic } })
       .then(async (response) => {
@@ -491,99 +488,11 @@ export const TableStages = ({ data }: { data: stagesData; }) => {
     <Stack>
       <TextareaHeader {...{ table }} />
       <MantineReactTable table={table} />
-      {/* <Table
-        captionSide="top"
-        fz="md"
-        highlightOnHover
-        horizontalSpacing='xl'
-        verticalSpacing="xs"
-        withRowBorders={false}
-        m="0"
-        mih={150}
-        classNames={{
-          table: 'bg-[#F1F4F5]',
-          // thead: 'sticky bg-[#F1F4F5]/95',
-          th: 'border-b border-[#E0E0E0]',
-        }}
-      >
-        <ScrollArea.Autosize mah={150} classNames={{
-          thumb: '!bg-[#BDBDBD] z-10',
-        }}>
-          <Table.Thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Tr key={headerGroup.id} >
-                {headerGroup.headers.map((header) => (
-                  <Table.Th key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                        header.column.columnDef.Header ??
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                  </Table.Th>
-                ))}
-              </Table.Tr>
-            ))}
-          </Table.Thead>
-
-          {!tableData.length ? (
-            <Table.Tbody>
-              <Table.Tr >
-                <Table.Td colSpan={2} classNames={{
-                  td: 'text-center text-black/30',
-                }}>
-                  No Data Found
-                </Table.Td>
-              </Table.Tr>
-            </Table.Tbody>
-          ) : (
-            <Table.Tbody>
-              {table.getRowModel().rows.map((row) => (
-                <Table.Tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <Table.Td key={cell.id}>
-                      <MRT_TableBodyCellValue cell={cell} table={table} />
-                    </Table.Td>
-                  ))}
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          )}
-        </ScrollArea.Autosize>
-      </Table> */}
     </Stack>
   )
 }
 
-export const TextareaHeader = ({ table, actionsButton }: {
-  table?: any;
-  actionsButton?: React.ReactNode;
-}) => {
-  const isTable = !!table
-  return (
-    <div className={clsx(
-      'relative flex bg-[#D9D9D9] rounded-t-lg mt-4 min-h-10',
-      isTable && '-mb-4'
-    )}>
-      <Flex justify="space-between" align="center" classNames={{
-        root: clsx('py-1 px-2 w-full', isTable && '!py-0'),
-      }}>
-        {isTable &&
-          <MRT_TablePagination
-            autoContrast
-            table={table}
-            color='#895CF3'
-            classNames={{
-              root: '',
-              // control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[#895CF3] !hover:text-white/90 !hover:!border-[#895CF3] !transition-all !duration-300 !ease-in-out',
-            }}
-          />}
-        {actionsButton}
-      </Flex>
-    </div >
-  )
-}
+
 
 
 

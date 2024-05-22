@@ -6,7 +6,7 @@ import Image from 'next/image';
 import * as React from 'react'
 import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Radio, TextInput } from 'react-hook-form-mantine';
 import { getStatusRefList, updateCycle, updateStatusCycle } from '@/lib/service/client';
 import toast from '@/components/toast';
@@ -14,6 +14,7 @@ import { modals } from '@mantine/modals';
 import Diagram from '../Diagram';
 import clsx from 'clsx';
 import { LabelTooltip } from './_helper';
+import InputWithOverlay from '@/components/form/InputWithOverlay';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
@@ -66,20 +67,21 @@ const GeneralFormContent = ({
   toggle: () => void;
 }) => {
   const InputList = [
-    { name: 'cycle_name', label: 'Cycle name', value: data?.cycle_name, disabled: true },
-    { name: "cycle_id", label: 'Cycle id', value: data?.cycle_id, disabled: true },
-    { name: "app_name", label: 'Applications', value: data?.app_name, disabled: true },
-    { name: "cycle_created", label: 'Date Created', value: data?.cycle_created, disabled: true },
-    { name: "cycle_updated", label: 'Last edited date', value: data?.cycle_updated, disabled: true },
-    { name: "no_of_stages", label: 'No of stage', value: data?.no_of_stages, disabled: true },
-    { name: "cycle_active", label: 'Status', value: data?.cycle_active, disabled: !isEdit },
-    { name: "cycle_description", label: 'Description', value: data?.cycle_description, disabled: !isEdit },
+    { name: 'cycle_name', label: 'Cycle name', type: 'text', value: data?.cycle_name, disabled: true },
+    { name: "cycle_id", label: 'Cycle id', type: 'text', value: data?.cycle_id, disabled: true },
+    { name: "app_name", label: 'Applications', type: 'text', value: data?.app_name, disabled: true },
+    { name: "cycle_created", label: 'Date Created', type: 'text', value: data?.cycle_created, disabled: true },
+    { name: "cycle_updated", label: 'Last edited date', type: 'text', value: data?.cycle_updated, disabled: true },
+    { name: "no_of_stages", label: 'No of stage', type: 'text', value: data?.no_of_stages, disabled: true },
+    { name: "cycle_active", label: 'Status', type: 'radio', value: data?.cycle_active, disabled: !isEdit },
+    { name: "cycle_description", label: 'Description', type: 'text', value: data?.cycle_description, disabled: !isEdit },
   ];
 
   const [statusRefList, setStatusRefList] = React.useState<StatusRef[]>([]);
 
   const [diagramOpened, { open: diagramOpen, close: diagramClose, toggle: diagramToggle }] = useDisclosure(false);
-  const { control, handleSubmit, setValue } = useForm();
+  const methods = useForm();
+  const { control, handleSubmit, setValue } = methods;
 
   const onSubmit = async (formdata: any) => {
     const hasStatusChange = !compareStates((data.cycle_active).toString(), formdata.cycle_active);
@@ -170,61 +172,64 @@ const GeneralFormContent = ({
 
   return (
     <ScrollArea.Autosize mah={max_h_768 ? 700 : 768}>
-      <form
-        className={clsx('space-y-4 py-4', max_h_768 && 'pb-8')}
-        onSubmit={handleSubmit(onSubmit)}
-        onError={(e) => console.log(e)}
-      >
-        {/* <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button> */}
-        <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
+      <FormProvider {...methods}>
+        <form
+          className={clsx('space-y-4 py-4', max_h_768 && 'pb-8')}
+          onSubmit={handleSubmit(onSubmit)}
+          onError={(e) => console.log(e)}
+        >
+          {/* <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button> */}
+          <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
 
-        <div className="container mx-auto space-y-8 py-4">
-          <div className="flex justify-end py-2 px-14">
-            <Diagram />
+          <div className="container mx-auto space-y-8 py-4">
+            <div className="flex justify-end py-2 px-14">
+              <Diagram />
+            </div>
+            {InputList?.map((inputProps, index) =>
+              ['Status'].includes(inputProps.label) ? (
+                <Input.Wrapper
+                  key={index}
+                  label={inputProps.label}
+                  classNames={{
+                    root: 'px-14 space-y-4',
+                    label: '!text-sm !font-semibold',
+                  }}>
+                  <LabelTooltip label={inputProps.label} />
+                  <Radio.Group
+                    name={inputProps.name}
+                    control={control}
+                    defaultValue={inputProps.value?.toString()}
+                  >
+                    <Group>
+                      {statusRefList?.map((status: StatusRef) => (
+                        <Radio.Item
+                          key={status.uuid}
+                          disabled={inputProps.disabled}
+                          value={status.code}
+                          label={<span className='capitalize'>{status.descriptions}</span>} />
+                      ))}
+                    </Group>
+                  </Radio.Group>
+                </Input.Wrapper>
+              ) : (
+                <Input.Wrapper key={index} label={inputProps.label} classNames={{
+                  root: 'px-14 space-y-4',
+                  label: '!text-sm !font-semibold',
+                }}>
+                  <LabelTooltip label={inputProps.label} />
+                  <TextInput
+                    name={inputProps.name}
+                    defaultValue={inputProps.value}
+                    control={control}
+                    disabled={inputProps.disabled}
+                    classNames={{
+                      input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+                    }} />
+                </Input.Wrapper>
+              ))}
           </div>
-          {InputList?.map(({ name, label, value, disabled }, index) => ['Status'].includes(label) ? (
-            <Input.Wrapper
-              key={index}
-              label={label}
-              classNames={{
-                root: 'px-14 space-y-4',
-                label: '!text-sm !font-semibold',
-              }}>
-              <LabelTooltip label={label} />
-              <Radio.Group
-                name={name}
-                control={control}
-                defaultValue={value?.toString()}
-              >
-                <Group>
-                  {statusRefList?.map((status: StatusRef) => (
-                    <Radio.Item
-                      key={status.uuid}
-                      disabled={disabled}
-                      value={status.code}
-                      label={<span className='capitalize'>{status.descriptions}</span>} />
-                  ))}
-                </Group>
-              </Radio.Group>
-            </Input.Wrapper>
-          ) : (
-            <Input.Wrapper key={index} label={label} classNames={{
-              root: 'px-14 space-y-4',
-              label: '!text-sm !font-semibold',
-            }}>
-              <LabelTooltip label={label} />
-              <TextInput
-                name={name}
-                defaultValue={value}
-                control={control}
-                disabled={disabled}
-                classNames={{
-                  input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
-                }} />
-            </Input.Wrapper>
-          ))}
-        </div>
-      </form>
+        </form>
+      </FormProvider>
     </ScrollArea.Autosize >
   )
 };

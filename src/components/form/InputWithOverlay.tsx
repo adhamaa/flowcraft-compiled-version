@@ -7,8 +7,10 @@ import { InputProps, JsonInput, TextInput } from "react-hook-form-mantine";
 import SaveActions, { CustomInputType } from "./SaveActions";
 import { LabelTooltip } from "@/app/cycle/_components/Forms/_helper";
 import SyntaxSemanticActions from "./SyntaxSemanticActions";
-import { TableStages, TextareaHeader, onSemanticSubmit, onSyntaxSubmit, stagesData } from "@/app/cycle/_components/Forms/EditForm";
+import { TableStages, onSemanticSubmit, onSyntaxSubmit, stagesData } from "@/app/cycle/_components/Forms/EditForm";
 import { useElementSize } from "@mantine/hooks";
+
+import TextareaHeader from "./TextareaHeader";
 
 const InputWithOverlay = (props: InputProps<any> & {
   label?: string;
@@ -53,7 +55,7 @@ const InputWithOverlay = (props: InputProps<any> & {
         radius={props.radius || 'md'}
         classNames={{
           wrapper: 'w-full',
-          input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+          input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
           ...props.classNames
         }}
         rightSectionWidth={72}
@@ -111,7 +113,7 @@ const InputWithOverlay = (props: InputProps<any> & {
         autosize
         minRows={4}
         classNames={{
-          input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+          input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
         }}
       />
       {!inputDisabled && <SyntaxSemanticActions  {...{
@@ -147,3 +149,4 @@ const InputWithOverlay = (props: InputProps<any> & {
 };
 
 export default InputWithOverlay;
+
