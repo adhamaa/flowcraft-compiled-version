@@ -2,13 +2,18 @@
 
 import { signOut as nasignout } from "@/auth";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
-export async function signOut(redirectTo?: string) {
+export async function signOut({
+  redirect,
+  redirectTo,
+}: {
+  redirect?: boolean;
+  redirectTo?: string;
+} = {
+  }) {
   await nasignout({
-    // redirect: false,
-    // redirectTo,
+    redirect: redirect,
+    redirectTo: redirectTo,
   });
-  // redirect(redirectTo || "/")
-  revalidatePath("/")
+  // revalidatePath("/")
 }
