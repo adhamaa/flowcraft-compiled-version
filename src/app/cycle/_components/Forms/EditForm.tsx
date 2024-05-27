@@ -3,7 +3,7 @@
 import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Button, CopyButton, Flex, InputWrapper, List, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import HeaderForm from './HeaderForm';
 import { StageInfoData } from '../HomeContent';
@@ -11,7 +11,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { JsonInput, TextInput } from 'react-hook-form-mantine';
 import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, MantineReactTable, flexRender, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
-import { evaluateSemantics, getSemanticsErrorMessages, getSyntaxErrorMessages, testSemanticStageName, testSyntaxStageName, updateStage, verifySyntax } from '@/lib/service/client';
+import { evaluateSemantics, getSemanticsErrorMessages, getSyntaxErrorMessages, setAuditTrail, testSemanticStageName, testSyntaxStageName, updateStage, verifySyntax } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import { LabelTooltip } from './_helper';
@@ -19,6 +19,7 @@ import SaveActions from '@/components/form/SaveActions';
 import InputWithOverlay from '@/components/form/InputWithOverlay';
 import SyntaxSemanticActions from '@/components/form/SyntaxSemanticActions';
 import TextareaHeader from '@/components/form/TextareaHeader';
+import { useSession } from 'next-auth/react';
 
 export type stagesData = {
   process_stage_name: string;
@@ -233,7 +234,12 @@ const EditFormContent = ({
   isEdit: boolean;
   toggle: () => void;
 }) => {
+  const { data: session } = useSession();
+  const user_id = session?.user?.user_id;
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const params = searchParams.toString();
+  const pageUrl = `${pathname}?${params}`;
   const stage_uuid = searchParams.get('stage_uuid');
 
   const InputList = [
@@ -252,7 +258,7 @@ const EditFormContent = ({
 
 
   const methods = useForm();
-  const { control, handleSubmit, setValue } = methods;
+  const { handleSubmit, setValue } = methods;
 
   //! to SAVE the changes made to the stage and TEST the syntax of the stage name or the syntax of the JSON string
   const onSaveSubmit = async (formdata: any, e: any) => {
@@ -313,8 +319,19 @@ const EditFormContent = ({
                       stage_uuid: stage_uuid as string,
                       field_name: target_id,
                       body: { value }
-                    }).then(() => {
+                    }).then(async () => {
                       toast.success(`${label} updated successfully`);
+                      await setAuditTrail({
+                        action: `update_stage_info`,
+                        location_url: pageUrl,
+                        object: 'src/app/cycle/_components/Forms/EditForm.tsx',
+                        process_state: 'TRIGGERAPI',
+                        sysfunc: '"onSaveSubmit" func ',
+                        userid: user_id as string,
+                        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+                        notes: `stage info "${label}" updated successfully`,
+                        json_object: { stage_uuid, field_name: target_id, value },
+                      });
                     }).catch((error) => {
                       toast.error('Failed to update stage' + '\n' + error);
                     }).finally(() => {
@@ -325,7 +342,6 @@ const EditFormContent = ({
                   }
 
                 } else {
-
                   syntax = await verifySyntax({ body: { str_test_syntax: value } })
                     .then(async (response) => {
                       if (response.error) {
@@ -363,8 +379,19 @@ const EditFormContent = ({
                     stage_uuid: stage_uuid as string,
                     field_name: target_id,
                     body: { value }
-                  }).then(() => {
+                  }).then(async () => {
                     toast.success(`${label} updated successfully`);
+                    await setAuditTrail({
+                      action: `update_stage_info`,
+                      location_url: pageUrl,
+                      object: 'src/app/cycle/_components/Forms/EditForm.tsx',
+                      process_state: 'TRIGGERAPI',
+                      sysfunc: '"onSaveSubmit" func ',
+                      userid: user_id as string,
+                      sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+                      notes: `stage info "${label}" updated successfully`,
+                      json_object: { stage_uuid, field_name: target_id, value },
+                    });
                   }).catch((error) => {
                     toast.error('Failed to update stage' + '\n' + error);
                   }).finally(() => {

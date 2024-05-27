@@ -8,13 +8,15 @@ import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
 import { FormProvider, useForm } from "react-hook-form";
 import { Radio, TextInput } from 'react-hook-form-mantine';
-import { getStatusRefList, updateCycle, updateStatusCycle } from '@/lib/service/client';
+import { getStatusRefList, setAuditTrail, updateCycle, updateStatusCycle } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import Diagram from '../Diagram';
 import clsx from 'clsx';
 import { LabelTooltip } from './_helper';
 import InputWithOverlay from '@/components/form/InputWithOverlay';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
@@ -66,6 +68,14 @@ const GeneralFormContent = ({
   isEdit: boolean;
   toggle: () => void;
 }) => {
+  const { data: session } = useSession();
+  const user_id = session?.user?.user_id;
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const params = searchParams.toString();
+  const pageUrl = `${pathname}?${params}`;
+
+
   const InputList = [
     { name: 'cycle_name', label: 'Cycle name', type: 'text', value: data?.cycle_name, disabled: true },
     { name: "cycle_id", label: 'Cycle id', type: 'text', value: data?.cycle_id, disabled: true },
@@ -79,7 +89,6 @@ const GeneralFormContent = ({
 
   const [statusRefList, setStatusRefList] = React.useState<StatusRef[]>([]);
 
-  const [diagramOpened, { open: diagramOpen, close: diagramClose, toggle: diagramToggle }] = useDisclosure(false);
   const methods = useForm();
   const { control, handleSubmit, setValue } = methods;
 
@@ -97,13 +106,14 @@ const GeneralFormContent = ({
             </Button>
             <Button onClick={
               async () => {
+
                 if (!hasStatusChange && !hasDescriptionChange) {
                   toast.error('No changes detected');
                   modals.closeAll();
                   toggleEdit();
                 } else if (hasStatusChange || hasDescriptionChange) {
                   try {
-                    await Promise.all([
+                    const response = await Promise.all([
                       updateStatusCycle({
                         cycle_id: data.cycle_id.toString(),
                         status_code: formdata.cycle_active
@@ -116,20 +126,69 @@ const GeneralFormContent = ({
                       })
                     ]);
 
-                    toast.success(`Cycle and description updated successfully`);
+                    const statusResponseOk = !response[0].error;
+                    const descriptionResponseOk = !response[1].error;
+                    const statusMessage = response[0].message;
+                    const descriptionMessage = response[1].message;
+                    if (statusResponseOk && descriptionResponseOk) {
+
+                      toast.success(message`${statusMessage} ${descriptionMessage}`);
+                      modals.closeAll();
+                      toggleEdit();
+                      await setAuditTrail({
+                        action: 'update_cycle_info',
+                        location_url: pageUrl,
+                        object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
+                        process_state: 'TRIGGERAPI',
+                        sysfunc: '"onSubmit" func ',
+                        userid: user_id as string,
+                        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+                        notes: `Cycle and description updated successfully`,
+                        json_object: formdata,
+                      });
+                    } else if (statusResponseOk) {
+                      toast.success(statusMessage);
+                      modals.closeAll();
+                      toggleEdit();
+                      await setAuditTrail({
+                        action: 'update_cycle_info',
+                        location_url: pageUrl,
+                        object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
+                        process_state: 'TRIGGERAPI',
+                        sysfunc: '"onSubmit" func ',
+                        userid: user_id as string,
+                        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+                        notes: `Cycle and description updated successfully`,
+                        json_object: formdata,
+                      });
+                    } else if (descriptionResponseOk) {
+                      toast.success(descriptionMessage);
+                      modals.closeAll();
+                      toggleEdit();
+                      await setAuditTrail({
+                        action: 'update_cycle_info',
+                        location_url: pageUrl,
+                        object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
+                        process_state: 'TRIGGERAPI',
+                        sysfunc: '"onSubmit" func ',
+                        userid: user_id as string,
+                        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+                        notes: `Cycle and description updated successfully`,
+                        json_object: formdata,
+                      });
+                    } else {
+                      toast.error('Failed to update cycle and description');
+                      modals.closeAll();
+                      toggleEdit();
+                    }
                   } catch (error) {
                     toast.error('Failed to update cycle and description' + "\n" + error);
                   }
-
-                  modals.closeAll();
-                  toggleEdit();
-                  window.location.reload();
                 } else {
                   toast.error('Failed to update cycle and description');
                   modals.closeAll();
                   toggleEdit();
                 }
-
               }
             } color='#895CF3' radius='md'>
               Yes
@@ -246,11 +305,7 @@ function message(strings: TemplateStringsArray, ...values: any[]) {
   const status = values[0];
   const description = values[1];
 
-  const cycle = strings[0];
-  const and = strings[1];
-  const updatedSuccessfully = strings[2];
-
-  return `${cycle} status ${and} description ${updatedSuccessfully}`
+  return `${status} \n ${description}`
 };
 
 function compareStates(prevStates: string, currStates: string) {
