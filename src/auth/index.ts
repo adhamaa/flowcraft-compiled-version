@@ -73,7 +73,7 @@ export const authConfig = {
   debug: process.env.NODE_ENV === "development",
   pages: {
     signIn: "/auth/signin",
-    error: "/auth/error",
+    error: "/",
   },
   callbacks: {
     async jwt(params: {

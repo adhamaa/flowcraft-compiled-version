@@ -1,49 +1,49 @@
 'use client';
 
 import * as React from 'react'
-import ReactFlow, { Background, Controls, DefaultEdgeOptions, Edge, EdgeChange, FitViewOptions, MiniMap, Node, NodeChange, NodeResizeControl, NodeResizer, NodeTypes, OnConnect, OnEdgesChange, OnNodesChange, ReactFlowProvider, addEdge, applyEdgeChanges, applyNodeChanges, useReactFlow } from 'reactflow';
-import { RFState } from '@/store';
-import { useShallow } from 'zustand/react/shallow';
-import useDiagramStore from '@/store/Diagram';
+// import ReactFlow, { Background, Controls, DefaultEdgeOptions, Edge, EdgeChange, FitViewOptions, MiniMap, Node, NodeChange, NodeResizeControl, NodeResizer, NodeTypes, OnConnect, OnEdgesChange, OnNodesChange, ReactFlowProvider, addEdge, applyEdgeChanges, applyNodeChanges, useReactFlow } from 'reactflow';
+// import { RFState } from '@/store';
+// import { useShallow } from 'zustand/react/shallow';
+// import useDiagramStore from '@/store/Diagram';
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
-import { Button, Group, Modal, Tabs } from '@mantine/core';
-import { getDiagramData } from '@/lib/service/client';
-import { useParams, useSearchParams } from 'next/navigation';
-import toast from '@/components/toast';
-import ColorChooserNode from '@/components/reactflow/nodeTypes/ColorChooserNode';
-import DevTools from '@/components/reactflow/Devtools';
-import Diagram from '@/app/cycle/_components/Diagram';
-import { useDisclosure } from '@mantine/hooks';
-import { Icon } from '@iconify-icon/react';
-import { nprogress, NavigationProgress } from '@mantine/nprogress';
+// import { Button, Group, Modal, Tabs } from '@mantine/core';
+// import { getDiagramData } from '@/lib/service/client';
+// import { useParams, useSearchParams } from 'next/navigation';
+// import toast from '@/components/toast';
+// import ColorChooserNode from '@/components/reactflow/nodeTypes/ColorChooserNode';
+// import DevTools from '@/components/reactflow/Devtools';
+// import Diagram from '@/app/cycle/_components/Diagram';
+// import { useDisclosure } from '@mantine/hooks';
+// import { Icon } from '@iconify-icon/react';
+// import { nprogress, NavigationProgress } from '@mantine/nprogress';
 
-const nodeTypes = { colorChooser: ColorChooserNode };
+// const nodeTypes = { colorChooser: ColorChooserNode };
 
-const selector = (state: RFState) => ({
-  nodes: state.nodes,
-  edges: state.edges,
-  onNodesChange: state.onNodesChange,
-  onEdgesChange: state.onEdgesChange,
-  onConnect: state.onConnect,
-  fetchNodesEdges: state.fetchNodesEdges,
-  setNodes: state.setNodes,
-  setEdges: state.setEdges,
-});
+// const selector = (state: RFState) => ({
+//   nodes: state.nodes,
+//   edges: state.edges,
+//   onNodesChange: state.onNodesChange,
+//   onEdgesChange: state.onEdgesChange,
+//   onConnect: state.onConnect,
+//   fetchNodesEdges: state.fetchNodesEdges,
+//   setNodes: state.setNodes,
+//   setEdges: state.setEdges,
+// });
 
 const DiagramPage = () => {
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const cycle_id = params.cycle_id;
-  const selected_app = searchParams.get('selected_app');
+  // const params = useParams();
+  // const searchParams = useSearchParams();
+  // const cycle_id = params.cycle_id;
+  // const selected_app = searchParams.get('selected_app');
 
-  const [opened, { open, close, toggle }] = useDisclosure(false);
-  const { fetchNodesEdges } = useDiagramStore(
-    useShallow(selector),
-  );
+  // const [opened, { open, close, toggle }] = useDisclosure(false);
+  // const { fetchNodesEdges } = useDiagramStore(
+  //   useShallow(selector),
+  // );
   return (
     <div className='grid place-items-center h-screen'>
-      <NavigationProgress />
+      {/* <NavigationProgress />
       <Group justify="center">
         <Button onClick={() => nprogress.start()}>Start</Button>
         <Button onClick={() => nprogress.stop()}>Stop</Button>
@@ -101,7 +101,7 @@ const DiagramPage = () => {
             Business Process Diagram
           </Button>
         </Tabs.Panel>
-      </Tabs >
+      </Tabs > */}
 
     </div>
   )
@@ -109,50 +109,50 @@ const DiagramPage = () => {
 
 export default DiagramPage
 
-const Flow = () => {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges, setNodes, setEdges } = useDiagramStore(
-    useShallow(selector),
-  );
+// const Flow = () => {
+//   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges, setNodes, setEdges } = useDiagramStore(
+//     useShallow(selector),
+//   );
 
-  const fitViewOptions: FitViewOptions = {
-    padding: 0.2,
-  };
+//   const fitViewOptions: FitViewOptions = {
+//     padding: 0.2,
+//   };
 
-  const defaultEdgeOptions: DefaultEdgeOptions = {
-    animated: true,
-  };
-  return (
-    <div style={{ height: '80vh', width: '100vw', display: 'grid', placeItems: 'center' }}>
-      <Button
-        type='button'
-        classNames={{
-          root: 'absolute top-4 right-0 m-4 z-10',
-        }}
-        onClick={() => fetchNodesEdges({
-          cycle_id: "2",
-          apps_label: "SP"
-        })}
-      >Fetch Nodes and Edges</Button>
-      <ReactFlowProvider>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          fitView
-          fitViewOptions={fitViewOptions}
-          defaultEdgeOptions={defaultEdgeOptions}
-          nodeTypes={nodeTypes}
-        >
-          <Background />
-          <Controls />
+//   const defaultEdgeOptions: DefaultEdgeOptions = {
+//     animated: true,
+//   };
+//   return (
+//     <div style={{ height: '80vh', width: '100vw', display: 'grid', placeItems: 'center' }}>
+//       <Button
+//         type='button'
+//         classNames={{
+//           root: 'absolute top-4 right-0 m-4 z-10',
+//         }}
+//         onClick={() => fetchNodesEdges({
+//           cycle_id: "2",
+//           apps_label: "SP"
+//         })}
+//       >Fetch Nodes and Edges</Button>
+//       <ReactFlowProvider>
+//         <ReactFlow
+//           nodes={nodes}
+//           edges={edges}
+//           onNodesChange={onNodesChange}
+//           onEdgesChange={onEdgesChange}
+//           onConnect={onConnect}
+//           fitView
+//           fitViewOptions={fitViewOptions}
+//           defaultEdgeOptions={defaultEdgeOptions}
+//           nodeTypes={nodeTypes}
+//         >
+//           <Background />
+//           <Controls />
 
-          <DevTools />
+//           <DevTools />
 
-        </ReactFlow>
+//         </ReactFlow>
 
-      </ReactFlowProvider>
-    </div>
-  )
-};
+//       </ReactFlowProvider>
+//     </div>
+//   )
+// };
