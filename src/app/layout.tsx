@@ -1,11 +1,8 @@
-import { BASE_PATH, auth } from '@/auth';
-import { SideMenuProvider } from '@/hooks/useSideMenu';
 import Providers from '@/provider';
 import '@/styles/globals.css';
 
 import { ColorSchemeScript } from '@mantine/core';
 import type { Metadata } from "next";
-import { SessionProvider } from 'next-auth/react';
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,7 +17,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
   return (
     <html lang="en">
       <head>
@@ -31,11 +27,9 @@ export default async function RootLayout({
         <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body className={inter.className}>
-        <SessionProvider basePath={BASE_PATH} session={session}>
-          <Providers>
-            {children}
-          </Providers>
-        </SessionProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
