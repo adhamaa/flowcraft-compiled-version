@@ -1,11 +1,13 @@
 
+'use server';
+
 import { clientRevalidateTag } from "./server";
 import { datasource_mapping } from "@/constant/datasource";
 
 export type Datasource_type = 'database' | 'memory' | 'cache';
 export type Apps_label = 'SP' | 'Client';
-// const baseUrl = process.env.NEXT_PUBLIC_M1_API_URL;
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
 
 export const getApplicationList = async () => {
   const endpoint = '/businessProcess/listAppsBizProcess';
@@ -601,4 +603,46 @@ export const duplicateCycle = async ({
   // }
   clientRevalidateTag('cyclelist');
   return await response.json();
+};
+
+export const setAuditTrail = async ({
+  action,
+  notes,
+  object,
+  process_state,
+  sysapp,
+  sysfunc,
+  userid,
+  json_object,
+  location_url
+}: {
+  action: string;
+  notes: string;
+  object: string;
+  process_state: string;
+  sysapp: string;
+  sysfunc: string;
+  userid: string;
+  json_object: Record<string, any>;
+  location_url: string;
+}) => {
+  const encodedUrl = encodeURIComponent(process.env.AUTH_URL + location_url);
+  const endpoint = `/auditrail/businessProcess/?action=${action}&notes=${notes}&object=${object}&process_state=${process_state}&sysapp=${sysapp}&sysfunc=${sysfunc}&userid=${userid}&json_object=${JSON.stringify(json_object)}&location_url=${encodedUrl}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['audittrail'] },
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to fetch audit trail.');
+  // }
+  const data = await response.json();
+  return data;
 };
