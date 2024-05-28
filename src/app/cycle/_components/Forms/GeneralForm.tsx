@@ -1,6 +1,6 @@
 'use client';
 import { Icon } from '@iconify-icon/react';
-import { Button, Flex, Group, Input, Modal, ScrollArea, Text } from '@mantine/core'
+import { ActionIcon, Button, Flex, Group, Input, Modal, ScrollArea, Text } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import Image from 'next/image';
 import * as React from 'react'
@@ -8,16 +8,29 @@ import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
 import { FormProvider, useForm } from "react-hook-form";
 import { Radio, TextInput } from 'react-hook-form-mantine';
-import { getStatusRefList, setAuditTrail, updateCycle, updateStatusCycle } from '@/lib/service/client';
+import { Apps_label, Datasource_type, getCycleInfo, getStatusRefList, setAuditTrail, updateCycle, updateStatusCycle } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import Diagram from '../Diagram';
 import clsx from 'clsx';
 import { LabelTooltip } from './_helper';
 import InputWithOverlay from '@/components/form/InputWithOverlay';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useCycle, useData } from '@/hooks/useData';
 
+// function useWaitQuery(props: { cycle_id: string, apps_label: string, datasource_type: string }) {
+//   const query = useSuspenseQuery({
+//     queryKey: ['cycleinfo', props.cycle_id, props.apps_label, props.datasource_type],
+//     queryFn: () => getCycleInfo({
+//       cycle_id: props.cycle_id,
+//       apps_label: props.apps_label as Apps_label,
+//       datasource_type: props.datasource_type as Datasource_type
+//     }),
+//   })
+
+//   return [query.data, query] as const
+// }
 
 const GeneralForm = ({ data }: { data: CycleData }) => {
   const [isEdit, setIsEdit] = React.useState(false);
@@ -70,11 +83,16 @@ const GeneralFormContent = ({
 }) => {
   const { data: session } = useSession();
   const user_id = session?.user?.user_id;
+  const router = useRouter();
   const pathname = usePathname();
+  const params = useParams();
   const searchParams = useSearchParams();
-  const params = searchParams.toString();
-  const pageUrl = `${pathname}?${params}`;
+  const queryParams = searchParams.toString();
+  const pageUrl = `${pathname}?${queryParams}`;
 
+  const cycle_id = params.cycle_id as string;
+  const apps_label = searchParams.get('selected_app') as Apps_label;
+  const datasource_type = searchParams.get('datasource_type') as Datasource_type;
 
   const InputList = [
     { name: 'cycle_name', label: 'Cycle name', type: 'text', value: data?.cycle_name, disabled: true },
@@ -146,6 +164,7 @@ const GeneralFormContent = ({
                         notes: `Cycle and description updated successfully`,
                         json_object: formdata,
                       });
+                      window.location.reload();
                     } else if (statusResponseOk) {
                       toast.success(statusMessage);
                       modals.closeAll();
@@ -161,6 +180,7 @@ const GeneralFormContent = ({
                         notes: `Cycle and description updated successfully`,
                         json_object: formdata,
                       });
+                      window.location.reload();
                     } else if (descriptionResponseOk) {
                       toast.success(descriptionMessage);
                       modals.closeAll();
@@ -176,6 +196,7 @@ const GeneralFormContent = ({
                         notes: `Cycle and description updated successfully`,
                         json_object: formdata,
                       });
+                      window.location.reload();
                     } else {
                       toast.error('Failed to update cycle and description');
                       modals.closeAll();
@@ -233,17 +254,14 @@ const GeneralFormContent = ({
     <ScrollArea.Autosize mah={max_h_768 ? 700 : 768}>
       <FormProvider {...methods}>
         <form
-          className={clsx('space-y-4 py-4', max_h_768 && 'pb-8')}
+          className={clsx('space-y-4 pb-4', max_h_768 && 'pb-8')}
           onSubmit={handleSubmit(onSubmit)}
           onError={(e) => console.log(e)}
         >
-          {/* <Button color='#895CF3' radius='md' onClick={diagramToggle}>Business Process Diagram</Button> */}
           <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
 
           <div className="container mx-auto space-y-8 py-4">
-            <div className="flex justify-end py-2 px-14">
-              <Diagram />
-            </div>
+            <DiagramBar />
             {InputList?.map((inputProps, index) =>
               ['Status'].includes(inputProps.label) ? (
                 <Input.Wrapper
@@ -315,3 +333,23 @@ function compareStates(prevStates: string, currStates: string) {
     return false
   }
 };
+
+
+function DiagramBar() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const datasource_type = searchParams.get('data_source') as Datasource_type;
+  const canDisplay = datasource_type === 'database';
+
+  return canDisplay && (
+    <div className="flex justify-end py-2 px-14">
+      <ActionIcon variant="filled" color="#895CF3" size="lg" radius="md" aria-label="Settings" mr="auto"
+        onClick={() => router.refresh()}
+      >
+        <Icon className='cursor-pointer rounded' icon="heroicons-outline:refresh" width="1rem" height="1rem" />
+      </ActionIcon>
+      <Diagram />
+    </div>
+  )
+
+}

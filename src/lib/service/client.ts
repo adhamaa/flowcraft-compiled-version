@@ -51,6 +51,7 @@ export const getCycleList = async ({
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
     },
     next: { tags: ['cyclelist'] },
+    cache: 'no-store'
   });
   if (response.status === 404) {
     return [];
@@ -92,54 +93,6 @@ export const getCycleList = async ({
 
   return await stringifyObjectValues;
 };
-
-
-export const getStatusRef = async (status_code: number) => {
-  const endpoint = `/businessProcessTmp/statusRef?status_code=${status_code}`;
-  const url = `${baseUrl}${endpoint}`;
-  const response = await fetch(url, {
-
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
-    },
-    next: { tags: ['statusref'] },
-    cache: 'no-store'
-  });
-  if (response.status === 404) {
-    return [];
-  }
-  if (!response.ok) {
-    throw new Error('Failed to fetch status reference.');
-  }
-  const data = await response.json();
-  return data.result.descriptions;
-};
-
-export const getStatusRefList = async () => {
-  const endpoint = '/businessProcessTmp/statusRef';
-  const url = `${baseUrl}${endpoint}`;
-  const response = await fetch(url, {
-
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
-    },
-    next: { tags: ['statusreflist'] },
-    cache: 'no-store'
-  });
-  if (response.status === 404) {
-    return [];
-  }
-  if (!response.ok) {
-    throw new Error('Failed to fetch status reference.');
-  }
-  const data = await response.json();
-  return data.result;
-};
-
 
 export const getCycleInfo = async ({
   apps_label,
@@ -204,6 +157,52 @@ export const getCycleInfo = async ({
     }), {});
 
   return await stringifyObjectValues;
+};
+
+export const getStatusRef = async (status_code: number) => {
+  const endpoint = `/businessProcessTmp/statusRef?status_code=${status_code}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['statusref'] },
+    cache: 'no-store'
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch status reference.');
+  }
+  const data = await response.json();
+  return data.result.descriptions;
+};
+
+export const getStatusRefList = async () => {
+  const endpoint = '/businessProcessTmp/statusRef';
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['statusreflist'] },
+    cache: 'no-store'
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch status reference.');
+  }
+  const data = await response.json();
+  return data.result;
 };
 
 export const getStageList = async ({

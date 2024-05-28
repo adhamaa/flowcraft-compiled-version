@@ -1,3 +1,4 @@
+import { DatasourceType } from '@/constant/datasource';
 import { Icon } from '@iconify-icon/react';
 import { Button, ButtonFactory, ButtonProps } from '@mantine/core';
 import clsx from 'clsx';
@@ -20,7 +21,8 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
   isFullscreen?: boolean;
 }) => {
   const searchParams = useSearchParams();
-  const datasource_type = searchParams.get('data_source');
+  const datasource_type = searchParams.get('data_source') as DatasourceType;
+  const canDisplay = datasource_type === 'database';
 
   if (!type) throw new Error('type is required');
 
@@ -29,7 +31,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Duplicate',
       type: 'button',
       disabled: type === 'stages' && !isEdit,
-      canShow: datasource_type === 'database' && type === 'stages' && !isEdit,
+      canShow: canDisplay && type === 'stages' && !isEdit,
       onClick: () => { },
 
       variant: "filled",
@@ -47,7 +49,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Delete',
       type: 'button',
       disabled: true,
-      canShow: datasource_type === 'database' && !isEdit,
+      canShow: canDisplay && !isEdit,
       onClick: () => { },
 
       variant: "filled",
@@ -65,7 +67,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Edit',
       type: 'button',
       disabled: false,
-      canShow: datasource_type === 'database' && !isEdit,
+      canShow: canDisplay && !isEdit,
       onClick: toggleEdit as () => void,
 
       variant: "filled",
@@ -82,7 +84,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Close',
       type: 'button',
       disabled: false,
-      canShow: (datasource_type === 'database' && type === 'stages' && isEdit) as boolean,
+      canShow: (canDisplay && type === 'stages' && isEdit) as boolean,
       onClick: toggleEdit as () => void,
 
       variant: "white",
@@ -100,7 +102,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Save',
       type: 'submit',
       disabled: false,
-      canShow: (datasource_type === 'database' && type === 'general' && isEdit) as boolean,
+      canShow: (canDisplay && type === 'general' && isEdit) as boolean,
       onClick: () => { },
 
       variant: "filled",
@@ -117,7 +119,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Cancel',
       type: 'button',
       disabled: false,
-      canShow: (datasource_type === 'database' && type === 'general' && isEdit) as boolean,
+      canShow: (canDisplay && type === 'general' && isEdit) as boolean,
       onClick: toggleEdit as () => void,
 
       variant: "white",
@@ -134,20 +136,33 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
   ] satisfies CustomButtonProps[];
 
   return (
-    <div className={clsx('flex px-14 py-6 items-center border-b', 'justify-end')}>
-      {datasource_type === 'database' && (
+    <div className={clsx(
+      'flex px-14 py-6 items-center border-b',
+      canDisplay && type === 'general' && 'justify-end'
+    )}>
+      {canDisplay && (
         <>
-          <div className="flex gap-4">
-            {buttons.map(({ label, canShow, icon, ...btn }, index) => canShow && (
-              <Button
-                key={index}
-                {...btn}
-                leftSection={icon}
-              >
-                {label}
-              </Button>
-            ))}
-          </div>
+          {type === 'general' ? (
+            <div className="flex gap-4">
+              {buttons.map(({ label, canShow, icon, ...btn }, index) => canShow && (
+                <Button
+                  key={index}
+                  {...btn}
+                  leftSection={icon}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+          ) : (
+            <h1 className="text-2xl font-semibold">Stage Information</h1>
+          )}
+        </>
+      )}
+      {!canDisplay && (
+        <>
+          {type === 'general' && <h1 className="text-2xl font-semibold">General Information</h1>}
+          {type === 'stages' && <h1 className="text-2xl font-semibold">Stage Information</h1>}
         </>
       )}
     </div>

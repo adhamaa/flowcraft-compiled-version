@@ -437,11 +437,10 @@ const EditFormContent = ({
     <ScrollArea.Autosize mah={max_h_768 ? 700 : 768}>
       <FormProvider {...methods}>
         <form
-          className={clsx('space-y-8 py-4', max_h_768 && 'pb-8')}
+          className={clsx('space-y-4 pb-4', max_h_768 && 'pb-8')}
           onSubmit={handleSubmit(onSaveSubmit)}
         >
-          {/* <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} /> */}
-          <h1 className="text-2xl font-semibold px-14 pt-8">Stage Information</h1>
+          <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} />
           <div className="container mx-auto space-y-8 py-4">
             {InputList?.map((inputProps, index) => (
               <InputWithOverlay

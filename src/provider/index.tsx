@@ -69,11 +69,11 @@ export default function Providers({
   return (
     <MantineProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
-        <ModalsProvider modals={modals}>
-          <Notifications position="top-right" classNames={{
-            root: 'w-max'
-          }} />
-          <ReactQueryStreamedHydration>
+        <ReactQueryStreamedHydration>
+          <ModalsProvider modals={modals}>
+            <Notifications position="top-right" classNames={{
+              root: 'w-max'
+            }} />
             <SideMenuProvider >
               <GlobalStateProvider>
                 <OnbordaProvider>
@@ -81,8 +81,8 @@ export default function Providers({
                 </OnbordaProvider>
               </GlobalStateProvider>
             </SideMenuProvider>
-          </ReactQueryStreamedHydration>
-        </ModalsProvider>
+          </ModalsProvider>
+        </ReactQueryStreamedHydration>
       </QueryClientProvider>
     </MantineProvider>
   )
