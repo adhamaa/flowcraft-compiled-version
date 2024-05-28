@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { Icon } from '@iconify-icon/react';
-import { Button, ScrollArea, Tabs } from '@mantine/core';
+import { Button, ScrollArea, Tabs, Tooltip } from '@mantine/core';
 import clsx from 'clsx';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import EditForm from './Forms/EditForm';
@@ -120,9 +120,6 @@ export default function ColapsableMenu({
           <></>
           {sideMenuList.map((menu) => (
             <Tabs.Tab key={menu.value} value={menu.value} className=''>
-              {/* <ActionIcon variant="filled" color="#895CF3" size="lg" radius="md" aria-label="Settings" >
-              <Icon className='cursor-pointer rounded' icon="heroicons-outline:refresh" width="1rem" height="1rem" />
-            </ActionIcon> */}
               {menu.name}
             </Tabs.Tab>
           ))}
@@ -146,14 +143,15 @@ export default function ColapsableMenu({
                   panel: ''
                 }}
               >
-                {!isSideMenuCollapse && <Tabs.List>
-                  <></>
-                  {menu.children.map((child) => (
-                    <Tabs.Tab key={child.value} value={child.value} onClick={child.onClick}>
-                      {child.name}
-                    </Tabs.Tab>
-                  ))}
-                </Tabs.List>}
+                {!isSideMenuCollapse &&
+                  <Tabs.List>
+                    <></>
+                    {menu.children.map((child) => (
+                      <Tabs.Tab key={child.value} value={child.value} onClick={child.onClick}>
+                        {child.name}
+                      </Tabs.Tab>
+                    ))}
+                  </Tabs.List>}
 
                 {menu.children.map((child) => (
                   <Tabs.Panel key={child.value} value={child.value}
@@ -171,9 +169,8 @@ export default function ColapsableMenu({
                           orientation="vertical"
                           classNames={{
                             root: 'h-full',
-                            tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                            tab: 'w-40 !border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
                             tabLabel: '~text-md/lg',
-                            panel: ''
                           }}
                           onChange={async (value) => {
                             router.push(pathname + '?' + createQueryString('stage_uuid', value as string));
@@ -182,15 +179,22 @@ export default function ColapsableMenu({
                           {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
                           {!isSideMenuCollapse
                             && (!!stageData.length
-                              && <Tabs.List>
+                              &&
+                              <Tabs.List>
                                 <></>
                                 <ScrollArea.Autosize mah={768}>
                                   {child.children?.map((stage) => (
-                                    <Tabs.Tab
-                                      key={stage.value}
-                                      value={stage.value}>
-                                      {stage.name}
-                                    </Tabs.Tab>
+                                    <Tooltip label={stage.name} position='right'>
+                                      <Tabs.Tab
+                                        key={stage.value}
+                                        value={stage.value}
+                                        classNames={{
+                                          tabLabel: 'truncate'
+                                        }}
+                                      >
+                                        {stage.name}
+                                      </Tabs.Tab>
+                                    </Tooltip>
                                   ))}
 
                                 </ScrollArea.Autosize>
@@ -224,7 +228,7 @@ const FooterButton = ({ isAdd, isCollapse, isSideMenuCollapse, onClick }: { isAd
         fz={16}
         {...(isAdd && {
           leftSection:
-            < Icon className='cursor-pointer rounded' icon="ic:round-plus" width="1.75rem" />
+            < Icon className='cursor-pointer rounded' icon="heroicons-solid:rectangle-group" width="1.75rem" />
         })}
         onClick={onClick}
       >
