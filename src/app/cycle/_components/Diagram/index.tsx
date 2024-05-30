@@ -2,7 +2,7 @@
 'use client';
 
 import toast from '@/components/toast';
-import { getDiagramData } from '@/lib/service/client';
+import { Apps_label, getDiagramData } from '@/lib/service/client';
 import { Icon } from '@iconify-icon/react';
 import { Modal, Button, Popover, Accordion } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -15,7 +15,7 @@ import useDiagramStore, { RFState } from '@/store/Diagram';
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
 import DevTools from '@/components/reactflow/Devtools';
-import { isObjectEmpty } from '@/lib/helper';
+import { convertToCycleStages, isObjectEmpty } from '@/lib/helper';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
@@ -779,197 +779,58 @@ const nodeTypes = {
   },
 };
 
-function getNodeType(node: Record<string, any>) {
-  const { type, data } = node;
-  const { label, listEntCondition, listExtCondition } = data || {};
+// function getNodeType(node: Record<string, any>) {
+//   const { type, data } = node;
+//   const { label, listEntCondition, listExtCondition } = data || {};
 
-  if (type === 'Start') {
-    return 'Start';
-  }
+//   if (type === 'Start') {
+//     return 'Start';
+//   }
 
-  if (type === 'End') {
-    if (label === 'FCA-01-02-Payment-Process') {
-      return 'End';
-    }
+//   if (type === 'End') {
+//     if (label === 'FCA-01-02-Payment-Process') {
+//       return 'End';
+//     }
 
-    const hasEntry = !isObjectEmpty(listEntCondition);
-    const hasExit = !isObjectEmpty(listExtCondition);
+//     const hasEntry = !isObjectEmpty(listEntCondition);
+//     const hasExit = !isObjectEmpty(listExtCondition);
 
-    if (hasEntry && hasExit) {
-      return 'WithEntryAndExit';
-    }
-    if (!hasEntry && hasExit) {
-      return 'WithExit';
-    }
-    if (hasEntry && !hasExit) {
-      return 'WithEntry';
-    }
-    return 'default';
-  }
-}
+//     if (hasEntry && hasExit) {
+//       return 'WithEntryAndExit';
+//     }
+//     if (!hasEntry && hasExit) {
+//       return 'WithExit';
+//     }
+//     if (hasEntry && !hasExit) {
+//       return 'WithEntry';
+//     }
+//     return 'default';
+//   }
+// }
 
-const Diagram = () => {
+const Diagram = ({ disabled }: {
+  disabled?: boolean;
+}) => {
   const params = useParams();
   const searchParams = useSearchParams();
   const cycle_id = params.cycle_id;
   const selected_app = searchParams.get('selected_app');
 
   const [opened, { open, close, toggle }] = useDisclosure(false);
-
+  const [renderDiagram, setRenderDiagram] = React.useState(false);
 
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges } = useDiagramStore(
     useShallow(selector),
   );
 
-  const refineNodes = nodes.map((node) => {
-    return {
-      ...node,
-      type: getNodeType(node),
-    };
-  });
-
-  const refineEdges = edges.map((edge) => {
-    const { source, target } = edge;
-    const sourceNode = nodes.find((node) => node.id === source);
-    const targetNode = nodes.find((node) => node.id === target);
-
-    if (!sourceNode || !targetNode) {
-      return edge;
-    }
-
-    const sourceNodeType = getNodeType(sourceNode);
-    const targetNodeType = getNodeType(targetNode);
-
-    if (sourceNodeType === 'Start' && targetNodeType === 'WithEntry') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'Start' && targetNodeType === 'WithEntryAndExit') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'Start' && targetNodeType === 'WithExit') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithEntry' && targetNodeType === 'WithEntry') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithEntry' && targetNodeType === 'WithEntryAndExit') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithEntry' && targetNodeType === 'WithExit') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithEntry' && targetNodeType === 'End') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithEntryAndExit' && targetNodeType === 'WithEntry') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithEntryAndExit' && targetNodeType === 'WithEntryAndExit') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithEntryAndExit' && targetNodeType === 'WithExit') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithEntryAndExit' && targetNodeType === 'End') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithExit' && targetNodeType === 'WithEntry') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithExit' && targetNodeType === 'WithExit') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    if (sourceNodeType === 'WithExit' && targetNodeType === 'WithEntryAndExit') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-
-    if (sourceNodeType === 'WithExit' && targetNodeType === 'End') {
-      return {
-        ...edge,
-        animated: false,
-        type: 'smoothstep',
-      };
-    }
-
-    return edge;
-  });
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
   };
 
   const defaultEdgeOptions: DefaultEdgeOptions = {
-    animated: true,
+    animated: false,
+    type: 'step',
   };
 
   return (
@@ -983,39 +844,47 @@ const Diagram = () => {
         closeButtonProps={{
           icon: <Icon icon="mingcute:close-fill" width="1.2rem" height="1.2rem" className='!text-[#895CF3]' />,
         }}
-        size="xl"
+        size={renderDiagram ? "xl" : "xs"}
       >
         {/* here where you put the Diagram (reactflow) */}
         {/* <Image src='/Diagram.png' width={1000} height={1000} alt='diagram' className='object-cover' /> */}
-        <div style={{ height: '80vh' }}>
-          <ReactFlow
-            nodes={refineNodes}
-            edges={refineEdges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            fitView={true}
-            fitViewOptions={fitViewOptions}
-            defaultEdgeOptions={defaultEdgeOptions}
-            nodeTypes={nodeTypes}
-          >
-            {/* <Background /> */}
-            <Controls />
-            {/* <DevTools /> */}
+        {!renderDiagram ?
+          (
+            <div className='grid place-items-center pb-12'>
+              <h1 className='italic text-gray-500/50'>Diagram Not Found</h1>
+            </div>
+          ) : (
+            <div style={{ height: '80vh' }}>
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                fitView={true}
+                fitViewOptions={fitViewOptions}
+                defaultEdgeOptions={defaultEdgeOptions}
+                nodeTypes={nodeTypes}
+                nodesDraggable={false}
+              >
+                {/* <Background /> */}
+                <Controls />
+                {/* <DevTools /> */}
 
-            <span className='absolute top-3 right-3 text-xs text-safwa-gray-3'>
-              Cycle id: <span>{cycle_id}</span>
-            </span>
-            <span className='absolute right-2 bottom-1 text-[8px] text-safwa-gray-3'>
-              Powered by Schinkels Technik
-            </span>
-          </ReactFlow>
-        </div>
+                <span className='absolute top-3 right-3 text-xs text-safwa-gray-3'>
+                  Cycle id: <span>{cycle_id}</span>
+                </span>
+                <span className='absolute right-2 bottom-1 text-[8px] text-safwa-gray-3'>
+                  Powered by Schinkels Technik
+                </span>
+              </ReactFlow>
+            </div>
+          )}
 
       </Modal>
 
       <Button
-        disabled
+        disabled={disabled}
         variant='filled'
         color='#F1F5F9'
         c='#0F172A'
@@ -1025,9 +894,12 @@ const Diagram = () => {
         onClick={async () => {
           await fetchNodesEdges({
             cycle_id: cycle_id as string,
-            apps_label: selected_app as string
-          })
-            .catch((error) => toast.error(error.message))
+            apps_label: selected_app as Apps_label
+          }).then(() => setRenderDiagram(true))
+            .catch((error) => {
+              setRenderDiagram(false);
+              toast.error(error.message);
+            })
             .finally(() => open())
         }}
         classNames={{
