@@ -14,7 +14,8 @@
     "migration:drop": "drizzle-kit drop",
     "db:pull": "drizzle-kit introspect:mysql",
     "db:push": "drizzle-kit push:mysql",
-    "studio": "drizzle-kit studio"
+    "studio": "drizzle-kit studio",
+    "prepare": "husky"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.0.1",
@@ -64,6 +65,7 @@
     "eslint": "^9.1.1",
     "eslint-config-next": "14.2.3",
     "fluid-tailwind": "^0.1.6",
+    "husky": "^9.0.11",
     "postcss": "^8.4.35",
     "postcss-preset-mantine": "^1.13.0",
     "postcss-simple-vars": "^7.0.1",
