@@ -32,7 +32,7 @@ const InputWithOverlay = (props: InputProps<any> & {
     if (!inputDisabled) {
       setFocus(props.name);
     }
-  }, [setFocus, inputDisabled]);
+  }, [setFocus, inputDisabled, props.name]);
 
 
   return props.type === 'text' ? (

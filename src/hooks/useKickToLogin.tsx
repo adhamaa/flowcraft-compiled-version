@@ -38,7 +38,7 @@ function useKickToLogin({
     return () => {
       clearTimeout(idleTimeOut);
     };
-  }, [idle, checkIdleRoute]);
+  }, [idle, checkIdleRoute, signoutTime, router]);
 
 }
 

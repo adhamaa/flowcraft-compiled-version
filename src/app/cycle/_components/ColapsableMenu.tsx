@@ -183,8 +183,8 @@ export default function ColapsableMenu({
                               <Tabs.List>
                                 <></>
                                 <ScrollArea.Autosize mah={768}>
-                                  {child.children?.map((stage) => (
-                                    <Tooltip label={stage.name} position='right'>
+                                  {child.children?.map((stage, i) => (
+                                    <Tooltip key={i} label={stage.name} position='right'>
                                       <Tabs.Tab
                                         key={stage.value}
                                         value={stage.value}
