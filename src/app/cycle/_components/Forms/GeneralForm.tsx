@@ -341,10 +341,14 @@ function DiagramBar() {
 
   return canDisplay && (
     <div className="flex justify-end py-2 px-14">
-      <ActionIcon variant="filled" color="#895CF3" size="lg" radius="md" aria-label="Settings" mr="auto"
+      <ActionIcon
+        disabled
+        variant="filled"
+        color="#895CF3" size="lg"
+        radius="md" aria-label="Settings" mr="auto"
         onClick={() => router.refresh()}
       >
-        <Icon className='cursor-pointer rounded' icon="heroicons-outline:refresh" width="1rem" height="1rem" />
+        <Icon className='rounded' icon="heroicons-outline:refresh" width="1rem" height="1rem" />
       </ActionIcon>
       <Diagram />
     </div>
