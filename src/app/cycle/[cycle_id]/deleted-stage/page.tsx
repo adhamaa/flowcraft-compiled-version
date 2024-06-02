@@ -1,13 +1,8 @@
-import { Apps_label, Datasource_type, getStageList } from '@/lib/service/client';
 import * as React from 'react'
-import ColapsableMenu from '../_components/ColapsableMenu';
-import { Metadata } from 'next';
+import ColapsableMenu from '../../_components/ColapsableMenu';
+import { Apps_label, Datasource_type, getStageList } from '@/lib/service/client';
 
-export const metadata: Metadata = {
-  title: 'Cycle Page',
-}
-
-const CyclePage = async ({
+async function DeletedPage({
   params: { cycle_id },
   searchParams: {
     selected_app,
@@ -19,8 +14,7 @@ const CyclePage = async ({
     selected_app: string;
     data_source: Datasource_type;
   }
-}) => {
-
+}) {
   const stage = await getStageList({
     cycle_id: cycle_id,
     apps_label: selected_app as Apps_label,
@@ -31,10 +25,8 @@ const CyclePage = async ({
   const [stageData] = await Promise.all([stage])
 
   return (
-    <>
-      <ColapsableMenu stageData={stageData} />
-    </>
+    <div className="border border-yellow-400 w-full">CONTENT</div>
   )
 }
 
-export default CyclePage
+export default DeletedPage

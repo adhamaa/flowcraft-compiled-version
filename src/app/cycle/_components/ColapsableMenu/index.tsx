@@ -1,14 +1,16 @@
 'use client';
+
 import * as React from 'react';
 import { Icon } from '@iconify-icon/react';
 import { Button, ScrollArea, Tabs, Tooltip } from '@mantine/core';
 import clsx from 'clsx';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import EditForm from './Forms/EditForm';
-import GeneralForm from './Forms/GeneralForm';
-import { CycleData, StageData, StageInfoData } from './HomeContent';
+import EditForm from '../Forms/EditForm';
+import GeneralForm from '../Forms/GeneralForm';
+import { CycleData, StageData, StageInfoData } from '../HomeContent';
 import { Apps_label, Datasource_type, getCycleInfo, getStageInfo } from '@/lib/service/client';
 import { useDisclosure } from '@mantine/hooks';
+import FooterButton from './footer';
 
 export default function ColapsableMenu({
   stageData,
@@ -98,7 +100,13 @@ export default function ColapsableMenu({
             value: stage.stage_uuid,
             content: <EditForm data={stageInfo as StageInfoData} />
           }))
-        }
+        },
+        {
+          name: 'Deleted Stage',
+          value: 'deleted_stage',
+          onClick: () => router.push(`/cycle/${cycle_id}/deleted-stage`),
+          content: null
+        },
       ]
     },
 
@@ -126,6 +134,8 @@ export default function ColapsableMenu({
 
           <FooterButton {...{ isSideMenuCollapse }} isCollapse onClick={toggleSideMenuCollapse} />{/* ! main collapse button */}
         </Tabs.List>
+
+
         {sideMenuList.map((menu) => {
           return (
             <Tabs.Panel key={menu.value} value={menu.value}>
@@ -217,28 +227,124 @@ export default function ColapsableMenu({
       </Tabs >
     </aside >
   );
-}
+  // return (
+  //   <aside
+  //     className={clsx(
+  //       'flex',
+  //     )}
+  //   >
+  //     <Tabs component='div' defaultValue="cycle" orientation="vertical" classNames={{
+  //       root: 'h-full w-screen',
+  //       tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+  //       tabLabel: '~text-md/lg',
+  //       panel: ''
+  //     }}>
+  //       <Tabs.List>
+  //         <></>
+  //         {sideMenuList.map((menu) => (
+  //           <Tabs.Tab key={menu.value} value={menu.value} className=''>
+  //             {menu.name}
+  //           </Tabs.Tab>
+  //         ))}
 
-const FooterButton = ({ isAdd, isCollapse, isSideMenuCollapse, onClick }: { isAdd?: boolean; isCollapse?: boolean; isSideMenuCollapse: boolean; onClick: () => void; }) => {
-  return (
-    <div className="flex items-end justify-end mt-auto py-2 border-t">
-      <Button
-        variant='transparent'
-        color='#895CF3'
-        fz={16}
-        {...(isAdd && {
-          leftSection:
-            < Icon className='cursor-pointer rounded' icon="heroicons-solid:rectangle-group" width="1.75rem" />
-        })}
-        onClick={onClick}
-      >
-        {isAdd && "Restructure"}
-        {isCollapse && <Icon
-          icon="tabler:chevron-down"
-          width="3rem"
-          rotate={isSideMenuCollapse ? 15 : 45}
-          className='text-[#895CF3]' />}
-      </Button>
-    </div >
-  );
-}
+  //         <FooterButton {...{ isSideMenuCollapse }} isCollapse onClick={toggleSideMenuCollapse} />{/* ! main collapse button */}
+  //       </Tabs.List>
+
+
+  //       {sideMenuList.map((menu) => {
+  //         return (
+  //           <Tabs.Panel key={menu.value} value={menu.value}>
+  //             <Tabs
+  //               // keepMounted={false}
+  //               defaultValue={menu.children[0].value}
+  //               orientation="vertical"
+  //               classNames={{
+  //                 root: clsx(
+  //                   'h-full',
+  //                   // isSideMenuCollapse && 'justify-center'
+  //                 ),
+  //                 tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+  //                 tabLabel: '~text-md/lg',
+  //                 panel: ''
+  //               }}
+  //             >
+  //               {!isSideMenuCollapse &&
+  //                 <Tabs.List>
+  //                   <></>
+  //                   {menu.children.map((child) => (
+  //                     <Tabs.Tab key={child.value} value={child.value} onClick={child.onClick}>
+  //                       {child.name}
+  //                     </Tabs.Tab>
+  //                   ))}
+  //                 </Tabs.List>}
+
+  //               {menu.children.map((child) => (
+  //                 <Tabs.Panel key={child.value} value={child.value}
+  //                   classNames={{
+  //                     panel: clsx(
+  //                       // isSideMenuCollapse && 'container'
+  //                     )
+  //                   }}>
+  //                   {child.content
+  //                     || child.children
+  //                     && (
+  //                       <Tabs
+  //                         // keepMounted={false}
+  //                         defaultValue={child.children[0]?.value ?? ''}
+  //                         orientation="vertical"
+  //                         classNames={{
+  //                           root: 'h-full',
+  //                           tab: 'w-40 !border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+  //                           tabLabel: '~text-md/lg',
+  //                         }}
+  //                         onChange={async (value) => {
+  //                           router.push(pathname + '?' + createQueryString('stage_uuid', value as string));
+  //                         }}
+  //                       >
+  //                         {stageData.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
+  //                         {!isSideMenuCollapse
+  //                           && (!!stageData.length
+  //                             &&
+  //                             <Tabs.List>
+  //                               <></>
+  //                               <ScrollArea.Autosize mah={768}>
+  //                                 {child.children?.map((stage, i) => (
+  //                                   <Tooltip key={i} label={stage.name} position='right'>
+  //                                     <Tabs.Tab
+  //                                       key={stage.value}
+  //                                       value={stage.value}
+  //                                       classNames={{
+  //                                         tabLabel: 'truncate'
+  //                                       }}
+  //                                     >
+  //                                       {stage.name}
+  //                                     </Tabs.Tab>
+  //                                   </Tooltip>
+  //                                 ))}
+
+  //                               </ScrollArea.Autosize>
+
+  //                               <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => { }} />
+  //                             </Tabs.List>)}
+  //                         {child.children?.map((stage) => (
+  //                           <Tabs.Panel key={stage.value} value={stage.value}>
+  //                             {stage.content}
+  //                           </Tabs.Panel>
+  //                         ))}
+  //                       </Tabs>
+  //                     )}
+  //                 </Tabs.Panel>
+  //               ))}
+  //             </Tabs>
+  //           </Tabs.Panel>
+  //         )
+  //       })}
+  //     </Tabs >
+  //   </aside >
+  // );
+};
+
+
+
+
+

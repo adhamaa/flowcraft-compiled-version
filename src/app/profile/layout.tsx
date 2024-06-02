@@ -12,10 +12,12 @@ export default async function Layout({
   const session = await auth();
   return (
     <SessionProvider basePath={BASE_PATH} session={session}>
-      <div className={clsx('grid grid-rows-[4rem_auto] h-screen transition-all duration-300 overflow-hidden')}
-      >
-        <Header />
-        {children}
+      <div className="flex h-[calc(100vh-66px)]">
+        <div className={clsx('grid grid-rows-[4rem_auto] h-screen transition-all duration-300 overflow-hidden')}
+        >
+          <Header />
+          {children}
+        </div>
       </div>
     </SessionProvider>
   );
