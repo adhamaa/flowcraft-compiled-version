@@ -74,7 +74,7 @@ function InputPagesTesting() {
 
   return (
     <div className='p-10 container max-w-xl m-auto'>
-      <FormProvider {...method}>
+      {/* <FormProvider {...method}>
         <form>
           <Stack classNames={{
             root: 'bg-white p-4 py-10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out',
@@ -85,7 +85,7 @@ function InputPagesTesting() {
             ))}
           </Stack>
         </form>
-      </FormProvider>
+      </FormProvider> */}
     </div >
   )
 }
