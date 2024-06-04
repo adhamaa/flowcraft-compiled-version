@@ -2,27 +2,203 @@
 
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react'
+import { Apps_label, Datasource_type, getStageList } from '@/lib/service/client';
+import { useDisclosure } from '@mantine/hooks';
+import { ScrollAreaAutosize, Tabs, TabsList, TabsPanel, TabsTab, Tooltip } from '@mantine/core';
+import FooterButton from './footer';
+import clsx from 'clsx';
 
 function SideMenus() {
+  const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
+  const [stageData, setStageData] = React.useState<any[]>();
   const searchParams = useSearchParams();
   const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
   const selected_app = searchParams.get('selected_app');
-  console.log('selected_app:', selected_app)
-  const stage_uuid = searchParams.get('stage_uuid');
-  console.log('stage_uuid:', stage_uuid)
   const datasource_type = searchParams.get('data_source');
-  console.log('datasource_type:', datasource_type)
   const cycle_id = params.cycle_id;
-  console.log('cycle_id:', cycle_id)
-  return (
-    <div>{
-      selected_app && datasource_type && cycle_id
-        ? `Selected App: ${selected_app}, Stage UUID: ${stage_uuid}, Data Source: ${datasource_type}, Cycle ID: ${cycle_id}`
-        : 'No selected app'
-    }</div>
+  const stage_uuid = params.stage_uuid;
+
+  const createQueryString = React.useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (name !== '' && value !== '') {
+        params.set(name, value);
+      }
+
+      return params.toString();
+    },
+    [searchParams]
   )
+
+  const removeQueryString = React.useCallback((param: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(param);
+    return params.toString();
+  }, [searchParams]);
+
+  const remainQueryString = React.useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    return params.toString();
+  }, [searchParams]);
+
+  /**
+   * Fetch stage list data
+   */
+  React.useEffect(() => {
+    async function getStageListData() {
+      const stageListDataRes = await getStageList({
+        cycle_id: cycle_id as string,
+        apps_label: selected_app as Apps_label,
+        datasource_type: datasource_type as Datasource_type
+      });
+      setStageData(stageListDataRes)
+    }
+
+    if (cycle_id && selected_app && datasource_type) {
+      getStageListData()
+    }
+  }, [cycle_id, datasource_type, selected_app])
+
+
+  const sideMenuList = [
+    {
+      name: 'Cycle', value: 'cycle', icon: 'heroicons-outline:refresh',
+      children: [
+        {
+          name: 'General Information',
+          value: 'general',
+          onClick: () => router.replace(`/cycle/${cycle_id}/` + '?' + remainQueryString()),
+        },
+        {
+          name: 'Stages',
+          value: 'stages',
+          onClick: async () => {
+            router.push(`/cycle/${cycle_id}/stage/${stageData?.[0]?.stage_uuid}/` + '?' + remainQueryString());
+          },
+          onChange: async (value: any) => {
+            router.push(`/cycle/${cycle_id}/stage/${value}/` + '?' + remainQueryString());
+          },
+          children: stageData?.map((stage) => ({
+            name: stage.stage_name,
+            value: stage.stage_uuid,
+          }))
+        },
+        {
+          name: 'Deleted Stage',
+          value: 'deleted_stage',
+          onClick: () => router.push(`/cycle/${cycle_id}/stage/deleted` + '?' + remainQueryString()),
+          content: null
+        },
+      ]
+    },
+  ];
+
+  return (
+    <aside>
+      <Tabs
+        component='div'
+        defaultValue="cycle"
+        orientation="vertical"
+        classNames={{
+          root: 'h-full',
+          tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+          tabLabel: '~text-md/lg',
+          panel: ''
+        }}>
+        <TabsList>
+          <></>
+          {sideMenuList.map((menu) => (
+            <Tabs.Tab
+              key={menu.value}
+              value={menu.value}
+              className=''>
+              {menu.name}
+            </Tabs.Tab>
+          ))}
+
+          <FooterButton {...{ isSideMenuCollapse }} isCollapse onClick={toggleSideMenuCollapse} />{/* ! main collapse button */}
+        </TabsList>
+
+
+        {sideMenuList.map((menu) => {
+          return (
+            <TabsPanel
+              key={menu.value}
+              value={menu.value}>
+              <Tabs
+                defaultValue={menu.children[0].value}
+                orientation="vertical"
+                classNames={{
+                  root: clsx(
+                    'h-full',
+                  ),
+                  tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                  tabLabel: '~text-md/lg',
+                  panel: ''
+                }}
+              >
+                {!isSideMenuCollapse &&
+                  <TabsList>
+                    <></>
+                    {menu.children.map((child) => (
+                      <TabsTab key={child.value} value={child.value} onClick={child.onClick}>
+                        {child.name}
+                      </TabsTab>
+                    ))}
+                  </TabsList>}
+
+                {menu.children.map((child) => (
+                  <TabsPanel key={child.value} value={child.value} >
+                    {child.children
+                      && (
+                        <Tabs
+                          value={stage_uuid as string}
+                          orientation="vertical"
+                          classNames={{
+                            root: 'h-full',
+                            tab: 'w-40 !border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                            tabLabel: '~text-md/lg',
+                          }}
+                          onChange={child.onChange}
+                        >
+                          {stageData?.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
+                          {!isSideMenuCollapse
+                            && (!!stageData?.length
+                              &&
+                              <TabsList>
+                                <></>
+                                <ScrollAreaAutosize mah={768}>
+                                  {child.children?.map((stage, i) => (
+                                    <Tooltip key={i} label={stage.name} position='right'>
+                                      <TabsTab
+                                        key={stage.value}
+                                        value={stage.value}
+                                        classNames={{
+                                          tabLabel: 'truncate'
+                                        }}
+                                      >
+                                        {stage.name}
+                                      </TabsTab>
+                                    </Tooltip>
+                                  ))}
+
+                                </ScrollAreaAutosize>
+
+                                <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => { }} />
+                              </TabsList>)}
+                        </Tabs>
+                      )}
+                  </TabsPanel>
+                ))}
+              </Tabs>
+            </TabsPanel>
+          )
+        })}
+      </Tabs >
+    </aside >
+  );
 }
 
 export default SideMenus
