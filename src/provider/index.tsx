@@ -11,11 +11,7 @@ import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experime
 import '@mantine/notifications/styles.css';
 import modals from '@/app/cycle/_components/Modals';
 import { OnbordaProvider } from 'onborda';
-import { useIdle } from '@mantine/hooks';
-import toast from '@/components/toast';
-import { signOut } from '@/app/auth/signout/_action';
-import { authRoutes } from '@/routes';
-import { useRouter } from 'next/navigation';
+
 import useKickToLogin from '@/hooks/useKickToLogin';
 
 const theme = createTheme({

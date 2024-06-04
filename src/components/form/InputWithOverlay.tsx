@@ -11,7 +11,7 @@ import { useElementSize } from "@mantine/hooks";
 
 import TextareaHeader from "./TextareaHeader";
 import { LabelTooltip } from "@/app/cycle/_components/Forms/LabelTooltip";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 const InputWithOverlay = (props: InputProps<any> & {
   label?: string;
@@ -20,9 +20,12 @@ const InputWithOverlay = (props: InputProps<any> & {
   disabled: boolean;
 }) => {
   const { ref, height } = useElementSize();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const datasource_type = searchParams.get('data_source');
-  const allowEdit = datasource_type === 'database' && !props.disabled;
+  const isDeletedStage = pathname.includes('deleted'); 
+  const allowEdit = datasource_type === 'database' && !props.disabled && !isDeletedStage;
+
 
   const { handleSubmit, setFocus } = useFormContext();
 

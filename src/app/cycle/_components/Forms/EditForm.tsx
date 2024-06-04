@@ -27,7 +27,6 @@ const EditForm = () => {
   const [data, setData] = React.useState<StageInfoData>();
   const searchParams = useSearchParams();
   const params = useParams();
-  const router = useRouter();
   const pathname = usePathname();
   const selected_app = searchParams.get('selected_app');
   const datasource_type = searchParams.get('data_source');
@@ -35,7 +34,6 @@ const EditForm = () => {
   const stage_uuid = params.stage_uuid;
 
   const toggleEdit = () => setIsEdit(!isEdit);
-
   /**
   * Fetch stage info data
   */

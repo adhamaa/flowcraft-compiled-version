@@ -88,8 +88,14 @@ function SideMenus() {
         {
           name: 'Deleted Stage',
           value: 'deleted_stage',
-          onClick: () => router.push(`/cycle/${cycle_id}/stage/deleted` + '?' + remainQueryString()),
-          content: null
+          onClick: () => router.push(`/cycle/${cycle_id}/stage/deleted/${stageData?.[0]?.stage_uuid}/` + '?' + remainQueryString()),
+          onChange: async (value: any) => {
+            router.push(`/cycle/${cycle_id}/stage/deleted/${value}/` + '?' + remainQueryString());
+          },
+          children: stageData?.map((stage) => ({
+            name: stage.stage_name,
+            value: stage.stage_uuid,
+          }))
         },
       ]
     },
@@ -128,7 +134,12 @@ function SideMenus() {
               key={menu.value}
               value={menu.value}>
               <Tabs
-                defaultValue={menu.children[0].value}
+                value={
+                  pathname.includes('/stage/deleted/') ? 'deleted_stage' :
+                    pathname.includes('/stage/') ? 'stages' :
+                      pathname.includes('/cycle/') ? 'general' :
+                        ''
+                }
                 orientation="vertical"
                 classNames={{
                   root: clsx(
