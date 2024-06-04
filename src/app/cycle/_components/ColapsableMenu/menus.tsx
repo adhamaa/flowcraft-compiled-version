@@ -69,7 +69,7 @@ function SideMenus() {
         {
           name: 'General Information',
           value: 'general',
-          onClick: () => router.replace(`/cycle/${cycle_id}/` + '?' + remainQueryString()),
+          onClick: () => router.push(`/cycle/${cycle_id}/` + '?' + remainQueryString()),
         },
         {
           name: 'Stages',
@@ -186,7 +186,7 @@ function SideMenus() {
 
                                 </ScrollAreaAutosize>
 
-                                <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => { }} />
+                                <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => router.push(`/cycle/restructure/${123}`)} />
                               </TabsList>)}
                         </Tabs>
                       )}

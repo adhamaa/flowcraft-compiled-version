@@ -5,12 +5,12 @@ import * as React from "react";
 import { useFormContext } from "react-hook-form";
 import { InputProps, JsonInput, TextInput } from "react-hook-form-mantine";
 import SaveActions, { CustomInputType } from "./SaveActions";
-import { LabelTooltip } from "@/app/cycle/_components/Forms/_helper";
 import SyntaxSemanticActions from "./SyntaxSemanticActions";
 import { TableStages, onSemanticSubmit, onSyntaxSubmit, stagesData } from "@/app/cycle/_components/Forms/EditForm";
 import { useElementSize } from "@mantine/hooks";
 
 import TextareaHeader from "./TextareaHeader";
+import { LabelTooltip } from "@/app/cycle/_components/Forms/LabelTooltip";
 
 const InputWithOverlay = (props: InputProps<any> & {
   label?: string;
@@ -61,6 +61,7 @@ const InputWithOverlay = (props: InputProps<any> & {
         rightSectionWidth={72}
         rightSection={!inputDisabled && <SaveActions {...{
           name: props.name,
+          type: 'text',
           disabled: inputDisabled,
           onCancel: toggleInputDisabled
         }} />

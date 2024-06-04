@@ -14,7 +14,7 @@ import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import Diagram from '../Diagram';
 import clsx from 'clsx';
-import { LabelTooltip } from './_helper';
+import { LabelTooltip } from './LabelTooltip';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 

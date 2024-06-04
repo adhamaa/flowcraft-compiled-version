@@ -17,7 +17,7 @@ const SaveActions = ({ name, copyValue, disabled, onCancel, type }: {
   return (
     <div className={clsx(
       'flex items-center ml-auto space-x-1.5',
-      name === 'process_stage_name' && 'absolute right-0'
+      type === 'text' && 'absolute right-2'
     )}>
       {!disabled &&
         <>
