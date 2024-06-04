@@ -11,6 +11,7 @@ import { useElementSize } from "@mantine/hooks";
 
 import TextareaHeader from "./TextareaHeader";
 import { LabelTooltip } from "@/app/cycle/_components/Forms/LabelTooltip";
+import { useSearchParams } from "next/navigation";
 
 const InputWithOverlay = (props: InputProps<any> & {
   label?: string;
@@ -19,6 +20,9 @@ const InputWithOverlay = (props: InputProps<any> & {
   disabled: boolean;
 }) => {
   const { ref, height } = useElementSize();
+  const searchParams = useSearchParams();
+  const datasource_type = searchParams.get('data_source');
+  const allowEdit = datasource_type === 'database' && !props.disabled;
 
   const { handleSubmit, setFocus } = useFormContext();
 
@@ -26,7 +30,7 @@ const InputWithOverlay = (props: InputProps<any> & {
 
   const toggleInputDisabled = () => setInputDisabled(!inputDisabled)
 
-  const display = props.disabled ? 'none' : 'block';
+  const display = allowEdit ? 'block' : 'none';
 
   React.useEffect(() => {
     if (!inputDisabled) {
