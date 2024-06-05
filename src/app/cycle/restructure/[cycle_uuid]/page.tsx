@@ -1,6 +1,12 @@
 import * as React from 'react'
 import { Icon } from '@iconify-icon/react';
 import { ScrollAreaAutosize } from '@mantine/core';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Restructure Cycle",
+  description: "Cycle Restructure Page",
+};
 
 async function RestructureCyclePage({ params: { cycle_uuid } }: {
   params: { cycle_uuid: string; };
