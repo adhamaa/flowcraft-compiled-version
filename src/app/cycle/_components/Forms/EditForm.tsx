@@ -28,6 +28,8 @@ const EditForm = () => {
   const searchParams = useSearchParams();
   const params = useParams();
   const pathname = usePathname();
+  const deleted_stage = pathname.includes('/stage/deleted/');
+  console.log('deleted_stage:', deleted_stage)
   const selected_app = searchParams.get('selected_app');
   const datasource_type = searchParams.get('data_source');
   const cycle_id = params.cycle_id;
@@ -255,8 +257,7 @@ const EditFormContent = ({
   const pathname = usePathname();
   const params = useParams();
   const searchParams = useSearchParams();
-  const queryParams = searchParams.toString();
-  const pageUrl = `${pathname}?${queryParams}`;
+  const pageUrl = `${pathname}?${searchParams}`;
   const stage_uuid = params.stage_uuid;
 
   const InputList = [
@@ -277,7 +278,12 @@ const EditFormContent = ({
   const methods = useForm();
   const { handleSubmit, setValue } = methods;
 
-  //! to SAVE the changes made to the stage and TEST the syntax of the stage name or the syntax of the JSON string
+  /**
+   * @description Update the stage info
+   * @param formdata - form data
+   * @param e - event
+   * @returns {Promise<void>}
+   */
   const onSaveSubmit = async (formdata: any, e: any) => {
     const target_id = e.nativeEvent.submitter.id
     const value = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
@@ -294,9 +300,17 @@ const EditFormContent = ({
               Cancel
             </Button>
             <Button onClick={
+              /**
+               * Update the stage info
+               * Test the syntax of the stage name or the syntax of the JSON string
+               * Test the semantics of the stage name or the semantics of the JSON string
+               * If syntax and semantics are true, update the stage info
+               * otherwise display an error message
+               * @returns {Promise<void>}
+               */
               async () => {
-                let syntax;
-                let semantics;
+                let syntax: boolean | "conditional";
+                let semantics: boolean | "conditional";
 
                 if (target_id === 'process_stage_name') {
                   syntax = await testSyntaxStageName({ params: { stage_name: value } })

@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
-type CustomButtonProps = ButtonProps & {
+export type CustomButtonProps = ButtonProps & {
   label: string;
   type: 'button' | 'submit';
   onClick: () => void;
