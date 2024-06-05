@@ -111,8 +111,7 @@ const GeneralFormContent = ({
   const pathname = usePathname();
   const params = useParams();
   const searchParams = useSearchParams();
-  const queryParams = searchParams.toString();
-  const pageUrl = `${pathname}?${queryParams}`;
+  const pageUrl = `${pathname}?${searchParams}`;
 
   const cycle_id = params.cycle_id as string;
   const apps_label = searchParams.get('selected_app') as Apps_label;
