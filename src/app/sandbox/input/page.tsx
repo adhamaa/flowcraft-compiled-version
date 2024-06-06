@@ -1,7 +1,7 @@
 'use client';
 
 import InputWithOverlay from '@/components/form/InputWithOverlay';
-import { Stack } from '@mantine/core';
+import { LoadingOverlay, Stack } from '@mantine/core';
 import * as React from 'react'
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -13,7 +13,7 @@ function InputPagesTesting() {
     {
       name: 'username',
       label: 'Username',
-      // defaultValue: 'adhamaa',
+      defaultValue: 'adhamaa',
       type: 'text',
       control: method.control,
       setFocus: method.setFocus,
@@ -28,7 +28,7 @@ function InputPagesTesting() {
     {
       name: 'email',
       label: 'Email',
-      // defaultValue: '',
+      defaultValue: '',
       type: 'email',
       control: method.control,
       setFocus: method.setFocus,
@@ -43,7 +43,7 @@ function InputPagesTesting() {
     {
       name: 'password',
       label: 'Password',
-      // defaultValue: '',
+      defaultValue: '',
       type: 'password',
       control: method.control,
       setFocus: method.setFocus,
@@ -58,7 +58,7 @@ function InputPagesTesting() {
     {
       name: 'json',
       label: 'Json',
-      // defaultValue: '',
+      defaultValue: '',
       type: 'json',
       control: method.control,
       setFocus: method.setFocus,
@@ -74,7 +74,8 @@ function InputPagesTesting() {
 
   return (
     <div className='p-10 container max-w-xl m-auto'>
-      {/* <FormProvider {...method}>
+      <LoadingOverlay visible zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} loaderProps={{ color: '#895CF3', type: 'oval' }} />
+      <FormProvider {...method}>
         <form>
           <Stack classNames={{
             root: 'bg-white p-4 py-10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out',
@@ -85,7 +86,7 @@ function InputPagesTesting() {
             ))}
           </Stack>
         </form>
-      </FormProvider> */}
+      </FormProvider>
     </div >
   )
 }

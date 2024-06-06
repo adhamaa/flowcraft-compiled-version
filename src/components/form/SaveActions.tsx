@@ -36,7 +36,7 @@ const SaveActions = ({ name, copyValue, disabled, onCancel, type }: {
               <Icon
                 icon="heroicons-outline:check"
                 width="1.2rem"
-                className='border p-2 rounded-lg text-black/70 hover:text-black/50'
+                className='border p-2 rounded-lg text-black/70 hover:text-black'
               />
             </ActionIcon>
           </Tooltip>
@@ -55,7 +55,7 @@ const SaveActions = ({ name, copyValue, disabled, onCancel, type }: {
               <Icon
                 icon="heroicons-outline:x"
                 width="1.2rem"
-                className='border p-2 rounded-lg text-black/70 hover:text-black/50'
+                className='border p-2 rounded-lg text-black/70 hover:text-black'
               />
             </ActionIcon>
           </Tooltip>
@@ -81,14 +81,14 @@ const SaveActions = ({ name, copyValue, disabled, onCancel, type }: {
                       icon="heroicons-outline:check"
                       width="1.2rem"
                       height="1.2rem"
-                      className='text-black/70 hover:text-black/50'
+                      className='text-black/70 hover:text-black'
                     />
                   ) : (
                     <Icon
                       icon="heroicons-outline:document-duplicate"
                       width="1.2rem"
                       height="1.2rem"
-                      className='text-black/70 hover:text-black/50'
+                      className='text-black/70 hover:text-black'
                     />
                   )}
                 </ActionIcon>
