@@ -1,9 +1,6 @@
 import * as React from 'react'
 
-import { Icon } from '@iconify-icon/react';
-import { ActionIcon, Button, ScrollAreaAutosize, Tooltip } from '@mantine/core';
-import { CustomButtonProps } from '@/app/cycle/_components/Forms/HeaderForm';
-import { useParams } from 'next/navigation';
+import { ScrollAreaAutosize } from '@mantine/core';
 import FlowObjects from './FlowObjects';
 import Current from './Current';
 import Wip from './Wip';
