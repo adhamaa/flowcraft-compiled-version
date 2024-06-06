@@ -7,8 +7,9 @@ export const metadata: Metadata = {
   description: "Cycle Deleted Stage Information",
 };
 
-function StageInfoPage() {
-  return (
+function StageInfoPage({ params: { stage_uuid } }: { params: { stage_uuid: string; } }) {
+  const stageUuid = stage_uuid === 'undefined' ? false : stage_uuid
+  return stageUuid && (
     <div className="w-full">
       <EditForm />
     </div>

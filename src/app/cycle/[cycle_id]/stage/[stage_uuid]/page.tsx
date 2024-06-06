@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 function StageInfoPage() {
   return (
-    <div className="w-full">
+    <div className="relative w-full">
       <EditForm />
     </div>
   )

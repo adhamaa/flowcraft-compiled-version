@@ -2,7 +2,7 @@
 
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react'
-import { Apps_label, Datasource_type, getStageList } from '@/lib/service/client';
+import { Apps_label, Datasource_type, getDeletedStageList, getStageList } from '@/lib/service/client';
 import { useDisclosure } from '@mantine/hooks';
 import { ScrollAreaAutosize, Tabs, TabsList, TabsPanel, TabsTab, Tooltip } from '@mantine/core';
 import FooterButton from './footer';
@@ -11,14 +11,18 @@ import clsx from 'clsx';
 function SideMenus() {
   const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
   const [stageData, setStageData] = React.useState<any[]>();
+  const [deletedStageData, setDeletedStageData] = React.useState<any[]>();
   const searchParams = useSearchParams();
   const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
+  const deleted_stage_route = pathname.includes('/stage/deleted/');
   const selected_app = searchParams.get('selected_app');
   const datasource_type = searchParams.get('data_source');
   const cycle_id = params.cycle_id;
   const stage_uuid = params.stage_uuid;
+
+  const renderStageData = deleted_stage_route ? deletedStageData : stageData;
 
   const createQueryString = React.useCallback(
     (name: string, value: string) => {
@@ -48,12 +52,19 @@ function SideMenus() {
    */
   React.useEffect(() => {
     async function getStageListData() {
+      const stageListDeletedDataRes = await getDeletedStageList({
+        cycle_id: cycle_id as string,
+        apps_label: selected_app as Apps_label,
+        datasource_type: datasource_type as Datasource_type
+      });
       const stageListDataRes = await getStageList({
         cycle_id: cycle_id as string,
         apps_label: selected_app as Apps_label,
         datasource_type: datasource_type as Datasource_type
       });
+
       setStageData(stageListDataRes)
+      setDeletedStageData(stageListDeletedDataRes)
     }
 
     if (cycle_id && selected_app && datasource_type) {
@@ -88,11 +99,11 @@ function SideMenus() {
         {
           name: 'Deleted Stage',
           value: 'deleted_stage',
-          onClick: () => router.push(`/cycle/${cycle_id}/stage/deleted/${stageData?.[0]?.stage_uuid}/` + '?' + remainQueryString()),
+          onClick: () => router.push(`/cycle/${cycle_id}/stage/deleted/${deletedStageData?.[0]?.stage_uuid}/` + '?' + remainQueryString()),
           onChange: async (value: any) => {
             router.push(`/cycle/${cycle_id}/stage/deleted/${value}/` + '?' + remainQueryString());
           },
-          children: stageData?.map((stage) => ({
+          children: deletedStageData?.map((stage) => ({
             name: stage.stage_name,
             value: stage.stage_uuid,
           }))
@@ -174,9 +185,9 @@ function SideMenus() {
                           }}
                           onChange={child.onChange}
                         >
-                          {stageData?.length === 0 && <div className='flex justify-start items-start p-7 h-full'>No stages found</div>}
+                          {renderStageData?.length === 0 && <div className='flex justify-start items-start p-7 h-full w-max italic'>No stages found</div>}
                           {!isSideMenuCollapse
-                            && (!!stageData?.length
+                            && (!!renderStageData?.length
                               &&
                               <TabsList>
                                 <></>
@@ -197,7 +208,7 @@ function SideMenus() {
 
                                 </ScrollAreaAutosize>
 
-                                <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => router.push(`/cycle/restructure/${123}`)} />
+                                {!deleted_stage_route && <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => router.push(`/cycle/restructure/${123}`)} />}
                               </TabsList>)}
                         </Tabs>
                       )}

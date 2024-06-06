@@ -15,6 +15,7 @@ import { modals } from '@mantine/modals';
 import InputWithOverlay from '@/components/form/InputWithOverlay';
 import TextareaHeader from '@/components/form/TextareaHeader';
 import { useSession } from 'next-auth/react';
+import { isObjectEmpty } from '@/lib/helper';
 
 export type stagesData = {
   process_stage_name: string;
@@ -25,11 +26,10 @@ const EditForm = () => {
   const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
   const [data, setData] = React.useState<StageInfoData>();
+  const isDataEmpty = isObjectEmpty(data as object);
   const searchParams = useSearchParams();
   const params = useParams();
   const pathname = usePathname();
-  const deleted_stage = pathname.includes('/stage/deleted/');
-  console.log('deleted_stage:', deleted_stage)
   const selected_app = searchParams.get('selected_app');
   const datasource_type = searchParams.get('data_source');
   const cycle_id = params.cycle_id;
@@ -74,7 +74,12 @@ const EditForm = () => {
 export default EditForm
 
 
-//! to TEST the syntax of the stage name or the syntax of the JSON string
+/**
+ * @description Test the syntax of the stage name or the syntax of the JSON string
+ * @param formdata - form data
+ * @param e - event
+ * @returns {Promise<void>}
+ */
 export const onSyntaxSubmit = async (formdata: any, e: any) => {
   const target_id = e.target.offsetParent.id
   const str_test_syntax = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
@@ -157,7 +162,12 @@ export const onSyntaxSubmit = async (formdata: any, e: any) => {
       });
   }
 }
-
+/**
+ * @description Test the semantics of the stage name or the semantics of the JSON string
+ * @param formdata - form data
+ * @param e - event
+ * @returns {Promise<void>}
+ */
 export const onSemanticSubmit = async (formdata: any, e: any) => {
   const target_id = e.target.offsetParent.id
   const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
