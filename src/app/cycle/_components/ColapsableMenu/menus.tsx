@@ -208,7 +208,7 @@ function SideMenus() {
 
                                 </ScrollAreaAutosize>
 
-                                {!deleted_stage_route && <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => router.push(`/cycle/restructure/${123}`)} />}
+                                {!deleted_stage_route && <FooterButton disabled {...{ isSideMenuCollapse }} isAdd onClick={() => router.push(`/cycle/restructure/${123}`)} />}
                               </TabsList>)}
                         </Tabs>
                       )}
