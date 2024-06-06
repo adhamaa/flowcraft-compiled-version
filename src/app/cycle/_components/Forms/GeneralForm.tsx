@@ -1,4 +1,5 @@
 'use client';
+
 import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Button, Flex, Group, Input, Modal, ScrollArea, Text } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
@@ -13,7 +14,7 @@ import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import Diagram from '../Diagram';
 import clsx from 'clsx';
-import { LabelTooltip } from './_helper';
+import { LabelTooltip } from './LabelTooltip';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
@@ -30,11 +31,38 @@ import { useSession } from 'next-auth/react';
 //   return [query.data, query] as const
 // }
 
-const GeneralForm = ({ data }: { data: CycleData }) => {
+const GeneralForm = () => {
   const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
+  const [data, setData] = React.useState<CycleData>();
+  const searchParams = useSearchParams();
+  const params = useParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const selected_app = searchParams.get('selected_app');
+  const datasource_type = searchParams.get('data_source');
+  const cycle_id = params.cycle_id;
+  const stage_uuid = params.stage_uuid;
 
   const toggleEdit = () => setIsEdit(!isEdit);
+
+  /**
+   * Fetch cycle info data
+   */
+  React.useEffect(() => {
+    async function getCycleInfoData() {
+      const cycleInfoDataRes = await getCycleInfo({
+        apps_label: selected_app as Apps_label,
+        cycle_id: cycle_id as string,
+        datasource_type: datasource_type as Datasource_type
+      });
+      setData(cycleInfoDataRes)
+    }
+
+    if (cycle_id && selected_app && datasource_type) {
+      getCycleInfoData()
+    }
+  }, [cycle_id, datasource_type, selected_app])
 
   return opened ? (
     <Modal
@@ -45,11 +73,9 @@ const GeneralForm = ({ data }: { data: CycleData }) => {
       transitionProps={{ transition: 'fade', duration: 200 }}
       withCloseButton={false}
     >
-
       <GeneralFormContent {...{ data, toggleEdit, isEdit, open, close, toggle }} />
     </Modal>
   ) : (
-
     <GeneralFormContent {...{ data, toggleEdit, isEdit, open, close, toggle }} />
   )
 }
@@ -72,7 +98,7 @@ const GeneralFormContent = ({
   isEdit,
   toggle: toggleExpand
 }: {
-  data: CycleData;
+  data: CycleData | undefined;
   open: () => void;
   close: () => void;
   toggleEdit: () => void;
@@ -85,8 +111,7 @@ const GeneralFormContent = ({
   const pathname = usePathname();
   const params = useParams();
   const searchParams = useSearchParams();
-  const queryParams = searchParams.toString();
-  const pageUrl = `${pathname}?${queryParams}`;
+  const pageUrl = `${pathname}?${searchParams}`;
 
   const cycle_id = params.cycle_id as string;
   const apps_label = searchParams.get('selected_app') as Apps_label;
@@ -109,8 +134,8 @@ const GeneralFormContent = ({
   const { control, handleSubmit, setValue } = methods;
 
   const onSubmit = async (formdata: any) => {
-    const hasStatusChange = !compareStates((data.cycle_active).toString(), formdata.cycle_active);
-    const hasDescriptionChange = !compareStates(data.cycle_description, formdata.cycle_description);
+    const hasStatusChange = !compareStates((data?.cycle_active as number).toString(), formdata.cycle_active);
+    const hasDescriptionChange = !compareStates(data?.cycle_description as string, formdata.cycle_description);
     modals.open({
       title: 'Confirm update',
       children: (
@@ -131,11 +156,11 @@ const GeneralFormContent = ({
                   try {
                     const response = await Promise.all([
                       updateStatusCycle({
-                        cycle_id: data.cycle_id.toString(),
+                        cycle_id: data?.cycle_id.toString() as string,
                         status_code: formdata.cycle_active
                       }),
                       updateCycle({
-                        cycle_uuid: data.cycle_uuid,
+                        cycle_uuid: data?.cycle_uuid as string,
                         body: {
                           cycle_description: formdata.cycle_description
                         }

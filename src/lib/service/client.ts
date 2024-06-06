@@ -236,6 +236,38 @@ export const getStageList = async ({
   return data;
 };
 
+export const getDeletedStageList = async ({
+  cycle_id,
+  apps_label,
+  datasource_type = 'database'
+}: {
+  cycle_id: string;
+  apps_label: Apps_label;
+  datasource_type: Datasource_type;
+}) => {
+  if (!cycle_id) return [];
+  if (!apps_label) return [];
+  const endpoint = `${datasource_mapping[datasource_type]}/deletedStage?cycle_id=${cycle_id}&app_type=${apps_label}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+    },
+    next: { tags: ['deletedstagelist'] },
+    // cache: 'no-store'
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch deleted stage list.');
+  }
+  const data = await response.json();
+  return data;
+}
+
 export const getStageInfo = async ({
   stage_uuid,
   cycle_id,

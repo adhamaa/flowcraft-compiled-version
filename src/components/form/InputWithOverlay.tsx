@@ -5,12 +5,13 @@ import * as React from "react";
 import { useFormContext } from "react-hook-form";
 import { InputProps, JsonInput, TextInput } from "react-hook-form-mantine";
 import SaveActions, { CustomInputType } from "./SaveActions";
-import { LabelTooltip } from "@/app/cycle/_components/Forms/_helper";
 import SyntaxSemanticActions from "./SyntaxSemanticActions";
 import { TableStages, onSemanticSubmit, onSyntaxSubmit, stagesData } from "@/app/cycle/_components/Forms/EditForm";
 import { useElementSize } from "@mantine/hooks";
 
 import TextareaHeader from "./TextareaHeader";
+import { LabelTooltip } from "@/app/cycle/_components/Forms/LabelTooltip";
+import { usePathname, useSearchParams } from "next/navigation";
 
 const InputWithOverlay = (props: InputProps<any> & {
   label?: string;
@@ -19,6 +20,12 @@ const InputWithOverlay = (props: InputProps<any> & {
   disabled: boolean;
 }) => {
   const { ref, height } = useElementSize();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const datasource_type = searchParams.get('data_source');
+  const isDeletedStage = pathname.includes('deleted'); 
+  const allowEdit = datasource_type === 'database' && !props.disabled && !isDeletedStage;
+
 
   const { handleSubmit, setFocus } = useFormContext();
 
@@ -26,7 +33,7 @@ const InputWithOverlay = (props: InputProps<any> & {
 
   const toggleInputDisabled = () => setInputDisabled(!inputDisabled)
 
-  const display = props.disabled ? 'none' : 'block';
+  const display = allowEdit ? 'block' : 'none';
 
   React.useEffect(() => {
     if (!inputDisabled) {
@@ -61,6 +68,7 @@ const InputWithOverlay = (props: InputProps<any> & {
         rightSectionWidth={72}
         rightSection={!inputDisabled && <SaveActions {...{
           name: props.name,
+          type: 'text',
           disabled: inputDisabled,
           onCancel: toggleInputDisabled
         }} />

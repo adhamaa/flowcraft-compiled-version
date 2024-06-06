@@ -1,7 +1,4 @@
-import NextAuth from 'next-auth';
-import { authConfig } from '@/auth';
-
-export default NextAuth(authConfig).auth;
+export { auth as middleware } from "@/auth"
 
 // See "Matching Paths" below to learn more
 export const config = {

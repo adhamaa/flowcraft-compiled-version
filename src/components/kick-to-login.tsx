@@ -7,13 +7,8 @@ import { useIdle } from '@mantine/hooks';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react'
 
-function useKickToLogin({
-  idleTime,
-  signoutTime
-}: {
-  idleTime: number;
-  signoutTime: number;
-}) {
+export function KickToLogin() {
+  const idleTime = process.env.NEXT_PUBLIC_IDLE_TIME, signoutTime = process.env.NEXT_PUBLIC_SIGNOUT_TIME
   const router = useRouter();
   const pathname = usePathname();
   const checkIdleRoute = !authRoutes.includes(pathname);
@@ -39,7 +34,5 @@ function useKickToLogin({
       clearTimeout(idleTimeOut);
     };
   }, [idle, checkIdleRoute, signoutTime, router]);
-
+  return null;
 }
-
-export default useKickToLogin

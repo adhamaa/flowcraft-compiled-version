@@ -1,40 +1,59 @@
 'use client';
 
-import { Icon } from '@iconify-icon/react';
-import { ActionIcon, Button, CopyButton, Flex, InputWrapper, List, Modal, ScrollArea, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { Button, Flex, List, Modal, ScrollArea, Stack, Text, } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import HeaderForm from './HeaderForm';
 import { StageInfoData } from '../HomeContent';
 import { FormProvider, useForm } from 'react-hook-form';
-import { JsonInput, TextInput } from 'react-hook-form-mantine';
-import { MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_TableBodyCellValue, MRT_TableInstance, MRT_TablePagination, MRT_ToolbarAlertBanner, MantineReactTable, flexRender, useMantineReactTable } from 'mantine-react-table';
+import { MRT_ColumnDef, MantineReactTable, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
-import { evaluateSemantics, getSemanticsErrorMessages, getSyntaxErrorMessages, setAuditTrail, testSemanticStageName, testSyntaxStageName, updateStage, verifySyntax } from '@/lib/service/client';
+import { Apps_label, Datasource_type, evaluateSemantics, getSemanticsErrorMessages, getStageInfo, getSyntaxErrorMessages, setAuditTrail, testSemanticStageName, testSyntaxStageName, updateStage, verifySyntax } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
-import { LabelTooltip } from './_helper';
-import SaveActions from '@/components/form/SaveActions';
 import InputWithOverlay from '@/components/form/InputWithOverlay';
-import SyntaxSemanticActions from '@/components/form/SyntaxSemanticActions';
 import TextareaHeader from '@/components/form/TextareaHeader';
 import { useSession } from 'next-auth/react';
+import { isObjectEmpty } from '@/lib/helper';
 
 export type stagesData = {
   process_stage_name: string;
   created_datetime: string;
 }[];
 
-const EditForm = ({
-  data
-}: {
-  data: StageInfoData
-}) => {
+const EditForm = () => {
   const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
+  const [data, setData] = React.useState<StageInfoData>();
+  const isDataEmpty = isObjectEmpty(data as object);
+  const searchParams = useSearchParams();
+  const params = useParams();
+  const pathname = usePathname();
+  const selected_app = searchParams.get('selected_app');
+  const datasource_type = searchParams.get('data_source');
+  const cycle_id = params.cycle_id;
+  const stage_uuid = params.stage_uuid;
 
   const toggleEdit = () => setIsEdit(!isEdit);
+  /**
+  * Fetch stage info data
+  */
+  React.useEffect(() => {
+    async function getStageInfoData() {
+      const stageInfoDataRes = await getStageInfo({
+        stage_uuid: stage_uuid as string,
+        cycle_id: cycle_id as string,
+        apps_label: selected_app as Apps_label,
+        datasource_type: datasource_type as Datasource_type
+      });
+      setData(stageInfoDataRes)
+    }
+
+    if (cycle_id && selected_app && datasource_type && stage_uuid) {
+      getStageInfoData()
+    }
+  }, [cycle_id, datasource_type, selected_app, stage_uuid]);
 
   return opened ? (
     <Modal
@@ -55,8 +74,12 @@ const EditForm = ({
 export default EditForm
 
 
-
-//! to TEST the syntax of the stage name or the syntax of the JSON string
+/**
+ * @description Test the syntax of the stage name or the syntax of the JSON string
+ * @param formdata - form data
+ * @param e - event
+ * @returns {Promise<void>}
+ */
 export const onSyntaxSubmit = async (formdata: any, e: any) => {
   const target_id = e.target.offsetParent.id
   const str_test_syntax = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
@@ -139,7 +162,12 @@ export const onSyntaxSubmit = async (formdata: any, e: any) => {
       });
   }
 }
-
+/**
+ * @description Test the semantics of the stage name or the semantics of the JSON string
+ * @param formdata - form data
+ * @param e - event
+ * @returns {Promise<void>}
+ */
 export const onSemanticSubmit = async (formdata: any, e: any) => {
   const target_id = e.target.offsetParent.id
   const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
@@ -229,7 +257,7 @@ const EditFormContent = ({
   isEdit,
   toggle: toggleExpand
 }: {
-  data: StageInfoData;
+  data: StageInfoData | undefined;
   toggleEdit: () => void;
   isEdit: boolean;
   toggle: () => void;
@@ -237,10 +265,10 @@ const EditFormContent = ({
   const { data: session } = useSession();
   const user_id = session?.user?.user_id;
   const pathname = usePathname();
+  const params = useParams();
   const searchParams = useSearchParams();
-  const params = searchParams.toString();
-  const pageUrl = `${pathname}?${params}`;
-  const stage_uuid = searchParams.get('stage_uuid');
+  const pageUrl = `${pathname}?${searchParams}`;
+  const stage_uuid = params.stage_uuid;
 
   const InputList = [
     { name: 'process_stage_name', label: 'Stage name', type: 'text', value: data?.process_stage_name, disabled: false }, // this is a string
@@ -260,7 +288,12 @@ const EditFormContent = ({
   const methods = useForm();
   const { handleSubmit, setValue } = methods;
 
-  //! to SAVE the changes made to the stage and TEST the syntax of the stage name or the syntax of the JSON string
+  /**
+   * @description Update the stage info
+   * @param formdata - form data
+   * @param e - event
+   * @returns {Promise<void>}
+   */
   const onSaveSubmit = async (formdata: any, e: any) => {
     const target_id = e.nativeEvent.submitter.id
     const value = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
@@ -277,9 +310,17 @@ const EditFormContent = ({
               Cancel
             </Button>
             <Button onClick={
+              /**
+               * Update the stage info
+               * Test the syntax of the stage name or the syntax of the JSON string
+               * Test the semantics of the stage name or the semantics of the JSON string
+               * If syntax and semantics are true, update the stage info
+               * otherwise display an error message
+               * @returns {Promise<void>}
+               */
               async () => {
-                let syntax;
-                let semantics;
+                let syntax: boolean | "conditional";
+                let semantics: boolean | "conditional";
 
                 if (target_id === 'process_stage_name') {
                   syntax = await testSyntaxStageName({ params: { stage_name: value } })

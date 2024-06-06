@@ -26,9 +26,7 @@ async function HomePage({
   const [applicationData, cycleData] = await Promise.all([application, cycle])
 
   return (
-    <div className="flex h-[calc(100vh-66px)]">
-      <HomeContent {...{ applicationData, cycleData }} />
-    </div>
+    <HomeContent {...{ applicationData, cycleData }} />
   )
 }
 
