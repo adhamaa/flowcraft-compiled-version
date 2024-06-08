@@ -1,11 +1,12 @@
 'use client';
 
+import * as React from 'react'
 import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Tooltip } from '@mantine/core';
-import { useParams } from 'next/navigation';
-import React from 'react'
+import { useParams, useRouter } from 'next/navigation';
 
 function Header() {
+  const router = useRouter();
   const params = useParams();
   const cycle_uuid = params.cycle_uuid;
   return <div className='flex items-center gap-4 p-8 border-b-2'>
@@ -19,7 +20,9 @@ function Header() {
         color='#895CF3'
         size="2.5rem"
         radius="md"
-        aria-label="Back">
+        aria-label="Back"
+        onClick={() => router.back()}
+      >
         <Icon
           icon='heroicons-solid:arrow-circle-left'
           width="1.5rem"

@@ -8,9 +8,9 @@ import Header from './Header';
 
 function Workspace() {
   return (
-    <ScrollAreaAutosize mah={820}>
+    <ScrollAreaAutosize>
       <Header />
-      <div className='grid grid-cols-3 gap-6 p-8 h-[2000px]'>
+      <div className='grid grid-cols-3 gap-6 p-8 h-screen mb-10'>
         <Current />
         <Wip />
         <FlowObjects />

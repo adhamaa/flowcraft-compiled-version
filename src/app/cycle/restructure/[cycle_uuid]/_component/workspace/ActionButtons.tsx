@@ -12,15 +12,7 @@ const buttons = [
     disabled: false,
     canShow: true,
     onClick: () => { },
-    variant: "filled",
-    color: "#F1F5F9",
-    radius: "md",
-    size: "sm",
-    fz: '0.9rem',
-    classNames: {
-      root: 'text-black/70 hover:text-black disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-    },
-    icon: <Icon width='1.5rem' icon="heroicons-outline:x-circle" />,
+    icon: { name: "heroicons-outline:x-circle", width: '1.5rem' },
   },
   {
     label: 'Apply',
@@ -28,15 +20,7 @@ const buttons = [
     disabled: false,
     canShow: true,
     onClick: () => { },
-    variant: "filled",
-    color: "#F1F5F9",
-    radius: "md",
-    size: "sm",
-    fz: '0.9rem',
-    classNames: {
-      root: 'text-black/70 hover:text-black disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-    },
-    icon: <Icon width='1.5rem' icon="heroicons-outline:check-circle" />,
+    icon: { name: "heroicons-outline:check-circle", width: '1.5rem' },
   },
   {
     label: 'Save',
@@ -44,25 +28,23 @@ const buttons = [
     disabled: false,
     canShow: true,
     onClick: () => { },
-    variant: "filled",
-    color: "#F1F5F9",
-    radius: "md",
-    size: "sm",
-    fz: '0.9rem',
-    classNames: {
-      root: 'text-black/70 hover:text-black disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-    },
-    icon: <Icon width='1.5rem' icon="heroicons:arrow-right-end-on-rectangle-20-solid" rotate='45' />,
+    icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
   },
 ] satisfies CustomButtonProps[];
 
 const ActionButtons = () => (
   <div className="flex justify-end gap-3">
-    {buttons.map(({ label, canShow, icon, ...btn }, index) => canShow && (
+    {buttons.map(({ label, canShow, icon, ...btnProps }, index) => canShow && (
       <Button
         key={index}
-        {...btn}
-        leftSection={icon}
+        variant="filled"
+        color="#F1F5F9"
+        radius="md"
+        size="sm"
+        fz='0.9rem'
+        autoContrast
+        leftSection={<Icon width={icon.width} icon={icon.name} rotate={icon.rotate} />}
+        {...btnProps}
       >
         {label}
       </Button>
