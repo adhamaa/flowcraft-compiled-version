@@ -779,34 +779,6 @@ const nodeTypes = {
   },
 };
 
-// function getNodeType(node: Record<string, any>) {
-//   const { type, data } = node;
-//   const { label, listEntCondition, listExtCondition } = data || {};
-
-//   if (type === 'Start') {
-//     return 'Start';
-//   }
-
-//   if (type === 'End') {
-//     if (label === 'FCA-01-02-Payment-Process') {
-//       return 'End';
-//     }
-
-//     const hasEntry = !isObjectEmpty(listEntCondition);
-//     const hasExit = !isObjectEmpty(listExtCondition);
-
-//     if (hasEntry && hasExit) {
-//       return 'WithEntryAndExit';
-//     }
-//     if (!hasEntry && hasExit) {
-//       return 'WithExit';
-//     }
-//     if (hasEntry && !hasExit) {
-//       return 'WithEntry';
-//     }
-//     return 'default';
-//   }
-// }
 
 const Diagram = ({ disabled }: {
   disabled?: boolean;

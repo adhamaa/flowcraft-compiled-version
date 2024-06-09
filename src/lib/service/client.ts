@@ -9,7 +9,6 @@ export type Datasource_type = 'database' | 'memory' | 'cache';
 export type Apps_label = 'SP' | 'Client';
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 const apiPassword = decryptPassword(process.env.NEXT_PUBLIC_API_PASSWORD);
-console.log('apiPassword:', apiPassword)
 
 export const getApplicationList = async () => {
   const endpoint = '/businessProcess/listAppsBizProcess';
