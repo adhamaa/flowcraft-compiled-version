@@ -733,9 +733,9 @@ const getNodeId = () => `randomnode_${+new Date()}`;
 // ];
 
 // Example usage:
-const initialNodes: Node[] = [
+const initialNodes: any[] = [
   {
-    data: { action: "start", label: "Start", listEntCondition: {}, listExtCondition: null },
+    data: { label: "Start" },
     id: "1",
     type: "Start",
     position: { x: 0, y: 0 },
@@ -743,7 +743,7 @@ const initialNodes: Node[] = [
     height: 50
   },
   {
-    data: { label: "Node 1", listEntCondition: {}, listExtCondition: null },
+    data: { label: "Node 1" },
     id: "2",
     type: "Node",
     position: { x: 0, y: 0 },
@@ -751,7 +751,7 @@ const initialNodes: Node[] = [
     height: 50
   },
   {
-    data: { label: "Node 2", listEntCondition: {}, listExtCondition: null },
+    data: { label: "Node 2" },
     id: "3",
     type: "Node",
     position: { x: 0, y: 0 },
@@ -759,7 +759,7 @@ const initialNodes: Node[] = [
     height: 50
   },
   {
-    data: { label: "Node 3", listEntCondition: {}, listExtCondition: null },
+    data: { label: "Node 3" },
     id: "4",
     type: "Node",
     position: { x: 0, y: 0 },
@@ -767,7 +767,7 @@ const initialNodes: Node[] = [
     height: 50
   },
   {
-    data: { label: "Node 4", listEntCondition: {}, listExtCondition: null },
+    data: { label: "Node 4" },
     id: "5",
     type: "Node",
     position: { x: 0, y: 0 },
@@ -775,7 +775,7 @@ const initialNodes: Node[] = [
     height: 50
   },
   {
-    data: { label: "Node 5", listEntCondition: {}, listExtCondition: null },
+    data: { label: "Node 5" },
     id: "6",
     type: "Node",
     position: { x: 0, y: 0 },
@@ -783,7 +783,7 @@ const initialNodes: Node[] = [
     height: 50
   },
   {
-    data: { label: "Node 6", listEntCondition: {}, listExtCondition: null },
+    data: { label: "Node 6" },
     id: "7",
     type: "Node",
     position: { x: 0, y: 0 },
@@ -791,7 +791,7 @@ const initialNodes: Node[] = [
     height: 50
   },
   {
-    data: { label: "Node 7", listEntCondition: {}, listExtCondition: null },
+    data: { label: "Node 7" },
     id: "8",
     type: "Node",
     position: { x: 0, y: 0 },
