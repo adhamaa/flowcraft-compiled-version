@@ -7,7 +7,12 @@ import Diamond from '../diamond';
 import ActionIcons from './ActionIcons';
 import ActionButtons from './ActionButtons';
 
+type Action = "Add" | "Move" | "Duplicate" | "Delete" | "Restore" | "Disjoint";
+
+
 function FlowObjects() {
+  const [action, setAction] = React.useState<Action | undefined>(undefined);
+
   return <div className='h-full space-y-6'>
     <h1 className='text-xl font-semibold'>The Flow Objects</h1>
     <div className='flex flex-col h-full space-y-6'>
@@ -42,6 +47,7 @@ function FlowObjects() {
 
       {/* ---------- input section ----------- */}
       <>
+        {action && <h1 className='text-xl font-semibold'>{action} stage</h1>}
         <div className='border border-black rounded-xl h-72'>4</div>
         <ActionButtons />
       </>

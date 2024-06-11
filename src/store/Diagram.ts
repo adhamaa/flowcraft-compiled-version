@@ -90,20 +90,22 @@ const useDiagramStore = create<RFState>()(
         const diagramData = await getDiagramData({ cycle_id, apps_label });
         // and then set the data to the store
         set({
-          nodes: diagramData.nodes.map((node: Node) => {
+          nodes: diagramData.nodes.map(({ position, ...node }: Node) => {
             return {
               ...node,
               position: {
-                x: parseFloat(node.position.x as never),
-                y: parseFloat(node.position.y as never)
+                // x: parseFloat(position.x as never),
+                // y: parseFloat(position.y as never)
+                x: 0,
+                y: 0
               },
-
             }
           }),
-          edges: diagramData.edges.map((edge: Edge) => {
+          edges: diagramData.edges.map(({ type, markerEnd, ...edge }: Edge) => {
             return {
               ...edge,
-              type: 'bezier', // step, smoothstep, straight or bezier
+              // type: 'floating', // step, smoothstep, straight or bezier
+              // markerEnd: { type: 'arrow' }, 
             }
           }),
 

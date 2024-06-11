@@ -6,7 +6,6 @@ export async function GET(request: Request) {
 
   // Decrypt the data using your decryption function
   const password = decryptPassword(encryptedPassword as string);
-  console.log('password:', password)
   if (!password) {
     return Response.json({ error: 'Invalid password' }, { status: 400 });
   }
