@@ -466,3 +466,5 @@ export function AdjustXCoordinates(data: any[]): any[] {
 
   return data;
 }
+
+// check if parents has siblings, if 1 set x position as parent, if more than 1, check if its even or odd, if its odd get middle node x position, if even get the middle position by dividing the even number and check the dimension also to get the middle position of x node.
