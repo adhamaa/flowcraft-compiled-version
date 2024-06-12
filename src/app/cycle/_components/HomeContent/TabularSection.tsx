@@ -107,8 +107,8 @@ const TabularSection = ({ opened,
                     </Button>
                     <Button onClick={async () => {
                       await reloadBizProcess({
-                        cycle_id: cycle_id,
-                        apps_label: app_label,
+                        cycle_id: cycle_id.toString(),
+                        apps_label: app_label as Apps_label,
                       })
                         .then((res) => {
                           if (res) {
