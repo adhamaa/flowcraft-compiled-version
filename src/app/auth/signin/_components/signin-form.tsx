@@ -12,9 +12,10 @@ import { AuthError } from 'next-auth';
 
 function SigninForm() {
 
-  const { handleSubmit, control } = useForm({
+  const { handleSubmit, control, formState: { isSubmitting, isLoading, isValidating } } = useForm({
     resolver: zodResolver(loginSchema),
   })
+  console.log({ isSubmitting, isLoading, isValidating })
 
   const onSubmit = async ({ email, password }: any) => {
     try {
@@ -101,9 +102,14 @@ function SigninForm() {
               Forgot password?
             </Anchor>
           </div>
-          <Button type='submit' color='#895CF3' radius='md' classNames={{
-            root: '!w-full !my-8',
-          }}>
+          <Button
+            loading={isSubmitting || isLoading || isValidating}
+            type='submit'
+            color='#895CF3'
+            radius='md'
+            classNames={{
+              root: '!w-full !my-8',
+            }}>
             Sign in
           </Button>
         </form >
