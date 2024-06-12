@@ -88,7 +88,7 @@ const useDiagramStore = create<RFState>()(
         set({
           nodes: diagramData.nodes.map(({ position, ...node }: Node) => {
             const removedPosition = { ...node, position: undefined }
-            const updatedNodes = calculateNodePositions8([removedPosition], get().edges)
+            // const updatedNodes = calculateNodePositions8([removedPosition], get().edges)
             return {
               ...node,
               position: {
