@@ -16,6 +16,7 @@ import InputWithOverlay from '@/components/form/InputWithOverlay';
 import TextareaHeader from '@/components/form/TextareaHeader';
 import { useSession } from 'next-auth/react';
 import { isObjectEmpty } from '@/lib/helper';
+import useEditableState from '../hooks/useEditableState';
 
 export type stagesData = {
   process_stage_name: string;
@@ -23,7 +24,6 @@ export type stagesData = {
 }[];
 
 const EditForm = () => {
-  const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
   const [data, setData] = React.useState<StageInfoData>();
   const isDataEmpty = isObjectEmpty(data as object);
@@ -35,7 +35,6 @@ const EditForm = () => {
   const cycle_id = params.cycle_id;
   const stage_uuid = params.stage_uuid;
 
-  const toggleEdit = () => setIsEdit(!isEdit);
   /**
   * Fetch stage info data
   */
@@ -64,10 +63,10 @@ const EditForm = () => {
       transitionProps={{ transition: 'fade', duration: 200 }}
       withCloseButton={false}
     >
-      <EditFormContent {...{ data, toggleEdit, isEdit, open, close, toggle }} />
+      <EditFormContent {...{ data, open, close, toggle }} />
     </Modal>
   ) : (
-    <EditFormContent {...{ data, toggleEdit, isEdit, open, close, toggle }} />
+    <EditFormContent {...{ data, open, close, toggle }} />
   )
 }
 
@@ -251,15 +250,8 @@ export const onSemanticSubmit = async (formdata: any, e: any) => {
   }
 };
 
-const EditFormContent = ({
-  data,
-  toggleEdit,
-  isEdit,
-  toggle: toggleExpand
-}: {
+const EditFormContent = ({ data, toggle: toggleExpand }: {
   data: StageInfoData | undefined;
-  toggleEdit: () => void;
-  isEdit: boolean;
   toggle: () => void;
 }) => {
   const { data: session } = useSession();
@@ -269,6 +261,8 @@ const EditFormContent = ({
   const searchParams = useSearchParams();
   const pageUrl = `${pathname}?${searchParams}`;
   const stage_uuid = params.stage_uuid;
+  const datasource_type = searchParams.get('data_source');
+  const isDeletedStage = pathname.includes('deleted');
 
   const InputList = [
     { name: 'process_stage_name', label: 'Stage name', type: 'text', value: data?.process_stage_name, disabled: false }, // this is a string
@@ -287,6 +281,7 @@ const EditFormContent = ({
 
   const methods = useForm();
   const { handleSubmit, setValue } = methods;
+  const { isEditable, toggleIsEditable } = useEditableState();
 
   /**
    * @description Update the stage info
@@ -301,12 +296,17 @@ const EditFormContent = ({
     const label = InputList.find((input) => input.name === target_id)?.label;
 
     modals.open({
+      onClose: toggleIsEditable?.(target_id) as never,
       title: 'Confirm update',
       children: (
         <>
           <Text size="sm">Are you sure you want to update <strong>{label}</strong>?</Text>
           <Flex gap={16} justify={'end'} mt="md">
-            <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+            <Button
+              onClick={() => modals.closeAll()}
+              color='#F1F5F9'
+              c='#0F172A'
+              radius='md'>
               Cancel
             </Button>
             <Button onClick={
@@ -481,12 +481,15 @@ const EditFormContent = ({
           className={clsx('space-y-4 pb-4', max_h_768 && 'pb-8')}
           onSubmit={handleSubmit(onSaveSubmit)}
         >
-          <HeaderForm type='stages' {...{ toggleEdit, isEdit, toggleExpand }} />
+          <HeaderForm type='stages' {...{ toggleExpand }} />
           <div className="container mx-auto space-y-8 py-4">
             {InputList?.map((inputProps, index) => (
               <InputWithOverlay
                 key={index}
+                allowEdit={datasource_type === 'database' && !inputProps.disabled && !isDeletedStage}
                 {...inputProps}
+                isEditable={isEditable[inputProps.name]}
+                toggleIsEditable={() => toggleIsEditable(inputProps.name)}
               />
             ))}
           </div>

@@ -7,11 +7,11 @@ import { HTMLInputTypeAttribute } from "react";
 
 export type CustomInputType = HTMLInputTypeAttribute | 'json' | null;
 
-const SaveActions = ({ name, copyValue, disabled, onCancel, type }: {
+const SaveActions = ({ name, copyValue, hidden, onCancel, type }: {
   name: string;
   type?: CustomInputType;
   copyValue?: string;
-  disabled?: boolean;
+  hidden?: boolean;
   onCancel?: () => void;
 }) => {
   return (
@@ -19,7 +19,7 @@ const SaveActions = ({ name, copyValue, disabled, onCancel, type }: {
       'flex items-center ml-auto space-x-1.5',
       type === 'text' && 'absolute right-2'
     )}>
-      {!disabled &&
+      {!hidden &&
         <>
           <Tooltip label="Save">
             <ActionIcon
@@ -61,7 +61,6 @@ const SaveActions = ({ name, copyValue, disabled, onCancel, type }: {
           </Tooltip>
         </>
       }
-      {/* <div className="flex items-center"> */}
       {type === 'json' &&
         <>
           <CopyButton value={copyValue as string} timeout={2000}>
@@ -114,7 +113,6 @@ const SaveActions = ({ name, copyValue, disabled, onCancel, type }: {
             />
           </ActionIcon>
         </>}
-      {/* </div> */}
     </div>
   )
 };
