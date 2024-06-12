@@ -1,7 +1,7 @@
 import { Icon } from "@iconify-icon/react";
 import { Button } from "@mantine/core";
 
-const FooterButton = ({ isAdd, isCollapse, isSideMenuCollapse, onClick, disabled }: { isAdd?: boolean; isCollapse?: boolean; isSideMenuCollapse: boolean; onClick: () => void; disabled?: boolean; }) => {
+const FooterButton = ({ isRestructure, isCollapse, isSideMenuCollapse, onClick, disabled }: { isRestructure?: boolean; isCollapse?: boolean; isSideMenuCollapse: boolean; onClick: () => void; disabled?: boolean; }) => {
   return (
     <div className="flex items-end justify-end mt-auto py-2 border-t">
       <Button
@@ -9,14 +9,14 @@ const FooterButton = ({ isAdd, isCollapse, isSideMenuCollapse, onClick, disabled
         variant='transparent'
         color='#895CF3'
         fz={16}
-        {...(isAdd && {
+        {...(isRestructure && {
           leftSection:
             < Icon className='rounded' icon="heroicons-solid:rectangle-group" width="1.75rem" />
         })}
         onClick={onClick}
         bg='transparent'
       >
-        {isAdd && "Restructure"}
+        {isRestructure && "Restructure"}
         {isCollapse && <Icon
           icon="tabler:chevron-down"
           width="3rem"

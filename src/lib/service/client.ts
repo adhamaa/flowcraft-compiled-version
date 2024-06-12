@@ -1,13 +1,14 @@
 
 'use server';
 
+import { decryptPassword } from "../crypt";
 import { clientRevalidateTag } from "./server";
 import { datasource_mapping } from "@/constant/datasource";
 
 export type Datasource_type = 'database' | 'memory' | 'cache';
 export type Apps_label = 'SP' | 'Client';
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
+const apiPassword = decryptPassword(process.env.NEXT_PUBLIC_API_PASSWORD);
 
 export const getApplicationList = async () => {
   const endpoint = '/businessProcess/listAppsBizProcess';
@@ -16,7 +17,7 @@ export const getApplicationList = async () => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['applist'] }
   });
@@ -48,7 +49,7 @@ export const getCycleList = async ({
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['cyclelist'] },
     cache: 'no-store'
@@ -114,7 +115,7 @@ export const getCycleInfo = async ({
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['cycleinfo'] },
   });
@@ -167,7 +168,7 @@ export const getStatusRef = async (status_code: number) => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['statusref'] },
     cache: 'no-store'
@@ -190,7 +191,7 @@ export const getStatusRefList = async () => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['statusreflist'] },
     cache: 'no-store'
@@ -222,7 +223,7 @@ export const getStageList = async ({
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['stagelist'] },
   });
@@ -253,7 +254,7 @@ export const getDeletedStageList = async ({
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['deletedstagelist'] },
     // cache: 'no-store'
@@ -290,7 +291,7 @@ export const getStageInfo = async ({
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['stageinfo', stage_uuid] },
   });
@@ -319,7 +320,7 @@ export const getDiagramData = async ({
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['diagramdata'] },
   });
@@ -346,7 +347,7 @@ export const updateCycle = async ({
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     body: (JSON.stringify({ active: body.cycle_active, descriptions: body.cycle_description })),
     next: { tags: ['updatecycle'] }
@@ -374,7 +375,7 @@ export const updateStatusCycle = async ({
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['updatestatuscycle'] }
   });
@@ -403,7 +404,7 @@ export const updateStage = async ({
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     body: JSON.stringify({ value: body.value }),
     next: { tags: ['updatestage'] }
@@ -426,7 +427,7 @@ export const verifySyntax = async ({ body }: { body: { str_test_syntax: string }
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     body: JSON.stringify({ str_test_syntax: body.str_test_syntax }),
     next: { tags: ['evaluatesyntax'] }
@@ -450,7 +451,7 @@ export const getSyntaxErrorMessages = async ({ params }: { params: { error_messa
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['errorsyntaxmessages'] }
   });
@@ -472,7 +473,7 @@ export const testSyntaxStageName = async ({ params }: { params: { stage_name: st
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['testsyntaxstagename'] }
   });
@@ -494,7 +495,7 @@ export const evaluateSemantics = async ({ body }: { body: { str_test_semantic: s
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     body: JSON.stringify({ str_test_semantic: body.str_test_semantic }),
     next: { tags: ['evaluatesemantics'] }
@@ -518,7 +519,7 @@ export const getSemanticsErrorMessages = async ({ params }: { params: { error_me
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['errorsemanticmessages'] }
   });
@@ -540,7 +541,7 @@ export const testSemanticStageName = async ({ params }: { params: { stage_name: 
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['testsemanticstagename'] }
   });
@@ -555,12 +556,16 @@ export const testSemanticStageName = async ({ params }: { params: { stage_name: 
   return data;
 }
 
-export const reloadBizProcess = async (baseUrlIndex = 0): Promise<{ message: string }> => {
+export const reloadBizProcess = async (options?: {
+  cycle_id?: string;
+  apps_label?: Apps_label;
+}, baseUrlIndex = 0): Promise<{ message: string }> => {
+  const { cycle_id, apps_label } = options ?? {};
   const baseUrl = [process.env.NEXT_PUBLIC_M1_API_URL, process.env.NEXT_PUBLIC_M2_API_URL]
 
   async function uploadNCreate(baseUrl: string | undefined) {
     const uploadTableProcessPath = `/businessProcess/uploadTableProcess/`;
-    const reCreateProcessPath = `/businessProcess/reCreateProcess`;
+    const reCreateProcessPath = `/businessProcessV2/reCreateProcess?cycle_id=${cycle_id}&app_type=${apps_label}`;
     const uploadTableProcessPathUrl = `${baseUrl}${uploadTableProcessPath}`;
     const reCreateProcessPathUrl = `${baseUrl}${reCreateProcessPath}`;
 
@@ -568,7 +573,7 @@ export const reloadBizProcess = async (baseUrlIndex = 0): Promise<{ message: str
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+        'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
       },
       next: { tags: ['uploadtableprocess'] }
     }).then(async (response) => {
@@ -580,7 +585,7 @@ export const reloadBizProcess = async (baseUrlIndex = 0): Promise<{ message: str
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+          'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
         },
         next: { tags: ['recreateprocess'] }
       }).then(async (response) => {
@@ -605,7 +610,7 @@ export const reloadBizProcess = async (baseUrlIndex = 0): Promise<{ message: str
   await uploadNCreate(url);
 
   // Call recursively with the next index
-  return reloadBizProcess(baseUrlIndex + 1);
+  return reloadBizProcess(options, baseUrlIndex + 1);
 };
 
 export const duplicateCycle = async ({
@@ -622,7 +627,7 @@ export const duplicateCycle = async ({
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['duplicatecycle'] }
   });
@@ -664,7 +669,7 @@ export const setAuditTrail = async ({
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     next: { tags: ['audittrail'] },
   });

@@ -10,7 +10,7 @@ export type CustomButtonProps = ButtonProps & {
   type: 'button' | 'submit';
   onClick: () => void;
   canShow: boolean;
-  icon?: React.ReactNode;
+  icon?: React.ReactNode | { name: string; width: string; rotate?: number };
 }
 
 const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {

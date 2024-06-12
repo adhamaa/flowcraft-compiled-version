@@ -9,6 +9,7 @@ import { Panel } from 'reactflow';
 import ChangeLogger from './ChangeLogger';
 import NodeInspector from './NodeInspector';
 import ViewportLogger from './ViewportLogger';
+import '../style.css';
 
 
 export default function DevTools() {

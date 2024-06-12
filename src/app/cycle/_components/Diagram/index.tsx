@@ -13,12 +13,12 @@ import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, Ha
 import { useShallow } from 'zustand/react/shallow';
 import useDiagramStore, { RFState } from '@/store/Diagram';
 import 'reactflow/dist/style.css';
-import '@/components/reactflow/style.css';
 import DevTools from '@/components/reactflow/Devtools';
 import { convertToCycleStages, isObjectEmpty } from '@/lib/helper';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import { calculateNodePositions2, calculateNodePositions3, calculateNodePositions4 } from '@/components/reactflow/CalculateNodePositions';
 
 
 export enum Position {
@@ -779,34 +779,6 @@ const nodeTypes = {
   },
 };
 
-// function getNodeType(node: Record<string, any>) {
-//   const { type, data } = node;
-//   const { label, listEntCondition, listExtCondition } = data || {};
-
-//   if (type === 'Start') {
-//     return 'Start';
-//   }
-
-//   if (type === 'End') {
-//     if (label === 'FCA-01-02-Payment-Process') {
-//       return 'End';
-//     }
-
-//     const hasEntry = !isObjectEmpty(listEntCondition);
-//     const hasExit = !isObjectEmpty(listExtCondition);
-
-//     if (hasEntry && hasExit) {
-//       return 'WithEntryAndExit';
-//     }
-//     if (!hasEntry && hasExit) {
-//       return 'WithExit';
-//     }
-//     if (hasEntry && !hasExit) {
-//       return 'WithEntry';
-//     }
-//     return 'default';
-//   }
-// }
 
 const Diagram = ({ disabled }: {
   disabled?: boolean;
@@ -823,6 +795,8 @@ const Diagram = ({ disabled }: {
     useShallow(selector),
   );
 
+  const updatedNodes = calculateNodePositions4(nodes, edges);
+  console.log('updatedNodes:', updatedNodes)
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
@@ -856,7 +830,7 @@ const Diagram = ({ disabled }: {
           ) : (
             <div style={{ height: '80vh' }}>
               <ReactFlow
-                nodes={nodes}
+                nodes={updatedNodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
@@ -865,7 +839,7 @@ const Diagram = ({ disabled }: {
                 fitViewOptions={fitViewOptions}
                 defaultEdgeOptions={defaultEdgeOptions}
                 nodeTypes={nodeTypes}
-                nodesDraggable={false}
+                // nodesDraggable={false}
               >
                 {/* <Background /> */}
                 <Controls />
@@ -915,8 +889,6 @@ const Diagram = ({ disabled }: {
       `}</style>
     </ReactFlowProvider>
   )
-
-
 };
 
 export default Diagram;

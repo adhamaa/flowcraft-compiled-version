@@ -40,7 +40,8 @@ const TabularSection = ({ opened,
         { label: 'Add new cycle', onClick: () => console.log('reload'), disabled: true },
         { label: 'Delete cycle', onClick: () => console.log('Delete'), disabled: true },
         {
-          label: 'Duplicate cycle', onClick: async ({
+          label: 'Duplicate cycle',
+          onClick: async ({
             original: {
               cycle_id,
               app_label,
@@ -48,8 +49,6 @@ const TabularSection = ({ opened,
             } }: {
               original: CycleData;
             }) => {
-            console.log('row-cycle_id: ', cycle_id)
-            console.log('row-app_label: ', app_label)
             modals.open({
               title: 'Duplicate Cycle',
               children: (
@@ -85,14 +84,56 @@ const TabularSection = ({ opened,
               },
               radius: 'md',
             });
-          }, disabled: false
+          },
+          disabled: false
         },
 
       ],
     }, {
       group: 'reset',
       menu: [
-        { label: 'Reload Business Process', onClick: () => console.log('Reload'), disabled: true },
+        {
+          label: 'Reload Business Process',
+          onClick: async ({
+            original: { cycle_id, app_label, app_name } }: { original: CycleData; }) => {
+            modals.open({
+              title: 'Confirm update',
+              children: (
+                <>
+                  <Text size="sm">Are you sure you want to Reload <strong>{app_name} - cycle id: {cycle_id}</strong>?</Text>
+                  <Flex gap={16} justify={'end'} mt="md">
+                    <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+                      Cancel
+                    </Button>
+                    <Button onClick={async () => {
+                      await reloadBizProcess({
+                        cycle_id: cycle_id.toString(),
+                        apps_label: app_label as Apps_label,
+                      })
+                        .then((res) => {
+                          if (res) {
+                            toast.success(res.message)
+                          }
+                        }).catch((err) => {
+                          toast.error(err.message)
+                        }).finally(() => {
+                          modals.closeAll()
+                        });
+                    }} color='#895CF3' radius='md'>
+                      Yes
+                    </Button>
+                  </Flex>
+                </>
+              ),
+              overlayProps: {
+                backgroundOpacity: 0.55,
+                blur: 10,
+              },
+              radius: 'md',
+            });
+          },
+          disabled: false
+        },
         { label: 'Optimize business process ', onClick: () => console.log('Optimize'), disabled: true },
       ],
     }
@@ -284,7 +325,7 @@ const TabularSection = ({ opened,
               <div className='flex ml-2 gap-4'>
                 <Tooltip label="Reload Business Process (All)">
                   <ActionIcon
-                    // disabled
+                    disabled
                     onClick={async () => {
                       modals.open({
                         title: 'Confirm update',
@@ -385,62 +426,12 @@ const TabularSection = ({ opened,
                       <span className="capitalize ~text-base/lg">{tab.name}</span>
                     </Tabs.Tab>
                   ))}
-
               </Tabs.List>
-
-              {/* {datasourceList.map((tab) => (
-                <Tabs.Panel key={tab.name} value={tab.name}>
-                  <></>
-                </Tabs.Panel>
-              ))} */}
             </Tabs>
 
             <div className="relative overflow-auto w-screen">
               <div className='absolute top-12 border w-full border-black/5 z-50' />
               <MantineReactTable table={table} />
-              {/* <Table
-                captionSide="top"
-                fz="md"
-                highlightOnHover
-                horizontalSpacing={85}
-                // striped
-                verticalSpacing="xs"
-                // withTableBorder
-                // withColumnBorders
-                withRowBorders={false}
-                m="0"
-              >
-                <Table.Thead classNames={{
-                  thead: 'border-b'
-                }}>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <Table.Tr key={headerGroup.id} >
-                      {headerGroup.headers.map((header) => (
-                        <Table.Th key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                              header.column.columnDef.Header ??
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                        </Table.Th>
-                      ))}
-                    </Table.Tr>
-                  ))}
-                </Table.Thead>
-                <Table.Tbody>
-                  {table.getRowModel().rows.map((row) => (
-                    <Table.Tr key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id}>
-                          <MRT_TableBodyCellValue cell={cell} table={table} />
-                        </td>
-                      ))}
-                    </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table> */}
             </div>
             <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
           </Stack>

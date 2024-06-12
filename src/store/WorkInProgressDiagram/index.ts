@@ -81,15 +81,10 @@ const useDiagramStore = create<RFState>()(
         cycle_id,
         apps_label,
       }) => {
-        // check if storage has the data
         const storedData = storage.getItem('diagram-storage');
-        // if (storedData) {
-        //   return;
-        // } else {
-        //   return;
-        // if not, fetch from the server
+
         const diagramData = await getDiagramData({ cycle_id, apps_label });
-        // and then set the data to the store
+
         set({
           nodes: diagramData.nodes.map(({ position, ...node }: Node) => {
             const removedPosition = { ...node, position: undefined }

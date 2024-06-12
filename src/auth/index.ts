@@ -8,7 +8,7 @@ import { ZodError } from "zod"
 import { Fernet } from "fernet-nodejs"
 import { loginSchema } from "../lib/validation"
 import { DrizzleError } from "drizzle-orm"
-import { AdapterSession, AdapterUser } from "next-auth/adapters"
+import { AdapterUser } from "next-auth/adapters"
 import { randomUUID } from "crypto"
 
 class InvalidLoginError extends CredentialsSignin {
