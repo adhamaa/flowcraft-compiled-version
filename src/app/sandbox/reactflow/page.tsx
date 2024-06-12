@@ -1,6 +1,6 @@
 'use client';
 
-import CalculateNodePositions, { calculateNodePositions2, calculateNodePositions3, calculateNodePositions4, calculateNodePositions5, calculateNodePositions6, calculateNodePositions7 } from '@/components/reactflow/CalculateNodePositions';
+import CalculateNodePositions, { calculateNodePositions2, calculateNodePositions3, calculateNodePositions4, calculateNodePositions5, calculateNodePositions6, calculateNodePositions7, calculateNodePositions8 } from '@/components/reactflow/CalculateNodePositions';
 import DevTools from '@/components/reactflow/Devtools';
 import { Button } from '@mantine/core';
 import * as React from 'react';
@@ -855,8 +855,7 @@ const SaveRestore = () => {
   //   setNodes((nds) => nds.concat(newNode));
   // }, [setNodes]);
 
-  const updatedNodes = calculateNodePositions7(nodes, edges);
-  console.log('updatedNodes:', updatedNodes)
+  const updatedNodes = calculateNodePositions8(nodes, edges);
 
   return (
     <ReactFlow

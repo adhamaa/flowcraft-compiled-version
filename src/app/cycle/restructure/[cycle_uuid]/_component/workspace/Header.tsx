@@ -29,7 +29,7 @@ function Header() {
           className='hover:text-[#7d1aff]' />
       </ActionIcon>
     </Tooltip>
-    <h1 className='text-xl font-bold'>Cycle Name - Cycle uuid: {cycle_uuid}</h1>
+    <h1 className='text-xl font-bold'>Cycle uuid: {cycle_uuid}</h1>
   </div>;
 };
 

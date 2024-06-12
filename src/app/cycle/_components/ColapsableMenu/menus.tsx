@@ -2,7 +2,7 @@
 
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react'
-import { Apps_label, Datasource_type, getDeletedStageList, getStageList } from '@/lib/service/client';
+import { Apps_label, Datasource_type, getCycleInfo, getDeletedStageList, getStageList } from '@/lib/service/client';
 import { useDisclosure } from '@mantine/hooks';
 import { ScrollAreaAutosize, Tabs, TabsList, TabsPanel, TabsTab, Tooltip } from '@mantine/core';
 import FooterButton from './footer';
@@ -11,6 +11,7 @@ import clsx from 'clsx';
 function SideMenus() {
   const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
   const [stageData, setStageData] = React.useState<any[]>();
+  const [cycleUuid, setCycleUuid] = React.useState<string>();
   const [deletedStageData, setDeletedStageData] = React.useState<any[]>();
   const searchParams = useSearchParams();
   const params = useParams();
@@ -69,6 +70,24 @@ function SideMenus() {
 
     if (cycle_id && selected_app && datasource_type) {
       getStageListData()
+    }
+  }, [cycle_id, datasource_type, selected_app])
+
+  /**
+   * Fetch cycle info data
+   */
+  React.useEffect(() => {
+    async function getCycleInfoData() {
+      const cycleInfoDataRes = await getCycleInfo({
+        apps_label: selected_app as Apps_label,
+        cycle_id: cycle_id as string,
+        datasource_type: datasource_type as Datasource_type
+      });
+      setCycleUuid(cycleInfoDataRes.cycle_uuid)
+    }
+
+    if (cycle_id && selected_app && datasource_type) {
+      getCycleInfoData()
     }
   }, [cycle_id, datasource_type, selected_app])
 
@@ -208,7 +227,11 @@ function SideMenus() {
 
                                 </ScrollAreaAutosize>
 
-                                {!deleted_stage_route && <FooterButton {...{ isSideMenuCollapse }} isAdd onClick={() => router.push(`/cycle/restructure/${123}`)} />}
+                                {!deleted_stage_route && <FooterButton
+                                  {...{ isSideMenuCollapse }}
+                                  isRestructure
+                                  onClick={() => router.push(`/cycle/restructure/${cycleUuid}`)}
+                                />}
                               </TabsList>)}
                         </Tabs>
                       )}

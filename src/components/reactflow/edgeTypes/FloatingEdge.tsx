@@ -33,4 +33,4 @@ function FloatingEdge({ id, source, target, markerEnd, style }: EdgeProps) {
   );
 }
 
-export default FloatingEdge;
+export default React.memo(FloatingEdge);

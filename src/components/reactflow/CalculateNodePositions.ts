@@ -467,4 +467,86 @@ export function AdjustXCoordinates(data: any[]): any[] {
   return data;
 }
 
-// check if parents has siblings, if 1 set x position as parent, if more than 1, check if its even or odd, if its odd get middle node x position, if even get the middle position by dividing the even number and check the dimension also to get the middle position of x node.
+export function calculateNodePositions8(nodes: Node[], edges: Edge[]): Node[] {
+  const nodeMap: { [id: string]: Node } = {};
+  nodes.forEach(node => nodeMap[node.id] = node);
+
+  const horizontalPadding = 100; // Padding between nodes horizontally
+  const verticalPadding = 150; // Padding between nodes vertically
+
+  const calculateSubtreeWidth = (node: Node): number => {
+    const childrenEdges = edges.filter(edge => edge.source === node.id);
+    const childrenNodes = childrenEdges.map(edge => nodeMap[edge.target]);
+    if (childrenNodes.length === 0) {
+      return node.width!;
+    }
+    let totalWidth = -horizontalPadding;
+    childrenNodes.forEach(child => {
+      totalWidth += calculateSubtreeWidth(child) + horizontalPadding;
+    });
+    return totalWidth;
+  };
+
+  const findParent = (childId: string): Node | undefined => {
+    const parentEdge = edges.find(edge => edge.target === childId);
+    return parentEdge ? nodeMap[parentEdge.source] : undefined;
+  };
+
+  const findSiblings = (node: Node): Node[] => {
+    const parent = findParent(node.id);
+    if (!parent) return [];
+    const siblingEdges = edges.filter(edge => edge.source === parent.id && edge.target !== node.id);
+    return siblingEdges.map(edge => nodeMap[edge.target]);
+  };
+
+  const setPosition = (node: Node, x: number, y: number): void => {
+    node.position = { x, y };
+
+    const childrenEdges = edges.filter(edge => edge.source === node.id);
+    const childrenNodes = childrenEdges.map(edge => nodeMap[edge.target]);
+    if (childrenNodes.length === 0) return;
+
+    const totalWidth = calculateSubtreeWidth(node);
+    let currentX = x - totalWidth / 2;
+
+    const numChildren = childrenNodes.length;
+    const isEven = numChildren % 2 === 0;
+
+    childrenNodes.forEach((child, index) => {
+      const childWidth = calculateSubtreeWidth(child);
+      const parentSiblings = findSiblings(node);
+      const numParentSiblings = parentSiblings.length;
+      let parentCenterX = x;
+
+      if (numParentSiblings > 0) {
+        if (numParentSiblings % 2 === 0) {
+          const middleLeftSibling = parentSiblings[Math.floor((numParentSiblings - 1) / 2)];
+          const middleRightSibling = parentSiblings[Math.floor(numParentSiblings / 2)];
+          parentCenterX = (middleLeftSibling.position.x + middleRightSibling.position.x) / 2;
+        } else {
+          parentCenterX = parentSiblings[Math.floor(numParentSiblings / 2)].position.x;
+        }
+      }
+
+      if (numParentSiblings === 0) {
+        setPosition(child, x, y + node.height! + verticalPadding);
+      } else {
+        if (isEven) {
+          setPosition(child, parentCenterX + (index - numChildren / 2 + 0.5) * (childWidth + horizontalPadding), y + node.height! + verticalPadding);
+        } else {
+          setPosition(child, parentCenterX + (index - Math.floor(numChildren / 2)) * (childWidth + horizontalPadding), y + node.height! + verticalPadding);
+        }
+      }
+      currentX += childWidth + horizontalPadding;
+    });
+  };
+
+  const rootNode = nodes.find(node => node.type === 'Start');
+  if (rootNode) {
+    const initialX = 0; // Starting X position
+    const initialY = 0; // Starting Y position
+    setPosition(rootNode, initialX, initialY);
+  }
+
+  return nodes;
+}   

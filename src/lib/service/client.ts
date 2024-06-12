@@ -556,12 +556,16 @@ export const testSemanticStageName = async ({ params }: { params: { stage_name: 
   return data;
 }
 
-export const reloadBizProcess = async (baseUrlIndex = 0): Promise<{ message: string }> => {
+export const reloadBizProcess = async (options?: {
+  cycle_id?: string;
+  apps_label?: Apps_label;
+}, baseUrlIndex = 0): Promise<{ message: string }> => {
+  const { cycle_id, apps_label } = options ?? {};
   const baseUrl = [process.env.NEXT_PUBLIC_M1_API_URL, process.env.NEXT_PUBLIC_M2_API_URL]
 
   async function uploadNCreate(baseUrl: string | undefined) {
     const uploadTableProcessPath = `/businessProcess/uploadTableProcess/`;
-    const reCreateProcessPath = `/businessProcess/reCreateProcess`;
+    const reCreateProcessPath = `/businessProcessV2/reCreateProcess?cycle_id=${cycle_id}&app_type=${apps_label}`;
     const uploadTableProcessPathUrl = `${baseUrl}${uploadTableProcessPath}`;
     const reCreateProcessPathUrl = `${baseUrl}${reCreateProcessPath}`;
 
@@ -606,7 +610,7 @@ export const reloadBizProcess = async (baseUrlIndex = 0): Promise<{ message: str
   await uploadNCreate(url);
 
   // Call recursively with the next index
-  return reloadBizProcess(baseUrlIndex + 1);
+  return reloadBizProcess(options, baseUrlIndex + 1);
 };
 
 export const duplicateCycle = async ({

@@ -49,9 +49,6 @@ function Current() {
     useShallow(selector),
   );
 
-  const updatedNodes = calculateNodePositions2(nodes, edges);
-  console.log('updatedNodes:', updatedNodes)
-
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
   };
@@ -68,7 +65,7 @@ function Current() {
       <div className='border border-black rounded-xl h-full'>
         <ReactFlowProvider>
           <ReactFlow
-            nodes={updatedNodes}
+            nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
