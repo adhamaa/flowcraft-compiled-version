@@ -15,7 +15,6 @@ function SigninForm() {
   const { handleSubmit, control, formState: { isSubmitting, isLoading, isValidating } } = useForm({
     resolver: zodResolver(loginSchema),
   })
-  console.log({ isSubmitting, isLoading, isValidating })
 
   const onSubmit = async ({ email, password }: any) => {
     try {

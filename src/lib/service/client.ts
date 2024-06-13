@@ -565,7 +565,10 @@ export const reloadBizProcess = async (options?: {
 
   async function uploadNCreate(baseUrl: string | undefined) {
     const uploadTableProcessPath = `/businessProcess/uploadTableProcess/`;
-    const reCreateProcessPath = `/businessProcessV2/reCreateProcess?cycle_id=${cycle_id}&app_type=${apps_label}`;
+    const reCreateProcessPath = !!(cycle_id && apps_label)
+      ? `/businessProcessV2/reCreateProcess?cycle_id=${cycle_id}&app_type=${apps_label}`
+      : `/businessProcessV2/reCreateProcess`;
+
     const uploadTableProcessPathUrl = `${baseUrl}${uploadTableProcessPath}`;
     const reCreateProcessPathUrl = `${baseUrl}${reCreateProcessPath}`;
 
@@ -589,14 +592,16 @@ export const reloadBizProcess = async (options?: {
         },
         next: { tags: ['recreateprocess'] }
       }).then(async (response) => {
+        const data = await response.json();
+
         if (!response.ok) {
-          throw new Error('Failed to reload business process (reCreateProcess).');
+          throw new Error(data.error_message as string);
         }
 
         return {
           url: baseUrl,
           message: 'Business process reloaded successfully.',
-          result: await (await response.json()).result
+          result: data.result
         };
       });
     });
