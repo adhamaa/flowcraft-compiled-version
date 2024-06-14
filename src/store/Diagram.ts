@@ -19,7 +19,7 @@ import {
 import initialNodes from '@/components/reactflow/nodes';
 import initialEdges from '@/components/reactflow/edges';
 import { Apps_label, getDiagramData } from '@/lib/service/client';
-import { calculateNodePositions8 } from '@/components/reactflow/CalculateNodePositions';
+import { calculateNodePositions } from '@/components/reactflow/CalculateNodePositions';
 
 export type NodeData = {
   color: string;
@@ -35,6 +35,7 @@ export type RFState = {
   setEdges: (edges: Edge[]) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
   updateNodeColor: (nodeId: string, color: string) => void;
+  getNodesWithPositions: (nodes: Node[], edges: Edge[]) => Node[];
 };
 
 const storage: PersistStorage<RFState> = {
@@ -50,7 +51,6 @@ const storage: PersistStorage<RFState> = {
 }
 
 
-// this is our useStore hook that we can use in our components to get parts of the store and call actions
 const useDiagramStore = create<RFState>()(
   persist(
     (set, get) => ({
@@ -81,43 +81,38 @@ const useDiagramStore = create<RFState>()(
         cycle_id,
         apps_label,
       }) => {
-        // check if storage has the data
-        const storedData = storage.getItem('diagram-storage');
-        // if (storedData) {
-        //   return;
-        // } else {
-        //   return;
-        // if not, fetch from the server
         const diagramData = await getDiagramData({ cycle_id, apps_label });
-        // and then set the data to the store
         set({
           nodes: diagramData.nodes.map(({ position, ...node }: Node) => {
-            const removedPosition = { ...node, position: undefined }
-            // const updatedNodes = calculateNodePositions8([removedPosition], get().edges)
+            // const removedPosition = { ...node, position: { x: 0, y: 0 } };
+            // return removedPosition
             return {
               ...node,
               position: {
-                // x: parseFloat(position.x as never),
-                // y: parseFloat(position.y as never)
-                x: 0,
-                y: 0
+                x: parseFloat(position.x as never),
+                y: parseFloat(position.y as never)
+                // x: 0,
+                // y: 0
               },
             }
+
           }),
           edges: diagramData.edges.map(({ type, markerEnd, ...edge }: Edge) => {
             return {
               ...edge,
             }
           }),
-
         });
-        // }
+      },
+      getNodesWithPositions: (nodes, edges) => {
+        const updatedNodes = calculateNodePositions(nodes, edges);
+        console.log('updatedNodes:', updatedNodes)
+        return updatedNodes;
       },
       updateNodeColor: (nodeId: string, color: string) => {
         set({
           nodes: get().nodes.map((node) => {
             if (node.id === nodeId) {
-              // it's important to create a new object here, to inform React Flow about the changes
               node.data = { ...node.data, color };
             }
 

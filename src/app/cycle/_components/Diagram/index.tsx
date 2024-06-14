@@ -18,7 +18,6 @@ import { convertToCycleStages, isObjectEmpty } from '@/lib/helper';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { calculateNodePositions2, calculateNodePositions3, calculateNodePositions4 } from '@/components/reactflow/CalculateNodePositions';
 
 
 export enum Position {
@@ -35,6 +34,7 @@ const selector = (state: RFState) => ({
   onEdgesChange: state.onEdgesChange,
   onConnect: state.onConnect,
   fetchNodesEdges: state.fetchNodesEdges,
+  getNodesWithPositions: state.getNodesWithPositions,
 });
 
 function DataChecker(data: any) {
@@ -72,7 +72,7 @@ const nodeTypes = {
           alt='start-icon'
           className=' mx-auto w-32 h-32'
         />
-        <div className='flex justify-center w-max px-2 py-2 rounded-md  border shadow-md shadow-safwa-gray-4 border-black bg-white'>
+        <div className='flex justify-center w-max px-2 py-2 rounded-md border shadow-md shadow-safwa-gray-4 border-black bg-white'>
           <span>{node.data.label}</span>
         </div>
         {/* this is the blackdot for edges connection*/}
@@ -779,7 +779,6 @@ const nodeTypes = {
   },
 };
 
-
 const Diagram = ({ disabled }: {
   disabled?: boolean;
 }) => {
@@ -791,12 +790,10 @@ const Diagram = ({ disabled }: {
   const [opened, { open, close, toggle }] = useDisclosure(false);
   const [renderDiagram, setRenderDiagram] = React.useState(false);
 
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges } = useDiagramStore(
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges, getNodesWithPositions } = useDiagramStore(
     useShallow(selector),
   );
 
-  const updatedNodes = calculateNodePositions4(nodes, edges);
-  console.log('updatedNodes:', updatedNodes)
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
@@ -820,8 +817,6 @@ const Diagram = ({ disabled }: {
         }}
         size={renderDiagram ? "xl" : "xs"}
       >
-        {/* here where you put the Diagram (reactflow) */}
-        {/* <Image src='/Diagram.png' width={1000} height={1000} alt='diagram' className='object-cover' /> */}
         {!renderDiagram ?
           (
             <div className='grid place-items-center pb-12'>
@@ -830,7 +825,7 @@ const Diagram = ({ disabled }: {
           ) : (
             <div style={{ height: '80vh' }}>
               <ReactFlow
-                nodes={updatedNodes}
+                nodes={getNodesWithPositions(nodes, edges)}
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
@@ -839,7 +834,7 @@ const Diagram = ({ disabled }: {
                 fitViewOptions={fitViewOptions}
                 defaultEdgeOptions={defaultEdgeOptions}
                 nodeTypes={nodeTypes}
-                // nodesDraggable={false}
+                nodesDraggable={false}
               >
                 {/* <Background /> */}
                 <Controls />

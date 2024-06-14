@@ -19,7 +19,6 @@ import {
 import initialNodes from '@/components/reactflow/nodes';
 import initialEdges from '@/components/reactflow/edges';
 import { Apps_label, getDiagramData } from '@/lib/service/client';
-import { calculateNodePositions8 } from '@/components/reactflow/CalculateNodePositions';
 
 export type NodeData = {
   color: string;
@@ -82,18 +81,13 @@ const useDiagramStore = create<RFState>()(
         apps_label,
       }) => {
         const storedData = storage.getItem('diagram-storage');
-
         const diagramData = await getDiagramData({ cycle_id, apps_label });
-
         set({
           nodes: diagramData.nodes.map(({ position, ...node }: Node) => {
-            const removedPosition = { ...node, position: undefined }
-            // const updatedNodes = calculateNodePositions8([removedPosition], get().edges)
+            const removedPosition = { ...node, position: { x: 0, y: 0 } };
             return {
               ...node,
               position: {
-                // x: parseFloat(position.x as never),
-                // y: parseFloat(position.y as never)
                 x: 0,
                 y: 0
               },

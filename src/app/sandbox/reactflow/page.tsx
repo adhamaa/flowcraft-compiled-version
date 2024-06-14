@@ -1,6 +1,7 @@
 'use client';
 
-import CalculateNodePositions, { calculateNodePositions2, calculateNodePositions3, calculateNodePositions4, calculateNodePositions5, calculateNodePositions6, calculateNodePositions7, calculateNodePositions8 } from '@/components/reactflow/CalculateNodePositions';
+
+import { calculateNodePositions } from '@/components/reactflow/CalculateNodePositions';
 import DevTools from '@/components/reactflow/Devtools';
 import { Button } from '@mantine/core';
 import * as React from 'react';
@@ -733,74 +734,23 @@ const getNodeId = () => `randomnode_${+new Date()}`;
 // ];
 
 // Example usage:
-const initialNodes: any[] = [
-  {
-    data: { label: "Start" },
-    id: "1",
-    type: "Start",
-    position: { x: 0, y: 0 },
-    width: 100,
-    height: 50
-  },
-  {
-    data: { label: "Node 1" },
-    id: "2",
-    type: "Node",
-    position: { x: 0, y: 0 },
-    width: 100,
-    height: 50
-  },
-  {
-    data: { label: "Node 2" },
-    id: "3",
-    type: "Node",
-    position: { x: 0, y: 0 },
-    width: 100,
-    height: 50
-  },
-  {
-    data: { label: "Node 3" },
-    id: "4",
-    type: "Node",
-    position: { x: 0, y: 0 },
-    width: 100,
-    height: 50
-  },
-  {
-    data: { label: "Node 4" },
-    id: "5",
-    type: "Node",
-    position: { x: 0, y: 0 },
-    width: 100,
-    height: 50
-  },
-  {
-    data: { label: "Node 5" },
-    id: "6",
-    type: "Node",
-    position: { x: 0, y: 0 },
-    width: 100,
-    height: 50
-  },
-  {
-    data: { label: "Node 6" },
-    id: "7",
-    type: "Node",
-    position: { x: 0, y: 0 },
-    width: 100,
-    height: 50
-  },
-  {
-    data: { label: "Node 7" },
-    id: "8",
-    type: "Node",
-    position: { x: 0, y: 0 },
-    width: 100,
-    height: 50
-  },
+const initialNodes = [
+  { data: { label: "Start" }, id: "1", type: "Start", position: { x: 0, y: 0 }, width: 100, height: 50 },
+  { data: { label: "Node 1" }, id: "2", type: "Node", position: { x: 0, y: 0 }, width: 120, height: 60 },
+  { data: { label: "Node 2" }, id: "3", type: "Node", position: { x: 0, y: 0 }, width: 130, height: 70 },
+  { data: { label: "Node 3" }, id: "4", type: "Node", position: { x: 0, y: 0 }, width: 140, height: 80 },
+  { data: { label: "Node 4" }, id: "5", type: "Node", position: { x: 0, y: 0 }, width: 150, height: 90 },
+  { data: { label: "Node 5" }, id: "6", type: "Node", position: { x: 0, y: 0 }, width: 160, height: 100 },
+  { data: { label: "Node 6" }, id: "7", type: "Node", position: { x: 0, y: 0 }, width: 170, height: 110 },
+  { data: { label: "Node 7" }, id: "8", type: "Node", position: { x: 0, y: 0 }, width: 180, height: 120 },
+  { data: { label: "Node 8" }, id: "9", type: "Node", position: { x: 0, y: 0 }, width: 190, height: 130 },
+  { data: { label: "Node 9" }, id: "10", type: "Node", position: { x: 0, y: 0 }, width: 200, height: 140 },
+  { data: { label: "Node 10" }, id: "11", type: "Node", position: { x: 0, y: 0 }, width: 210, height: 150 },
+  { data: { label: "Node 11" }, id: "12", type: "Node", position: { x: 0, y: 0 }, width: 220, height: 160 },
+  { data: { label: "Node 12" }, id: "13", type: "Node", position: { x: 0, y: 0 }, width: 230, height: 170 },
 ];
 
-const initialEdges: Edge[] = [
+const initialEdges = [
   { id: '1-2', source: "1", style: { borderWidth: "1px", width: "1px" }, target: "2" },
   { id: '1-3', source: "1", style: { borderWidth: "1px", width: "1px" }, target: "3" },
   { id: '1-4', source: "1", style: { borderWidth: "1px", width: "1px" }, target: "4" },
@@ -811,67 +761,35 @@ const initialEdges: Edge[] = [
   { id: '5-7', source: "5", style: { borderWidth: "1px", width: "1px" }, target: "7" },
   { id: '6-8', source: "6", style: { borderWidth: "1px", width: "1px" }, target: "8" },
   { id: '7-8', source: "7", style: { borderWidth: "1px", width: "1px" }, target: "8" },
+  { id: '8-9', source: "8", style: { borderWidth: "1px", width: "1px" }, target: "9" },
+  { id: '8-10', source: "8", style: { borderWidth: "1px", width: "1px" }, target: "10" },
+  { id: '8-11', source: "8", style: { borderWidth: "1px", width: "1px" }, target: "11" },
+  { id: '8-12', source: "8", style: { borderWidth: "1px", width: "1px" }, target: "12" },
+  { id: '9-13', source: "9", style: { borderWidth: "1px", width: "1px" }, target: "13" },
+  { id: '10-13', source: "10", style: { borderWidth: "1px", width: "1px" }, target: "13" },
+  { id: '11-13', source: "11", style: { borderWidth: "1px", width: "1px" }, target: "13" },
+  { id: '12-13', source: "12", style: { borderWidth: "1px", width: "1px" }, target: "13" },
 ];
 
 
 const SaveRestore = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes as any[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges as any[]);
-  const [rfInstance, setRfInstance] = React.useState<any>(null);
-  const { setViewport } = useReactFlow();
 
   const onConnect = React.useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
-  // const onSave = React.useCallback(() => {
-  //   if (rfInstance) {
-  //     const flow = rfInstance.toObject();
-  //     localStorage.setItem(flowKey, JSON.stringify(flow));
-  //   }
-  // }, [rfInstance]);
 
-  // const onRestore = React.useCallback(() => {
-  //   const restoreFlow = async () => {
-  //     const flow = JSON.parse(localStorage.getItem(flowKey) as string);
-
-  //     if (flow) {
-  //       const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-  //       setNodes(flow.nodes || []);
-  //       setEdges(flow.edges || []);
-  //       setViewport({ x, y, zoom });
-  //     }
-  //   };
-
-  //   restoreFlow();
-  // }, [setNodes, setViewport]);
-
-  // const onAdd = React.useCallback(() => {
-  //   const newNode = {
-  //     id: getNodeId(),
-  //     data: { label: 'Added node' },
-  //     position: {
-  //       x: Math.random() * window.innerWidth - 100,
-  //       y: Math.random() * window.innerHeight,
-  //     },
-  //   };
-  //   setNodes((nds) => nds.concat(newNode));
-  // }, [setNodes]);
-
-  const updatedNodes = calculateNodePositions8(nodes, edges);
+  const updatedNodes = calculateNodePositions(nodes, edges);
 
   return (
     <ReactFlow
       nodes={updatedNodes}
       edges={edges}
+      defaultEdgeOptions={{ type: 'step' }}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
-      // onInit={setRfInstance}
       fitView={true}
     >
-      {/* <Panel position="top-right" className='flex gap-3'>
-        <Button onClick={onSave}>save</Button>
-        <Button onClick={onRestore}>restore</Button>
-        <Button onClick={onAdd}>add node</Button>
-      </Panel> */}
       <Background />
       <DevTools />
       <Controls />

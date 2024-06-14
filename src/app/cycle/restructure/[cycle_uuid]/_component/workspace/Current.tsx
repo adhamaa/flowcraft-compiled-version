@@ -18,7 +18,7 @@ import EndNode from '@/components/reactflow/nodeTypes/Restructure/EndNode';
 import WithEntryAndExitNode from '@/components/reactflow/nodeTypes/Restructure/WithEntryAndExitNode';
 import WithEntry from '@/components/reactflow/nodeTypes/Restructure/WithEntry';
 import WithExit from '@/components/reactflow/nodeTypes/Restructure/WithExit';
-import CalculateNodePositions, { calculateNodePositions2 } from '@/components/reactflow/CalculateNodePositions';
+import { calculateNodePositions } from '@/components/reactflow/CalculateNodePositions';
 
 export enum Position {
   Left = "left",
@@ -59,13 +59,15 @@ function Current() {
     markerEnd: { type: MarkerType.Arrow },
   };
 
+  const updatedNodes = calculateNodePositions(nodes, edges);
+
   return (
     <div className='h-full space-y-6'>
       <h1 className='text-xl font-semibold'>Current Cycle Diagram</h1>
       <div className='border border-black rounded-xl h-full'>
         <ReactFlowProvider>
           <ReactFlow
-            nodes={nodes}
+            nodes={updatedNodes}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
