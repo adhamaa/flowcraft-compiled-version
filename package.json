@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.0.1",
+    "@dagrejs/dagre": "^1.1.2",
     "@hookform/resolvers": "^3.3.4",
     "@mantine/core": "^7.6.1",
     "@mantine/dates": "^7.6.2",
@@ -57,6 +58,7 @@
     "@iconify-icon/react": "^2.0.1",
     "@tanstack/eslint-plugin-query": "^5.28.11",
     "@types/canvas-confetti": "^1.6.4",
+    "@types/dagre": "^0.7.52",
     "@types/node": "^20.12.10",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -17,12 +17,10 @@ import ReactFlow, {
   Background,
   Controls,
   useNodes,
+  ConnectionLineType,
 } from 'reactflow';
+import dagre from '@dagrejs/dagre';
 import 'reactflow/dist/style.css';
-
-const flowKey = 'example-flow';
-
-const getNodeId = () => `randomnode_${+new Date()}`;
 
 // const initialNodes = [
 //   {
@@ -734,6 +732,7 @@ const getNodeId = () => `randomnode_${+new Date()}`;
 // ];
 
 // Example usage:
+
 const initialNodes = [
   { data: { label: "Start" }, id: "1", type: "Start", position: { x: 0, y: 0 }, width: 100, height: 50 },
   { data: { label: "Node 1" }, id: "2", type: "Node", position: { x: 0, y: 0 }, width: 120, height: 60 },
@@ -771,28 +770,88 @@ const initialEdges = [
   { id: '12-13', source: "12", style: { borderWidth: "1px", width: "1px" }, target: "13" },
 ];
 
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-const SaveRestore = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes as any[]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges as any[]);
+const nodeWidth = 150; // horizontal space between nodes
+const nodeHeight = 100; // vertical space between nodes
 
-  const onConnect = React.useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
+  const isHorizontal = direction === 'LR';
+  dagreGraph.setGraph({ rankdir: direction });
 
-  const updatedNodes = calculateNodePositions(nodes, edges);
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+  });
+
+  edges.forEach((edge) => {
+    dagreGraph.setEdge(edge.source, edge.target);
+  });
+
+  dagre.layout(dagreGraph);
+
+  nodes.forEach((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    node.targetPosition = isHorizontal ? 'left' : 'top';
+    node.sourcePosition = isHorizontal ? 'right' : 'bottom';
+
+    // We are shifting the dagre node position (anchor=center center) to the top left
+    // so it matches the React Flow node anchor point (top left).
+    node.position = {
+      x: nodeWithPosition.x - nodeWidth / 2,
+      y: nodeWithPosition.y - nodeHeight / 2,
+    };
+
+    return node;
+  });
+
+  return { nodes, edges };
+};
+
+const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+  initialNodes,
+  initialEdges
+);
+
+const LayoutFlow = () => {
+  const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
+
+  const onConnect = React.useCallback(
+    (params: Edge | Connection) =>
+      setEdges((eds) =>
+        addEdge({ ...params, type: ConnectionLineType.Step, animated: true }, eds)
+      ),
+    []
+  );
+  const onLayout = React.useCallback(
+    (direction: string | undefined) => {
+      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+        nodes,
+        edges,
+        direction
+      );
+
+      setNodes([...layoutedNodes]);
+      setEdges([...layoutedEdges]);
+    },
+    [nodes, edges]
+  );
 
   return (
     <ReactFlow
-      nodes={updatedNodes}
+      nodes={nodes}
       edges={edges}
-      defaultEdgeOptions={{ type: 'step' }}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
-      fitView={true}
+      defaultEdgeOptions={{ animated: false, type: ConnectionLineType.Step }}
+      fitView
     >
-      <Background />
-      <DevTools />
-      <Controls />
+      <Panel position="top-right">
+        <button onClick={() => onLayout('TB')}>vertical layout</button>
+        <button onClick={() => onLayout('LR')}>horizontal layout</button>
+      </Panel>
     </ReactFlow>
   );
 };
@@ -800,7 +859,7 @@ const SaveRestore = () => {
 export default () => (
   <div className='h-screen'>
     <ReactFlowProvider>
-      <SaveRestore />
+      <LayoutFlow />
     </ReactFlowProvider>
   </div>
 );

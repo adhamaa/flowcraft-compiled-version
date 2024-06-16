@@ -19,14 +19,9 @@ import {
 import initialNodes from '@/components/reactflow/nodes';
 import initialEdges from '@/components/reactflow/edges';
 import { Apps_label, getDiagramData } from '@/lib/service/client';
-import { calculateNodePositions } from '@/components/reactflow/CalculateNodePositions';
-
-export type NodeData = {
-  color: string;
-};
 
 export type RFState = {
-  nodes: Node<NodeData>[];
+  nodes: Node[];
   edges: Edge[];
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
@@ -35,7 +30,6 @@ export type RFState = {
   setEdges: (edges: Edge[]) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
   updateNodeColor: (nodeId: string, color: string) => void;
-  getNodesWithPositions: (nodes: Node[], edges: Edge[]) => Node[];
 };
 
 const storage: PersistStorage<RFState> = {
@@ -51,6 +45,7 @@ const storage: PersistStorage<RFState> = {
 }
 
 
+// this is our useStore hook that we can use in our components to get parts of the store and call actions
 const useDiagramStore = create<RFState>()(
   persist(
     (set, get) => ({
@@ -81,38 +76,33 @@ const useDiagramStore = create<RFState>()(
         cycle_id,
         apps_label,
       }) => {
+        const storedData = storage.getItem('diagram-storage');
         const diagramData = await getDiagramData({ cycle_id, apps_label });
         set({
           nodes: diagramData.nodes.map(({ position, ...node }: Node) => {
-            // const removedPosition = { ...node, position: { x: 0, y: 0 } };
-            // return removedPosition
+            const removedPosition = { ...node, position: { x: 0, y: 0 } };
             return {
               ...node,
               position: {
-                x: parseFloat(position.x as never),
-                y: parseFloat(position.y as never)
-                // x: 0,
-                // y: 0
+                x: 0,
+                y: 0
               },
             }
-
           }),
           edges: diagramData.edges.map(({ type, markerEnd, ...edge }: Edge) => {
             return {
               ...edge,
             }
           }),
+
         });
-      },
-      getNodesWithPositions: (nodes, edges) => {
-        const updatedNodes = calculateNodePositions(nodes, edges);
-        console.log('updatedNodes:', updatedNodes)
-        return updatedNodes;
+        // }
       },
       updateNodeColor: (nodeId: string, color: string) => {
         set({
           nodes: get().nodes.map((node) => {
             if (node.id === nodeId) {
+              // it's important to create a new object here, to inform React Flow about the changes
               node.data = { ...node.data, color };
             }
 
@@ -122,7 +112,7 @@ const useDiagramStore = create<RFState>()(
       },
     }),
     {
-      name: 'diagram-storage',
+      name: 'current-diagram-storage',
       storage,
     },
   ),

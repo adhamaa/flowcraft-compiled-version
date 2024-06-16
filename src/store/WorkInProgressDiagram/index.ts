@@ -20,12 +20,8 @@ import initialNodes from '@/components/reactflow/nodes';
 import initialEdges from '@/components/reactflow/edges';
 import { Apps_label, getDiagramData } from '@/lib/service/client';
 
-export type NodeData = {
-  color: string;
-};
-
 export type RFState = {
-  nodes: Node<NodeData>[];
+  nodes: Node[];
   edges: Edge[];
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
@@ -116,7 +112,7 @@ const useDiagramStore = create<RFState>()(
       },
     }),
     {
-      name: 'diagram-storage',
+      name: 'wip-diagram-storage',
       storage,
     },
   ),

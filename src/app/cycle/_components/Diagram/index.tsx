@@ -9,15 +9,15 @@ import { useDisclosure } from '@mantine/hooks';
 import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation';
 import * as React from 'react';
-import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, Handle, Node, ReactFlowProvider } from 'reactflow';
+import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, Handle, Node, Panel, ReactFlowProvider } from 'reactflow';
 import { useShallow } from 'zustand/react/shallow';
-import useDiagramStore, { RFState } from '@/store/Diagram';
 import 'reactflow/dist/style.css';
 import DevTools from '@/components/reactflow/Devtools';
 import { convertToCycleStages, isObjectEmpty } from '@/lib/helper';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import useBaseDiagram from '@/store/BaseDiagram';
 
 
 export enum Position {
@@ -26,16 +26,6 @@ export enum Position {
   Right = "right",
   Bottom = "bottom"
 }
-
-const selector = (state: RFState) => ({
-  nodes: state.nodes,
-  edges: state.edges,
-  onNodesChange: state.onNodesChange,
-  onEdgesChange: state.onEdgesChange,
-  onConnect: state.onConnect,
-  fetchNodesEdges: state.fetchNodesEdges,
-  getNodesWithPositions: state.getNodesWithPositions,
-});
 
 function DataChecker(data: any) {
   // Check if 'data' exists and includes a list with only a string with a star ('*'). If so, return 'Any'
@@ -790,9 +780,7 @@ const Diagram = ({ disabled }: {
   const [opened, { open, close, toggle }] = useDisclosure(false);
   const [renderDiagram, setRenderDiagram] = React.useState(false);
 
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges, getNodesWithPositions } = useDiagramStore(
-    useShallow(selector),
-  );
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges } = useBaseDiagram();
 
 
   const fitViewOptions: FitViewOptions = {
@@ -825,16 +813,16 @@ const Diagram = ({ disabled }: {
           ) : (
             <div style={{ height: '80vh' }}>
               <ReactFlow
-                nodes={getNodesWithPositions(nodes, edges)}
+                nodes={nodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
-                fitView={true}
+                fitView
                 fitViewOptions={fitViewOptions}
                 defaultEdgeOptions={defaultEdgeOptions}
                 nodeTypes={nodeTypes}
-                nodesDraggable={false}
+              // nodesDraggable={false}
               >
                 {/* <Background /> */}
                 <Controls />
