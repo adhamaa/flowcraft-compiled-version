@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@iconify-icon/react';
-import { ActionIcon, Button, Flex, Group, Input, Modal, ScrollArea, Text } from '@mantine/core'
+import { ActionIcon, Button, Flex, Group, Input, Modal, ScrollArea, ScrollAreaAutosize, Text } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import Image from 'next/image';
 import * as React from 'react'
@@ -274,10 +274,10 @@ const GeneralFormContent = ({
   const max_h_768 = useMediaQuery('(max-height: 768px)');
 
   return (
-    <ScrollArea.Autosize mah={max_h_768 ? 700 : 768}>
+    <ScrollAreaAutosize mah={max_h_768 ? 700 : 768}>
       <FormProvider {...methods}>
         <form
-          className={clsx('space-y-4 pb-4', max_h_768 && 'pb-8')}
+          className={clsx('space-y-4 pb-4', max_h_768 && 'pb-14')}
           onSubmit={handleSubmit(onSubmit)}
           onError={(e) => console.log(e)}
         >
@@ -330,7 +330,7 @@ const GeneralFormContent = ({
           </div>
         </form>
       </FormProvider>
-    </ScrollArea.Autosize >
+    </ScrollAreaAutosize >
   )
 };
 

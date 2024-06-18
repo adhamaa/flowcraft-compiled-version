@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Flex, List, Modal, ScrollArea, Stack, Text, } from '@mantine/core';
+import { Button, Flex, List, Modal, ScrollArea, ScrollAreaAutosize, Stack, Text, } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
@@ -475,10 +475,10 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
   const max_h_768 = useMediaQuery('(max-height: 768px)');
 
   return (
-    <ScrollArea.Autosize mah={max_h_768 ? 700 : 768}>
+    <ScrollAreaAutosize mah={max_h_768 ? 700 : 768}>
       <FormProvider {...methods}>
         <form
-          className={clsx('space-y-4 pb-4', max_h_768 && 'pb-8')}
+          className={clsx('space-y-4 pb-4', max_h_768 && 'pb-14')}
           onSubmit={handleSubmit(onSaveSubmit)}
         >
           <HeaderForm type='stages' {...{ toggleExpand }} />
@@ -495,7 +495,7 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
           </div>
         </form >
       </FormProvider>
-    </ScrollArea.Autosize>
+    </ScrollAreaAutosize>
   )
 }
 

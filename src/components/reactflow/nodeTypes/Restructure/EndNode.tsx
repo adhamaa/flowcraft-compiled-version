@@ -4,13 +4,13 @@ import { Handle, Position, NodeResizer, NodeProps } from 'reactflow';
 
 const EndNode = ({ data: { label }, selected }: NodeProps) => {
   return (
-    <div className='flex flex-col items-center'>
+    <div className='flex flex-col items-center w-60'>
       <NodeResizer color="#ff0071" isVisible={selected} minWidth={100} minHeight={30} />
       <Handle type="target" position={Position.Top} className='opacity-0' />
+      <div className='border border-gray-300 p-4'>
+        <label htmlFor={label}>{label}</label>
+      </div>
       <Circle />
-      {/* <div className='border border-gray-300 p-4'>
-        <label htmlFor={node.data.label}>{node.data.label}</label>
-      </div> */}
       {/* <Handle type="source" position={Position.Bottom} className='opacity-0' /> */}
     </div>
   )
