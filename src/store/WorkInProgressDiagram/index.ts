@@ -15,6 +15,7 @@ import {
   OnConnect,
   applyNodeChanges,
   applyEdgeChanges,
+  ReactFlowInstance,
 } from 'reactflow';
 
 import initialNodes from '@/components/reactflow/nodes';
@@ -30,16 +31,19 @@ const nodeWidth = 250; // horizontal space between nodes
 const nodeHeight = 200; // vertical space between nodes
 
 type RFState = {
+  flowKey: string | undefined;
   nodes: Node[];
   edges: Edge[];
+  rfInstance: ReactFlowInstance | null;
+  getNodeId: () => string;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   onLayout: (direction: string | undefined) => void;
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
+  setRfInstance: (rfInstance: ReactFlowInstance) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
-  updateNodeColor: (nodeId: string, color: string) => void;
 };
 
 const storage: PersistStorage<RFState> = {
@@ -88,11 +92,16 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
   return { nodes, edges };
 };
 
+
+
 const useDiagramStore = create<RFState>()(
   persist(
     (set, get) => ({
+      flowKey: 'wip-flow',
       nodes: initialNodes,
       edges: initialEdges,
+      rfInstance: null,
+      getNodeId: () => `randomnode_${+new Date()}`,
       onNodesChange: (changes: NodeChange[]) => {
         set({
           nodes: applyNodeChanges(changes, get().nodes),
@@ -117,11 +126,46 @@ const useDiagramStore = create<RFState>()(
 
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
+      onSave: () => {
+        if (get().rfInstance) {
+          const flow = get().rfInstance!.toObject();
+          localStorage.setItem('flow', JSON.stringify(flow));
+        }
+      },
+      onRestore: () => {
+        const restoreFlow = async () => {
+          const flow = JSON.parse(localStorage.getItem(get().flowKey as string) as string);
+
+          if (flow) {
+            const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+            set({ nodes: flow.nodes || [], edges: flow.edges || [] });
+            get().rfInstance?.setViewport({ x, y, zoom });
+          }
+        };
+
+        restoreFlow();
+      },
+      onAdd: () => {
+        const node = {
+          id: get().getNodeId(),
+          type: 'default',
+          data: { label: 'New Node' },
+          position: {
+            x: Math.random() * window.innerWidth - 100,
+            y: Math.random() * window.innerHeight - 100,
+          },
+        };
+
+        set({ nodes: [...get().nodes, node] });
+      },
       setNodes: (nodes: Node[]) => {
         set({ nodes });
       },
       setEdges: (edges: Edge[]) => {
         set({ edges });
+      },
+      setRfInstance: (rfInstance: any) => {
+        set({ rfInstance });
       },
       fetchNodesEdges: async ({
         cycle_id,
@@ -143,17 +187,6 @@ const useDiagramStore = create<RFState>()(
         set({
           nodes: layoutedNodes,
           edges: layoutedEdges,
-        });
-      },
-      updateNodeColor: (nodeId: string, color: string) => {
-        set({
-          nodes: get().nodes.map((node) => {
-            if (node.id === nodeId) {
-              node.data = { ...node.data, color };
-            }
-
-            return node;
-          }),
         });
       },
     }),
