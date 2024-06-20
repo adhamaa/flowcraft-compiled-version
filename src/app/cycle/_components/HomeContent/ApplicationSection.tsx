@@ -57,7 +57,7 @@ const ApplicationSection = ({
     )} > {/* #CBD5E140 */}
       <div className="p-4" >
         <div className={clsx("flex items-center")}>
-          <h2 className='font-bold text-lg'>Appplications</h2>
+          <h2 className='font-bold text-lg'>Applications</h2>
           &nbsp;
           {selectedApp && <span>{`(${selectedApp})`}</span>}
           <UnstyledButton className='ml-auto text-sm' onClick={toggle} color='blue'>

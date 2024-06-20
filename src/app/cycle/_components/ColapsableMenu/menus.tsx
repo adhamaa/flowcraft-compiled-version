@@ -230,7 +230,7 @@ function SideMenus() {
                                 {!deleted_stage_route && <FooterButton
                                   {...{ isSideMenuCollapse }}
                                   isRestructure
-                                  onClick={() => router.push(`/cycle/restructure/${cycleUuid}`)}
+                                  onClick={() => router.push(`/cycle/restructure/${cycleUuid}?` + createQueryString('cycle_id', cycle_id as string))}
                                 />}
                               </TabsList>)}
                         </Tabs>

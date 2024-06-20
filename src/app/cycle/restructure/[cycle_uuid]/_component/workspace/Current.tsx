@@ -1,16 +1,8 @@
 'use client';
 
-import Diagram from '@/app/cycle/_components/Diagram';
-import useDiagramStore, { RFState } from '@/store/Diagram';
-import { useDisclosure } from '@mantine/hooks';
-import { useParams, useSearchParams } from 'next/navigation';
 import * as React from 'react'
-import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, Handle, MarkerType, Node, NodeResizer, ReactFlowProvider } from 'reactflow';
-import { useShallow } from 'zustand/react/shallow';
-import 'reactflow/dist/style.css';
-import '@/components/reactflow/style.css';
-import Circle from '../circle';
-import Diamond from '../diamond';
+import { useParams, useSearchParams } from 'next/navigation';
+import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType, ReactFlowProvider } from 'reactflow';
 import FloatingEdge from '@/components/reactflow/edgeTypes/FloatingEdge';
 import FloatingConnectionLine from '@/components/reactflow/edgeTypes/FloatingConnectionLine';
 import StartNode from '@/components/reactflow/nodeTypes/Restructure/StartNode';
@@ -18,36 +10,29 @@ import EndNode from '@/components/reactflow/nodeTypes/Restructure/EndNode';
 import WithEntryAndExitNode from '@/components/reactflow/nodeTypes/Restructure/WithEntryAndExitNode';
 import WithEntry from '@/components/reactflow/nodeTypes/Restructure/WithEntry';
 import WithExit from '@/components/reactflow/nodeTypes/Restructure/WithExit';
-import CalculateNodePositions, { calculateNodePositions2 } from '@/components/reactflow/CalculateNodePositions';
+import useCurrentDiagram from '@/store/CurrentDiagram';
 
-export enum Position {
-  Left = "left",
-  Top = "top",
-  Right = "right",
-  Bottom = "bottom"
-}
+import 'reactflow/dist/style.css';
+import '@/components/reactflow/style.css';
 
-const selector = (state: RFState) => ({
-  nodes: state.nodes,
-  edges: state.edges,
-  onNodesChange: state.onNodesChange,
-  onEdgesChange: state.onEdgesChange,
-  onConnect: state.onConnect,
-  fetchNodesEdges: state.fetchNodesEdges,
-});
+const nodeTypes = {
+  Start: StartNode,
+  WithEntry: WithEntry,
+  WithExit: WithExit,
+  WithEntryAndExit: WithEntryAndExitNode,
+  End: EndNode,
+};
+
+const edgeTypes = { floating: FloatingEdge };
 
 function Current() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const cycle_id = params.cycle_id;
+  const cycle_id = searchParams.get('cycle_id');
   const selected_app = searchParams.get('selected_app');
 
-  const [opened, { open, close, toggle }] = useDisclosure(false);
-  const [renderDiagram, setRenderDiagram] = React.useState(false);
 
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges } = useDiagramStore(
-    useShallow(selector),
-  );
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges } = useCurrentDiagram();
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
@@ -58,6 +43,13 @@ function Current() {
     type: 'smoothstep',
     markerEnd: { type: MarkerType.Arrow },
   };
+
+  React.useEffect(() => {
+    fetchNodesEdges({
+      cycle_id: cycle_id as string,
+      apps_label: selected_app as any
+    });
+  }, [cycle_id, selected_app]);
 
   return (
     <div className='h-full space-y-6'>
@@ -74,15 +66,9 @@ function Current() {
             fitViewOptions={fitViewOptions}
             defaultEdgeOptions={defaultEdgeOptions}
             connectionLineComponent={FloatingConnectionLine}
-            edgeTypes={{ floating: FloatingEdge }}
-            nodeTypes={{
-              Start: StartNode,
-              WithEntry: WithEntry,
-              WithExit: WithExit,
-              WithEntryAndExit: WithEntryAndExitNode,
-              End: EndNode,
-            }}
-          // nodesDraggable={false}
+            edgeTypes={edgeTypes}
+            nodeTypes={nodeTypes}
+            nodesDraggable={false}
           >
             <Background />
             <Controls />
@@ -103,11 +89,7 @@ function Current() {
       `}</style>
         </ReactFlowProvider>
       </div>
-    </div>
+    </div >
   );
 };
 export default Current
-
-// new store for this \
-// shape
-// action

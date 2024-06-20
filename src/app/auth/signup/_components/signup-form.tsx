@@ -15,7 +15,7 @@ import Image from 'next/image';
 function SignupForm() {
   const router = useRouter();
 
-  const { handleSubmit, control } = useForm({
+  const { handleSubmit, control, formState: { isSubmitting, isLoading, isValidating } } = useForm({
     resolver: zodResolver(registerSchema),
   })
 
@@ -116,9 +116,14 @@ function SignupForm() {
               Back to login
             </Anchor>
           </div>
-          <Button type='submit' color='#895CF3' radius='md' classNames={{
-            root: '!w-full !my-8',
-          }}>
+          <Button
+            type='submit'
+            loading={isSubmitting || isLoading || isValidating}
+            color='#895CF3'
+            radius='md'
+            classNames={{
+              root: '!w-full !my-8',
+            }}>
             Sign up
           </Button>
         </form >

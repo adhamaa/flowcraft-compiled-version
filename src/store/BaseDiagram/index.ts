@@ -15,7 +15,6 @@ import {
   OnConnect,
   applyNodeChanges,
   applyEdgeChanges,
-  ReactFlowInstance,
 } from 'reactflow';
 
 import initialNodes from '@/components/reactflow/nodes';
@@ -31,28 +30,16 @@ const nodeWidth = 250; // horizontal space between nodes
 const nodeHeight = 200; // vertical space between nodes
 
 type RFState = {
-  flowKey: string | undefined;
   nodes: Node[];
   edges: Edge[];
-  rfInstance: ReactFlowInstance | null;
-  generateNodeId: () => string;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   onLayout: (direction: string | undefined) => void;
-  onSave: () => void;
-  onApply: () => void;
-  onReset: () => void;
-  onAdd: () => void;
-  onMove: () => void;
-  onDuplicate: () => void;
-  onDelete: () => void;
-  onRestore: () => void;
-  onDisjoint: () => void;
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
-  setRfInstance: (rfInstance: ReactFlowInstance) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
+  updateNodeColor: (nodeId: string, color: string) => void;
 };
 
 const storage: PersistStorage<RFState> = {
@@ -101,16 +88,11 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
   return { nodes, edges };
 };
 
-
-
 const useDiagramStore = create<RFState>()(
   persist(
     (set, get) => ({
-      flowKey: 'wip-flow',
       nodes: initialNodes,
       edges: initialEdges,
-      rfInstance: null,
-      generateNodeId: () => crypto.randomUUID(),
       onNodesChange: (changes: NodeChange[]) => {
         set({
           nodes: applyNodeChanges(changes, get().nodes),
@@ -135,124 +117,11 @@ const useDiagramStore = create<RFState>()(
 
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
-      onSave: () => {
-        console.log('save')
-      },
-      onApply: () => {
-        const instance = get().rfInstance;
-        const key = get().flowKey as string;
-
-        if (instance) {
-          const flow = instance.toObject();
-          localStorage.setItem(key, JSON.stringify(flow));
-        }
-      },
-      onReset: () => {
-        const instance = get().rfInstance;
-        const key = get().flowKey as string;
-
-        const restoreFlow = async () => {
-          const flow = JSON.parse(localStorage.getItem(key) as string);
-
-          if (flow) {
-            const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-            set({ nodes: flow.nodes || [], edges: flow.edges || [] });
-            instance?.setViewport({ x, y, zoom });
-          }
-        };
-
-        restoreFlow();
-      },
-      onAdd: () => {
-        const uuid = get().generateNodeId();
-        console.log('uuid:', uuid)
-        const node = {
-          id: uuid,
-          type: 'default',
-          data: { label: 'New Node' },
-          position: {
-            x: Math.random() * window.innerWidth - 100,
-            y: Math.random() * window.innerHeight - 100,
-          },
-        };
-
-        set({ nodes: [...get().nodes, node] });
-      },
-      onMove: () => { console.log('move') },
-      onDuplicate: () => {
-        const { nodes, edges } = get();
-        const selectedNodes = nodes.filter((node) => node.selected);
-
-        selectedNodes.forEach((node) => {
-          const position = {
-            x: node.position.x + 50,
-            y: node.position.y + 50,
-          };
-
-          const newNode = {
-            ...node,
-            selected: false,
-            dragging: false,
-            id: `${node.id}-Copy`,
-            position,
-          };
-
-          set({ nodes: [...nodes, newNode] });
-        });
-      },
-      onDelete: () => {
-        const { nodes, edges } = get();
-        const selectedNodes = nodes.filter((node) => node.selected);
-
-        selectedNodes.forEach((node) => {
-          set({
-            nodes: nodes.filter((n) => n.id !== node.id),
-            edges: edges.filter((e) => e.source !== node.id && e.target !== node.id),
-          });
-        });
-      },
-      onRestore: () => { console.log('restore') },
-      onDisjoint: () => { console.log('disjoint') },
       setNodes: (nodes: Node[]) => {
         set({ nodes });
       },
       setEdges: (edges: Edge[]) => {
         set({ edges });
-      },
-      setRfInstance: (rfInstance: any) => {
-        set({ rfInstance });
-      },
-      toggleSelectedByNodeId: (nodeId: string) => {
-        set((state) => ({
-          nodes: state.nodes.map((node) => {
-            if (node.id === nodeId) {
-              node.selected = !node.selected;
-            } else {
-              node.selected = false;
-            }
-
-            return node;
-          }),
-        }));
-      },
-      addEdgesByNodeId: (nodeId: string) => {
-        const { nodes, edges } = get();
-        const selectedNode = nodes.find((node) => node.id === nodeId);
-
-        if (!selectedNode) {
-          return;
-        }
-
-        const newEdges = nodes
-          .filter((node) => node.id !== selectedNode.id && node.selected)
-          .map((node) => ({
-            id: `edge-${selectedNode.id}-${node.id}`,
-            source: selectedNode.id,
-            target: node.id,
-            animated: true,
-          }));
-
-        set({ edges: [...edges, ...newEdges] });
       },
       fetchNodesEdges: async ({
         cycle_id,
@@ -276,15 +145,26 @@ const useDiagramStore = create<RFState>()(
           edges: layoutedEdges,
         });
       },
+      updateNodeColor: (nodeId: string, color: string) => {
+        set({
+          nodes: get().nodes.map((node) => {
+            if (node.id === nodeId) {
+              node.data = { ...node.data, color };
+            }
+
+            return node;
+          }),
+        });
+      },
     }),
     {
-      name: 'wip-diagram-storage',
+      name: 'base-diagram-storage',
       storage,
     },
   ),
 );
 
-const useWorkInProgressDiagram = () => useDiagramStore(
+const useBaseDiagram = () => useDiagramStore(
   useShallow((state: RFState) => ({
     nodes: state.nodes,
     edges: state.edges,
@@ -292,19 +172,8 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
     onLayout: state.onLayout,
-    onSave: state.onSave,
-    onApply: state.onApply,
-    onReset: state.onReset,
-    onAdd: state.onAdd,
-    onMove: state.onMove,
-    onDuplicate: state.onDuplicate,
-    onDelete: state.onDelete,
-    onRestore: state.onRestore,
-    onDisjoint: state.onDisjoint,
-    setRfInstance: state.setRfInstance,
     fetchNodesEdges: state.fetchNodesEdges,
   })),
 );
 
-export default useWorkInProgressDiagram;
-
+export default useBaseDiagram;

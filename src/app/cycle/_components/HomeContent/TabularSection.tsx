@@ -106,19 +106,18 @@ const TabularSection = ({ opened,
                       Cancel
                     </Button>
                     <Button onClick={async () => {
-                      await reloadBizProcess({
-                        cycle_id: cycle_id.toString(),
-                        apps_label: app_label as Apps_label,
-                      })
-                        .then((res) => {
-                          if (res) {
-                            toast.success(res.message)
-                          }
-                        }).catch((err) => {
-                          toast.error(err.message)
-                        }).finally(() => {
-                          modals.closeAll()
+                      try {
+                        const res = await reloadBizProcess({
+                          cycle_id: cycle_id.toString(),
+                          apps_label: app_label as Apps_label,
                         });
+                        toast.success(res.message);
+                      } catch (err: any) {
+                        toast.error('Failed to reload business process' + '\n' +
+                          'Incorect cycle id or application label provided');
+                      } finally {
+                        modals.closeAll();
+                      }
                     }} color='#895CF3' radius='md'>
                       Yes
                     </Button>
@@ -227,8 +226,8 @@ const TabularSection = ({ opened,
         </Menu.Target>
 
         <Menu.Dropdown>
-          {tripleDotMenu.map((menuLayer) => (
-            <div key={menuLayer.group}>
+          {tripleDotMenu.map((menuLayer, i) => (
+            <div key={menuLayer.group + i}>
               {menuLayer.menu.map((menu) => (
                 <Menu.Item key={menu.label} onClick={() => menu.onClick(row)} disabled={menu.disabled}>
                   {menu.label}
@@ -279,6 +278,60 @@ const TabularSection = ({ opened,
     }
   }, [activeTab, createQueryString, data_source, pathname, router, selected_app])
 
+  const actionIcons = [
+    {
+      tooltip: "Reload Business Process (All)",
+      icon: "heroicons-outline:refresh",
+      onClick: async () => {
+        modals.open({
+          title: 'Confirm update',
+          children: (
+            <>
+              <Text size="sm">Are you sure you want to Reload <strong>The Business Process</strong>?</Text>
+              <Flex gap={16} justify={'end'} mt="md">
+                <Button
+                  onClick={() => modals.closeAll()}
+                  color='#F1F5F9'
+                  c='#0F172A'
+                  radius='md'>
+                  Cancel
+                </Button>
+                <Button onClick={
+                  async () => {
+                    try {
+                      const res = await reloadBizProcess();
+                      toast.success(res.message)
+                    } catch (err: any) {
+                      toast.error(err.message);
+                    } finally {
+                      modals.closeAll();
+                    }
+                  }} color='#895CF3' radius='md'>
+                  Yes
+                </Button>
+              </Flex>
+            </>
+          ),
+          overlayProps: {
+            backgroundOpacity: 0.55,
+            blur: 10,
+          },
+          radius: 'md',
+        });
+      },
+    },
+    {
+      tooltip: "Filter",
+      icon: "heroicons-outline:adjustments",
+      disabled: true,
+    },
+    {
+      tooltip: "Sort",
+      icon: "heroicons-outline:switch-vertical",
+      disabled: true,
+    },
+  ];
+
 
   return (
     <section className='flex flex-col items-center'>
@@ -323,78 +376,23 @@ const TabularSection = ({ opened,
               {isPagination && <MRT_TablePagination table={table} color='#895CF3' />}
 
               <div className='flex ml-2 gap-4'>
-                <Tooltip label="Reload Business Process (All)">
-                  <ActionIcon
-                    disabled
-                    onClick={async () => {
-                      modals.open({
-                        title: 'Confirm update',
-                        children: (
-                          <>
-                            <Text size="sm">Are you sure you want to Reload <strong>The Business Process</strong>?</Text>
-                            <Flex gap={16} justify={'end'} mt="md">
-                              <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
-                                Cancel
-                              </Button>
-                              <Button onClick={
-                                async () => {
-                                  await reloadBizProcess()
-                                    .then((res) => {
-                                      if (res) {
-                                        toast.success(res.message)
-                                      }
-                                    }).catch((err) => {
-                                      toast.error(err.message)
-                                    }).finally(() => {
-                                      modals.closeAll()
-                                    });
-                                }} color='#895CF3' radius='md'>
-                                Yes
-                              </Button>
-                            </Flex>
-                          </>
-                        ),
-                        overlayProps: {
-                          backgroundOpacity: 0.55,
-                          blur: 10,
-                        },
-                        radius: 'md',
-                      });
-
-                    }}
-                    variant="transparent"
-                    bg="#F1F5F9"
-                    color='black'
-                    size="lg"
-                    radius="md"
-                    aria-label="Settings">
-                    <Icon icon="heroicons-outline:refresh" width="1rem" height="1rem" />
-                  </ActionIcon>
-                </Tooltip>
-                <Tooltip label="Filter">
-                  <ActionIcon
-                    disabled
-                    variant="transparent"
-                    bg="#F1F5F9"
-                    color='black'
-                    size="lg"
-                    radius="md"
-                    aria-label="Settings">
-                    <Icon icon="heroicons-outline:adjustments" width="1rem" height="1rem" />
-                  </ActionIcon>
-                </Tooltip>
-                <Tooltip label="Sort">
-                  <ActionIcon
-                    disabled
-                    variant="transparent"
-                    bg="#F1F5F9"
-                    color='black'
-                    size="lg"
-                    radius="md"
-                    aria-label="Settings">
-                    <Icon icon="heroicons-outline:switch-vertical" width="1rem" height="1rem" />
-                  </ActionIcon>
-                </Tooltip>
+                {
+                  actionIcons.map((icon, i) => (
+                    <Tooltip key={icon.tooltip + i} label={icon.tooltip}>
+                      <ActionIcon
+                        disabled={icon.disabled}
+                        onClick={icon.onClick}
+                        variant="transparent"
+                        bg="#F1F5F9"
+                        color='black'
+                        size="lg"
+                        radius="md"
+                        aria-label="Settings">
+                        <Icon icon={icon.icon} width="1rem" height="1rem" />
+                      </ActionIcon>
+                    </Tooltip>
+                  ))
+                }
               </div>
             </Flex>
 
@@ -450,3 +448,6 @@ const TabularSection = ({ opened,
 }
 
 export default TabularSection;
+
+
+
