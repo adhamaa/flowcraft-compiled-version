@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react'
-import { useDisclosure } from '@mantine/hooks';
 import { useParams, useSearchParams } from 'next/navigation';
 import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType, ReactFlowProvider } from 'reactflow';
 import FloatingEdge from '@/components/reactflow/edgeTypes/FloatingEdge';
@@ -16,6 +15,15 @@ import useCurrentDiagram from '@/store/CurrentDiagram';
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
 
+const nodeTypes = {
+  Start: StartNode,
+  WithEntry: WithEntry,
+  WithExit: WithExit,
+  WithEntryAndExit: WithEntryAndExitNode,
+  End: EndNode,
+};
+
+const edgeTypes = { floating: FloatingEdge };
 
 function Current() {
   const params = useParams();
@@ -23,8 +31,6 @@ function Current() {
   const cycle_id = searchParams.get('cycle_id');
   const selected_app = searchParams.get('selected_app');
 
-  const [opened, { open, close, toggle }] = useDisclosure(false);
-  const [renderDiagram, setRenderDiagram] = React.useState(false);
 
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges } = useCurrentDiagram();
 
@@ -60,14 +66,8 @@ function Current() {
             fitViewOptions={fitViewOptions}
             defaultEdgeOptions={defaultEdgeOptions}
             connectionLineComponent={FloatingConnectionLine}
-            edgeTypes={{ floating: FloatingEdge }}
-            nodeTypes={{
-              Start: StartNode,
-              WithEntry: WithEntry,
-              WithExit: WithExit,
-              WithEntryAndExit: WithEntryAndExitNode,
-              End: EndNode,
-            }}
+            edgeTypes={edgeTypes}
+            nodeTypes={nodeTypes}
             nodesDraggable={false}
           >
             <Background />

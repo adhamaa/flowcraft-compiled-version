@@ -1,9 +1,8 @@
 'use client';
 
 import * as React from 'react'
-import { useDisclosure } from '@mantine/hooks';
 import { useParams, useSearchParams } from 'next/navigation';
-import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType, ReactFlowProvider, useReactFlow } from 'reactflow';
+import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType, ReactFlowProvider } from 'reactflow';
 import FloatingEdge from '@/components/reactflow/edgeTypes/FloatingEdge';
 import FloatingConnectionLine from '@/components/reactflow/edgeTypes/FloatingConnectionLine';
 import StartNode from '@/components/reactflow/nodeTypes/Restructure/StartNode';
@@ -16,6 +15,15 @@ import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 
+const nodeTypes = {
+  Start: StartNode,
+  WithEntry: WithEntry,
+  WithExit: WithExit,
+  WithEntryAndExit: WithEntryAndExitNode,
+  End: EndNode,
+};
+
+const edgeTypes = { floating: FloatingEdge };
 
 function Wip() {
   const params = useParams();
@@ -23,10 +31,8 @@ function Wip() {
   const cycle_id = searchParams.get('cycle_id');
   const selected_app = searchParams.get('selected_app');
 
-  const [opened, { open, close, toggle }] = useDisclosure(false);
-  const [renderDiagram, setRenderDiagram] = React.useState(false);
-
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, fetchNodesEdges } = useWorkInProgressDiagram();
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setRfInstance, fetchNodesEdges } = useWorkInProgressDiagram();
+  console.log('nodes:', nodes)
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
@@ -53,6 +59,7 @@ function Wip() {
           <ReactFlow
             nodes={nodes}
             edges={edges}
+            onInit={setRfInstance}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
@@ -60,15 +67,9 @@ function Wip() {
             fitViewOptions={fitViewOptions}
             defaultEdgeOptions={defaultEdgeOptions}
             connectionLineComponent={FloatingConnectionLine}
-            edgeTypes={{ floating: FloatingEdge }}
-            nodeTypes={{
-              Start: StartNode,
-              WithEntry: WithEntry,
-              WithExit: WithExit,
-              WithEntryAndExit: WithEntryAndExitNode,
-              End: EndNode,
-            }}
-            nodesDraggable={false}
+            edgeTypes={edgeTypes}
+            nodeTypes={nodeTypes}
+          // nodesDraggable={false}
           >
             <Background />
             <Controls />

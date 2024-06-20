@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import ActionIcons from './ActionIcons';
 import ActionButtons from './ActionButtons';
+import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 
 type Action = "Add" | "Move" | "Duplicate" | "Delete" | "Restore" | "Disjoint";
 
@@ -18,7 +19,10 @@ function FlowObjects() {
       {/* ---------- input section ----------- */}
       <>
         {action && <h1 className='text-xl font-semibold'>{action} stage</h1>}
-        <div className='border border-black rounded-xl h-72'>4</div>
+        <div className='border border-black rounded-xl h-72'>
+          {/* Stage Name dropdown (list of stage uuid, but shows the user its name) */}
+          {/* Position dropdown (refer to the list of Stage uuid) */}
+        </div>
         <ActionButtons />
       </>
     </div>

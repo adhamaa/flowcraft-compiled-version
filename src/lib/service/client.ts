@@ -534,8 +534,8 @@ export const getSemanticsErrorMessages = async ({ params }: { params: { error_me
   return data;
 }
 
-export const testSemanticStageName = async ({ params }: { params: { stage_name: string; } }) => {
-  const endpoint = `/semanticEngine/testStageName/?strText=${params.stage_name}`;
+export const testSemanticStageName = async ({ params }: { params: { stage_name: string; cycle_id: string; } }) => {
+  const endpoint = `/semanticEngine/testStageName/?strText=${params.stage_name}&intCycleId=${params.cycle_id}`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'GET',

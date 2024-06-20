@@ -169,9 +169,10 @@ export const onSyntaxSubmit = async (formdata: any, e: any) => {
  */
 export const onSemanticSubmit = async (formdata: any, e: any) => {
   const target_id = e.target.offsetParent.id
+  const cycle_id = e.target.offsetParent.dataset.cycle_id
   const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
   if (target_id === 'process_stage_name') {
-    await testSemanticStageName({ params: { stage_name: str_test_semantic } })
+    await testSemanticStageName({ params: { stage_name: str_test_semantic, cycle_id } })
       .then(async (response) => {
         if (response.error) {
           toast.error(response.message);
@@ -261,6 +262,7 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
   const searchParams = useSearchParams();
   const pageUrl = `${pathname}?${searchParams}`;
   const stage_uuid = params.stage_uuid;
+  const cycle_id = params.cycle_id;
   const datasource_type = searchParams.get('data_source');
   const isDeletedStage = pathname.includes('deleted');
 
@@ -339,7 +341,7 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
                       modals.closeAll();
                     });
 
-                  semantics = await testSemanticStageName({ params: { stage_name: value } })
+                  semantics = await testSemanticStageName({ params: { stage_name: value, cycle_id: cycle_id as string } })
                     .then((response) => {
                       if (response.error) {
                         toast.error(response.message);

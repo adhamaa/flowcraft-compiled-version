@@ -226,8 +226,8 @@ const TabularSection = ({ opened,
         </Menu.Target>
 
         <Menu.Dropdown>
-          {tripleDotMenu.map((menuLayer) => (
-            <div key={menuLayer.group}>
+          {tripleDotMenu.map((menuLayer, i) => (
+            <div key={menuLayer.group + i}>
               {menuLayer.menu.map((menu) => (
                 <Menu.Item key={menu.label} onClick={() => menu.onClick(row)} disabled={menu.disabled}>
                   {menu.label}
@@ -377,8 +377,8 @@ const TabularSection = ({ opened,
 
               <div className='flex ml-2 gap-4'>
                 {
-                  actionIcons.map((icon) => (
-                    <Tooltip label={icon.tooltip}>
+                  actionIcons.map((icon, i) => (
+                    <Tooltip key={icon.tooltip + i} label={icon.tooltip}>
                       <ActionIcon
                         disabled={icon.disabled}
                         onClick={icon.onClick}
