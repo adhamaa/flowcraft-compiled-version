@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Button, Text } from "@mantine/core";
 import { ContextModalProps } from "@mantine/modals";
-import modals from ".";
 
 const ConfirmModal = ({
   context,
@@ -28,8 +27,8 @@ const ConfirmModal = ({
 
 export default ConfirmModal;
 
-declare module '@mantine/modals' {
-  export interface MantineModalsOverride {
-    modals: typeof modals;
-  }
-}
+// declare module '@mantine/modals' {
+//   export interface MantineModalsOverride {
+//     modals: typeof modals;
+//   }
+// }
