@@ -168,9 +168,11 @@ export const onSyntaxSubmit = async (formdata: any, e: any) => {
  * @returns {Promise<void>}
  */
 export const onSemanticSubmit = async (formdata: any, e: any) => {
-  const target_id = e.target.offsetParent.id
-  const cycle_id = e.target.offsetParent.dataset.cycle_id
+  const target_id = e.target.offsetParent.id;
+  const cycle_id = e.target.offsetParent.dataset.cycle_id;
   const str_test_semantic = target_id === 'process_stage_name' ? formdata[target_id] : JSON.parse(formdata[target_id]);
+  const current_stage = e.target.offsetParent.dataset.stage_uuid;
+  const current_key = target_id;
   if (target_id === 'process_stage_name') {
     await testSemanticStageName({ params: { stage_name: str_test_semantic, cycle_id } })
       .then(async (response) => {
@@ -210,7 +212,7 @@ export const onSemanticSubmit = async (formdata: any, e: any) => {
         toast.error('Failed to test stage name' + '\n' + error);
       });
   } else {
-    await evaluateSemantics({ body: { str_test_semantic } })
+    await evaluateSemantics({ body: { str_test_semantic, current_stage, current_key } })
       .then(async (response) => {
         if (response.error) {
           toast.error(response.message);
@@ -402,7 +404,7 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
                     });
                 }
 
-                semantics = await evaluateSemantics({ body: { str_test_semantic: value } })
+                semantics = await evaluateSemantics({ body: { str_test_semantic: value, current_stage: stage_uuid as string, current_key: target_id } })
                   .then(async (response) => {
                     if (response.error) {
                       toast.error(response.message);

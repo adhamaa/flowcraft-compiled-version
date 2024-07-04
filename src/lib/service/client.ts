@@ -488,7 +488,7 @@ export const testSyntaxStageName = async ({ params }: { params: { stage_name: st
   return data;
 }
 
-export const evaluateSemantics = async ({ body }: { body: { str_test_semantic: string } }) => {
+export const evaluateSemantics = async ({ body }: { body: { str_test_semantic: string; current_stage: string; current_key: string; } }) => {
   const endpoint = `/semanticEngine/`;
   const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
@@ -497,7 +497,7 @@ export const evaluateSemantics = async ({ body }: { body: { str_test_semantic: s
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
-    body: JSON.stringify({ str_test_semantic: body.str_test_semantic }),
+    body: JSON.stringify({ str_test_semantic: body.str_test_semantic, current_stage: body.current_stage, current_key: body.current_key }),
     next: { tags: ['evaluatesemantics'] }
   });
   if (response.status === 404) {
