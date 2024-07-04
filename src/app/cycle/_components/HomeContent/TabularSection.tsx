@@ -152,11 +152,11 @@ const TabularSection = ({ opened,
 
   const columns: MRT_ColumnDef<CycleData>[] = [
     {
-      header: 'Cycle Name',
+      header: 'Cycle name',
       accessorFn: (originalRow) => originalRow.cycle_name,
     },
     {
-      header: 'Cycle ID',
+      header: 'Cycle id',
       accessorFn: (originalRow) => originalRow.cycle_id,
     },
     {
@@ -164,11 +164,15 @@ const TabularSection = ({ opened,
       accessorFn: (originalRow) => originalRow.app_name,
     },
     {
-      header: 'Date Created',
+      header: 'Date created',
       accessorFn: (originalRow) => originalRow.cycle_created,
     },
     {
-      header: 'No of Stages',
+      header: 'Last edited date',
+      accessorFn: (originalRow) => originalRow.cycle_updated,
+    },
+    {
+      header: 'No of stages',
       accessorFn: (originalRow) => originalRow.no_of_stages,
     },
     {
