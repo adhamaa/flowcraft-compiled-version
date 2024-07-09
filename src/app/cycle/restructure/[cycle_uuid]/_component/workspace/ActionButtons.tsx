@@ -6,12 +6,22 @@ import { Icon } from '@iconify-icon/react';
 import { Button } from '@mantine/core';
 import * as  React from 'react'
 import { useFormContext } from 'react-hook-form';
+import { addEdge, ConnectionLineType, Edge } from 'reactflow';
 
 
 const ActionButtons = () => {
-  const { onApply, onReset, onSave } = useWorkInProgressDiagram();
+  const { onApply, onReset, onSave, nodes, edges, setUpdateEdges } = useWorkInProgressDiagram();
   const method = useFormContext();
   const { handleSubmit } = method;
+
+  const onSaveSubmit = (data: any) => {
+    setUpdateEdges({
+      curr_stage_uuid: data.curr_stage_uuid,
+      previous_stage: data.previous_stage,
+      next_stage: data.next_stage
+    })
+  };
+
   const buttons = [
     {
       label: 'Reset',
@@ -34,7 +44,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: onSave as never,
+      onClick: onSaveSubmit as never,
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
   ] satisfies CustomButtonProps[];

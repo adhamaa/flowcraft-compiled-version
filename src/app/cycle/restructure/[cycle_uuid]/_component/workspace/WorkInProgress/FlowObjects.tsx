@@ -17,7 +17,7 @@ type Action = "Add" | "Move" | "Duplicate" | "Delete" | "Restore" | "Disjoint";
 
 
 function FlowObjects() {
-  const { nodes, toggleSelectedByNodeId, getSelectedNodeId, getInputOptions } = useWorkInProgressDiagram();
+  const { nodes, edges, toggleSelectedByNodeId, getSelectedNodeId, getInputOptions } = useWorkInProgressDiagram();
   const selectedNodeId = getSelectedNodeId();
   const [action, setAction] = React.useState<Action | undefined>(undefined);
   const { ref, height } = useElementSize();
@@ -32,7 +32,7 @@ function FlowObjects() {
 
   const InputList = [
     {
-      type: 'text', name: 'stage_name', label: 'Stage Name', placeholder: 'Pick value', data: getInputOptions(), value: selectedNodeId, onChange: toggleSelectedByNodeId
+      type: 'text', name: 'curr_stage_uuid', label: 'Stage Name', placeholder: 'Pick value', data: getInputOptions(), value: selectedNodeId, onChange: toggleSelectedByNodeId
     },
     {
       group: 'Position',
@@ -54,7 +54,7 @@ function FlowObjects() {
           <div className='border border-black rounded-xl pb-2'>
             <form
               className={clsx('space-y-4 p-4')}
-              onSubmit={handleSubmit(onSaveSubmit)}
+            // onSubmit={handleSubmit(onSaveSubmit)}
             >
               {InputList.map((input, index) => {
                 return (
@@ -75,9 +75,9 @@ function FlowObjects() {
                         checkIconPosition='right'
                         rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
                         data={input.data}
-                        // @ts-ignore
-                        value={input.value}
-                        onChange={input.onChange as never}
+                      // @ts-ignore
+                      // value={input.value}
+                      // onChange={input.onChange as never}
                       />
                     </InputWrapper>
                     }
@@ -103,9 +103,9 @@ function FlowObjects() {
                             data={input.data}
                             searchable
                             nothingFoundMessage="Nothing found..."
-                            // @ts-ignore
-                            value={input.value}
-                            onChange={input.onChange as never}
+                          // @ts-ignore
+                          // value={input.value}
+                          // onChange={input.onChange as never}
                           />
                         </InputWrapper>
                       ))}

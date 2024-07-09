@@ -16,6 +16,7 @@ import {
   applyNodeChanges,
   applyEdgeChanges,
   ReactFlowInstance,
+  ConnectionLineType,
 } from 'reactflow';
 
 import initialNodes from '@/components/reactflow/nodes';
@@ -58,7 +59,9 @@ type RFState = {
   setRfInstance: (rfInstance: ReactFlowInstance) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
   toggleSelectedByNodeId: (nodeId: string) => void;
-  setEdgesByNodeId: (nodeId: string) => void;
+  setUpdateEdges: (data: {
+    previous_stage: string[]; next_stage: string[]; curr_stage_uuid: string;
+  }) => void;
 };
 
 const storage: PersistStorage<RFState> = {
@@ -131,6 +134,7 @@ const useDiagramStore = create<RFState>()(
         });
       },
       onConnect: (connection: Connection) => {
+        console.log('connection:', connection)
         set({
           edges: addEdge(connection, get().edges),
         });
@@ -256,24 +260,23 @@ const useDiagramStore = create<RFState>()(
           }),
         }));
       },
-      setEdgesByNodeId: (nodeId: string,) => {
-        const { nodes, edges } = get();
-        const selectedNode = nodes.find((node) => node.id === nodeId);
+      setUpdateEdges: (data) => {
+        const { previous_stage, next_stage, curr_stage_uuid } = data;
 
-        if (!selectedNode) {
-          return;
-        }
+        const createEdge = (source: string, target: string) => ({
+          id: `${source}-${target}`,
+          source,
+          target,
+          type: ConnectionLineType.SmoothStep,
+          animated: false,
+        });
 
-        const newEdges = nodes
-          .filter((node) => node.id !== selectedNode.id && node.selected)
-          .map((node) => ({
-            id: `edge-${selectedNode.id}-${node.id}`,
-            source: selectedNode.id,
-            target: node.id,
-            animated: true,
-          }));
+        const prev2curr = previous_stage.map((prev: string) => createEdge(prev, curr_stage_uuid));
+        const curr2next = next_stage.map((next: string) => createEdge(curr_stage_uuid, next));
 
-        set({ edges: [...edges, ...newEdges] });
+        const combinedEdges = [...prev2curr, ...curr2next];
+
+        set({ edges: [...get().edges, ...combinedEdges] });
       },
       fetchNodesEdges: async ({
         cycle_id,
@@ -326,8 +329,8 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     onDisjoint: state.onDisjoint,
     fetchNodesEdges: state.fetchNodesEdges,
     setRfInstance: state.setRfInstance,
-    setEdgesByNodeId: state.setEdgesByNodeId,
     toggleSelectedByNodeId: state.toggleSelectedByNodeId,
+    setUpdateEdges: state.setUpdateEdges,
   })),
 );
 

@@ -67,7 +67,7 @@ function Wip() {
           connectionLineComponent={FloatingConnectionLine}
           edgeTypes={edgeTypes}
           nodeTypes={nodeTypes}
-          nodesDraggable={false}
+          // nodesDraggable={false}
         >
           <Background />
           <Controls />
