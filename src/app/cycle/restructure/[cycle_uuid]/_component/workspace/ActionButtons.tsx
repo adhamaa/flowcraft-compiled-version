@@ -5,18 +5,20 @@ import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import { Icon } from '@iconify-icon/react';
 import { Button } from '@mantine/core';
 import * as  React from 'react'
+import { useFormContext } from 'react-hook-form';
 
 
 const ActionButtons = () => {
   const { onApply, onReset, onSave } = useWorkInProgressDiagram();
-
+  const method = useFormContext();
+  const { handleSubmit } = method;
   const buttons = [
     {
       label: 'Reset',
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: onReset,
+      onClick: onReset as never,
       icon: { name: "heroicons-outline:x-circle", width: '1.5rem' },
     },
     {
@@ -24,7 +26,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: onApply,
+      onClick: onApply as never,
       icon: { name: "heroicons-outline:check-circle", width: '1.5rem' },
     },
     {
@@ -32,7 +34,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: onSave,
+      onClick: onSave as never,
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
   ] satisfies CustomButtonProps[];
@@ -49,10 +51,7 @@ const ActionButtons = () => {
           fz='0.9rem'
           autoContrast
           leftSection={<Icon width={icon.width} icon={icon.name} rotate={icon.rotate} />}
-          onClick={() => {
-            onClick()
-            console.log('clicked')
-          }}
+          onClick={handleSubmit(onClick)}
           {...btnProps}
         >
           {label}

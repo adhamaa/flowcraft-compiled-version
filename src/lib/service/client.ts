@@ -687,3 +687,31 @@ export const setAuditTrail = async ({
   const data = await response.json();
   return data;
 };
+
+const restructureBizProcess = async ({
+  cycle_uuid,
+  body
+}: {
+  cycle_uuid: string;
+  body: Record<string, any>;
+}) => {
+  const endpoint = `/businessProcess/restructure?cycle_uuid=${cycle_uuid}`;
+  const url = `${baseUrl}${endpoint}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    body: JSON.stringify(body),
+    next: { tags: ['restructureprocess'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to restructure business process.');
+  // }
+  clientRevalidateTag('cyclelist');
+  return await response.json();
+}

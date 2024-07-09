@@ -70,10 +70,10 @@ export function createBreadcrumbs(url: string): Breadcrumb[] {
  * @returns CycleStage[] - A list of cycle stages
  ------------------------------------------------*/
 interface CycleStage {
-  name: string;
-  uuid: string;
-  prev: string[];
-  next: string[];
+  stage_name: string;
+  stage_uuid: string;
+  list_prev: string[];
+  list_next: string[];
   duplicate_from?: string;
 }
 
@@ -83,20 +83,21 @@ export function convertToCycleStages(nodes: Node[], edges: Edge[]): CycleStage[]
   // Initialize the stages with node data
   nodes.forEach(node => {
     stagesMap[node.id] = {
-      name: node.data.label,
-      uuid: node.id,
-      prev: [],
-      next: []
+      stage_name: node.data.label,
+      stage_uuid: node.id,
+      list_prev: [],
+      list_next: [],
+      duplicate_from: node.data.duplicate_from,
     };
   });
 
-  // Populate prev and next fields from edges
+  // Populate list_prev and list_next fields from edges
   edges.forEach(edge => {
     if (stagesMap[edge.target]) {
-      stagesMap[edge.target].prev.push(edge.source);
+      stagesMap[edge.target].list_prev.push(edge.source);
     }
     if (stagesMap[edge.source]) {
-      stagesMap[edge.source].next.push(edge.target);
+      stagesMap[edge.source].list_next.push(edge.target);
     }
   });
 

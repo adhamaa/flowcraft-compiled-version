@@ -6,13 +6,12 @@ import ActionIcons from '../ActionIcons';
 import ActionButtons from '../ActionButtons';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
-import { Button, ComboboxItem, InputWrapper } from '@mantine/core';
+import { InputWrapper } from '@mantine/core';
 import { useElementSize } from '@mantine/hooks';
 import { MultiSelect, Select } from 'react-hook-form-mantine';
 import { FormProvider, useForm } from 'react-hook-form';
 import clsx from 'clsx';
 import { Icon } from '@iconify-icon/react';
-import { useNodes, useStoreApi } from 'reactflow';
 
 type Action = "Add" | "Move" | "Duplicate" | "Delete" | "Restore" | "Disjoint";
 
@@ -33,13 +32,13 @@ function FlowObjects() {
 
   const InputList = [
     {
-      type: 'text', name: 'stage_name', label: 'Stage Name', placeholder: 'Pick value', data: getInputOptions()
+      type: 'text', name: 'stage_name', label: 'Stage Name', placeholder: 'Pick value', data: getInputOptions(), value: selectedNodeId, onChange: toggleSelectedByNodeId
     },
     {
       group: 'Position',
       inputs: [
-        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Pick value', data: getInputOptions() },
-        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Pick value', data: getInputOptions() },
+        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Pick value', data: getInputOptions(), onChange: () => { console.log("baby") } },
+        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Pick value', data: getInputOptions(), onChange: () => { console.log("baby") } },
       ]
     }
   ];
@@ -77,8 +76,8 @@ function FlowObjects() {
                         rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
                         data={input.data}
                         // @ts-ignore
-                        value={selectedNodeId as string}
-                        onChange={(value, option) => toggleSelectedByNodeId(value as string)}
+                        value={input.value}
+                        onChange={input.onChange as never}
                       />
                     </InputWrapper>
                     }
@@ -104,6 +103,9 @@ function FlowObjects() {
                             data={input.data}
                             searchable
                             nothingFoundMessage="Nothing found..."
+                            // @ts-ignore
+                            value={input.value}
+                            onChange={input.onChange as never}
                           />
                         </InputWrapper>
                       ))}

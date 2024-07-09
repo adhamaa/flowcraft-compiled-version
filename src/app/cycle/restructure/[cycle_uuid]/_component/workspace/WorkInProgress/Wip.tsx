@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useParams, useSearchParams } from 'next/navigation';
-import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType, ReactFlowProvider, useNodes, useStore, useStoreApi } from 'reactflow';
+import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType } from 'reactflow';
 import FloatingEdge from '@/components/reactflow/edgeTypes/FloatingEdge';
 import FloatingConnectionLine from '@/components/reactflow/edgeTypes/FloatingConnectionLine';
 import StartNode from '@/components/reactflow/nodeTypes/Restructure/StartNode';
@@ -14,7 +14,6 @@ import WithExit from '@/components/reactflow/nodeTypes/Restructure/WithExit';
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
-import { Button } from '@mantine/core';
 
 const nodeTypes = {
   Start: StartNode,
@@ -68,7 +67,7 @@ function Wip() {
           connectionLineComponent={FloatingConnectionLine}
           edgeTypes={edgeTypes}
           nodeTypes={nodeTypes}
-        // nodesDraggable={false}
+          nodesDraggable={false}
         >
           <Background />
           <Controls />

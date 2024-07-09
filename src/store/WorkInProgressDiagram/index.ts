@@ -24,6 +24,7 @@ import { Apps_label, getDiagramData } from '@/lib/service/client';
 import { calculateNodePositions } from '@/components/reactflow/CalculateNodePositions';
 import { useShallow } from 'zustand/react/shallow';
 import { ComboboxItem } from '@mantine/core';
+import { convertToCycleStages } from '@/lib/helper';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -43,15 +44,15 @@ type RFState = {
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   onLayout: (direction: string | undefined) => void;
-  onSave: () => void;
+  onSave: (data: any, event: any) => void;
   onApply: () => void;
   onReset: () => void;
-  onAdd: () => void;
+  onAdd: (stage_name: string) => void;
   onMove: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
   onRestore: () => void;
-  onDisjoint: () => void;
+  onDisjoint: (nodeId: string) => void;
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   setRfInstance: (rfInstance: ReactFlowInstance) => void;
@@ -143,8 +144,13 @@ const useDiagramStore = create<RFState>()(
 
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
-      onSave: () => {
+      onSave: (data, event) => {
+        console.log('data:', data)
+        console.log('event:', event)
         console.log('save')
+
+        const ApiFormat = convertToCycleStages(get().nodes, get().edges);
+        console.log('ApiFormat:', ApiFormat)
       },
       onApply: () => {
         const instance = get().rfInstance;
@@ -171,13 +177,13 @@ const useDiagramStore = create<RFState>()(
 
         restoreFlow();
       },
-      onAdd: () => {
+      onAdd: (stage_name = 'New Node') => {
         const uuid = get().generateNodeId();
         console.log('uuid:', uuid)
         const node = {
           id: uuid,
           type: '', // 'Start' | 'WithEntryAndExit' | 'WithEntry'| 'WithExit' | 'End'  
-          data: { label: 'New Node' },
+          data: { label: stage_name },
           position: {
             x: Math.random() * window.innerWidth - 100,
             y: Math.random() * window.innerHeight - 100,
@@ -188,6 +194,7 @@ const useDiagramStore = create<RFState>()(
       },
       onMove: () => { console.log('move') },
       onDuplicate: () => {
+        const uuid = get().generateNodeId();
         const { nodes, edges } = get();
         const selectedNodes = nodes.filter((node) => node.selected);
 
@@ -199,9 +206,10 @@ const useDiagramStore = create<RFState>()(
 
           const newNode = {
             ...node,
+            data: { ...node.data, label: `${node.data.label}-Copy` },
             selected: false,
             dragging: false,
-            id: `${node.id}-Copy`,
+            id: uuid,
             position,
           };
 
@@ -220,7 +228,12 @@ const useDiagramStore = create<RFState>()(
         });
       },
       onRestore: () => { console.log('restore') },
-      onDisjoint: () => { console.log('disjoint') },
+      onDisjoint: () => {
+        const { nodes, edges } = get();
+        const selectedNode = nodes.find((node) => node.selected);
+        console.log('selectedNode:', selectedNode)
+
+      },
       setNodes: (nodes: Node[]) => {
         set({ nodes });
       },
@@ -243,7 +256,7 @@ const useDiagramStore = create<RFState>()(
           }),
         }));
       },
-      setEdgesByNodeId: (nodeId: string) => {
+      setEdgesByNodeId: (nodeId: string,) => {
         const { nodes, edges } = get();
         const selectedNode = nodes.find((node) => node.id === nodeId);
 
