@@ -1,10 +1,12 @@
 import * as React from 'react'
 
 import { ScrollAreaAutosize, rem } from '@mantine/core';
-import FlowObjects from './FlowObjects';
+import FlowObjects from './WorkInProgress/FlowObjects';
 import Current from './Current';
-import Wip from './Wip';
+import Wip from './WorkInProgress/Wip';
 import Header from './Header';
+import { ReactFlowProvider } from 'reactflow';
+import WorkInProgress from './WorkInProgress';
 
 function Workspace() {
   return (
@@ -12,8 +14,7 @@ function Workspace() {
       <Header />
       <div className='grid grid-cols-3 gap-6 p-8 h-screen'>
         <Current />
-        <Wip />
-        <FlowObjects />
+        <WorkInProgress />
       </div>
     </ScrollAreaAutosize>
   )

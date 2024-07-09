@@ -23,6 +23,7 @@ import initialEdges from '@/components/reactflow/edges';
 import { Apps_label, getDiagramData } from '@/lib/service/client';
 import { calculateNodePositions } from '@/components/reactflow/CalculateNodePositions';
 import { useShallow } from 'zustand/react/shallow';
+import { ComboboxItem } from '@mantine/core';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -35,6 +36,8 @@ type RFState = {
   nodes: Node[];
   edges: Edge[];
   rfInstance: ReactFlowInstance | null;
+  getSelectedNodeId: () => string | undefined;
+  getInputOptions: () => ComboboxItem[];
   generateNodeId: () => string;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
@@ -53,6 +56,8 @@ type RFState = {
   setEdges: (edges: Edge[]) => void;
   setRfInstance: (rfInstance: ReactFlowInstance) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
+  toggleSelectedByNodeId: (nodeId: string) => void;
+  setEdgesByNodeId: (nodeId: string) => void;
 };
 
 const storage: PersistStorage<RFState> = {
@@ -101,8 +106,6 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
   return { nodes, edges };
 };
 
-
-
 const useDiagramStore = create<RFState>()(
   persist(
     (set, get) => ({
@@ -111,6 +114,11 @@ const useDiagramStore = create<RFState>()(
       edges: initialEdges,
       rfInstance: null,
       generateNodeId: () => crypto.randomUUID(),
+      getSelectedNodeId: () => get().nodes.find((node) => node.selected)?.id,
+      getInputOptions: () => get().nodes.map((node) => ({
+        value: node.id,
+        label: node.data.label,
+      })),
       onNodesChange: (changes: NodeChange[]) => {
         set({
           nodes: applyNodeChanges(changes, get().nodes),
@@ -168,7 +176,7 @@ const useDiagramStore = create<RFState>()(
         console.log('uuid:', uuid)
         const node = {
           id: uuid,
-          type: 'default',
+          type: '', // 'Start' | 'WithEntryAndExit' | 'WithEntry'| 'WithExit' | 'End'  
           data: { label: 'New Node' },
           position: {
             x: Math.random() * window.innerWidth - 100,
@@ -235,7 +243,7 @@ const useDiagramStore = create<RFState>()(
           }),
         }));
       },
-      addEdgesByNodeId: (nodeId: string) => {
+      setEdgesByNodeId: (nodeId: string) => {
         const { nodes, edges } = get();
         const selectedNode = nodes.find((node) => node.id === nodeId);
 
@@ -288,6 +296,8 @@ const useWorkInProgressDiagram = () => useDiagramStore(
   useShallow((state: RFState) => ({
     nodes: state.nodes,
     edges: state.edges,
+    getSelectedNodeId: state.getSelectedNodeId,
+    getInputOptions: state.getInputOptions,
     onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
@@ -301,8 +311,10 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     onDelete: state.onDelete,
     onRestore: state.onRestore,
     onDisjoint: state.onDisjoint,
-    setRfInstance: state.setRfInstance,
     fetchNodesEdges: state.fetchNodesEdges,
+    setRfInstance: state.setRfInstance,
+    setEdgesByNodeId: state.setEdgesByNodeId,
+    toggleSelectedByNodeId: state.toggleSelectedByNodeId,
   })),
 );
 

@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useParams, useSearchParams } from 'next/navigation';
-import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType, ReactFlowProvider } from 'reactflow';
+import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType, ReactFlowProvider, useNodes, useStore, useStoreApi } from 'reactflow';
 import FloatingEdge from '@/components/reactflow/edgeTypes/FloatingEdge';
 import FloatingConnectionLine from '@/components/reactflow/edgeTypes/FloatingConnectionLine';
 import StartNode from '@/components/reactflow/nodeTypes/Restructure/StartNode';
@@ -14,6 +14,7 @@ import WithExit from '@/components/reactflow/nodeTypes/Restructure/WithExit';
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
+import { Button } from '@mantine/core';
 
 const nodeTypes = {
   Start: StartNode,
@@ -32,7 +33,6 @@ function Wip() {
   const selected_app = searchParams.get('selected_app');
 
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setRfInstance, fetchNodesEdges } = useWorkInProgressDiagram();
-  console.log('nodes:', nodes)
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
@@ -55,43 +55,41 @@ function Wip() {
     <div className='h-full space-y-6'>
       <h1 className='text-xl font-semibold'>Work In Progress Diagram</h1>
       <div className='border border-black rounded-xl h-full'>
-        <ReactFlowProvider>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onInit={setRfInstance}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            fitView={true}
-            fitViewOptions={fitViewOptions}
-            defaultEdgeOptions={defaultEdgeOptions}
-            connectionLineComponent={FloatingConnectionLine}
-            edgeTypes={edgeTypes}
-            nodeTypes={nodeTypes}
-          // nodesDraggable={false}
-          >
-            <Background />
-            <Controls />
-            {/* <DevTools /> */}
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onInit={setRfInstance}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView={true}
+          fitViewOptions={fitViewOptions}
+          defaultEdgeOptions={defaultEdgeOptions}
+          connectionLineComponent={FloatingConnectionLine}
+          edgeTypes={edgeTypes}
+          nodeTypes={nodeTypes}
+        // nodesDraggable={false}
+        >
+          <Background />
+          <Controls />
+          {/* <DevTools /> */}
 
-            {/* <span className='absolute top-3 right-3 text-xs text-safwa-gray-3'>
+          {/* <span className='absolute top-3 right-3 text-xs text-safwa-gray-3'>
                 Cycle id: <span>{cycle_id}</span>
               </span>
               <span className='absolute right-2 bottom-1 text-[8px] text-safwa-gray-3'>
                 Powered by Schinkels Technik
               </span> */}
-          </ReactFlow>
+        </ReactFlow>
 
-          <style jsx global>{`
+        <style jsx global>{`
         .react-flow__panel.right {
           display: none;
         }
       `}</style>
-        </ReactFlowProvider>
       </div>
     </div >
   );
 };
 
-export default Wip
+export default Wip;
