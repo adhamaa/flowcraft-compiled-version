@@ -7,9 +7,12 @@ import { Button } from '@mantine/core';
 import * as  React from 'react'
 import { useFormContext } from 'react-hook-form';
 import { addEdge, ConnectionLineType, Edge } from 'reactflow';
+import { useActionIcons } from './WorkInProgress/hooks/useActionIcons';
 
 
 const ActionButtons = () => {
+  const { isEditable, toggleIsEditable } = useActionIcons();
+
   const { onApply, onReset, onSave, onDraft, setUpdateEdges } = useWorkInProgressDiagram();
   const method = useFormContext();
   const { handleSubmit } = method;
@@ -29,6 +32,7 @@ const ActionButtons = () => {
       disabled: false,
       canShow: true,
       onClick: onReset as never,
+      color: '#F1F5F9',
       icon: { name: "heroicons-outline:x-circle", width: '1.5rem' },
     },
     {
@@ -37,6 +41,7 @@ const ActionButtons = () => {
       disabled: false,
       canShow: true,
       onClick: onApply as never,
+      color: '#F1F5F9',
       icon: { name: "heroicons-outline:check-circle", width: '1.5rem' },
     },
     {
@@ -45,6 +50,7 @@ const ActionButtons = () => {
       disabled: false,
       canShow: true,
       onClick: onDraft as never,
+      color: '#895CF3',
       icon: { name: "heroicons-outline:folder", width: '1.5rem' },
     },
     {
@@ -53,23 +59,24 @@ const ActionButtons = () => {
       disabled: false,
       canShow: true,
       onClick: onSave as never,
+      color: '#895CF3',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
   ] satisfies CustomButtonProps[];
 
   return (
     <div className="flex justify-end gap-3">
-      {buttons.map(({ label, canShow, icon, onClick, ...btnProps }, index) => canShow && (
+      {buttons.map(({ label, canShow, icon, onClick, color, ...btnProps }, index) => canShow && (
         <Button
           key={index}
           variant="filled"
-          color="#F1F5F9"
+          color={color}
           radius="md"
           size="sm"
           fz='0.9rem'
           autoContrast
           leftSection={<Icon width={icon.width} icon={icon.name} rotate={icon.rotate} />}
-          onClick={handleSubmit(onClick)}
+          onClick={onClick}
           {...btnProps}
         >
           {label}

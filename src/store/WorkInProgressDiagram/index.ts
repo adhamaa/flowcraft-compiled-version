@@ -39,8 +39,6 @@ type RFState = {
   nodes: Node[];
   edges: Edge[];
   rfInstance: ReactFlowInstance | null;
-  // actions: { [key: string]: boolean };
-  // toggleAction: (action: string) => void;
   getSelectedNodeId: () => string | undefined;
   getInputOptions: () => ComboboxItem[];
   generateNodeId: () => string;
@@ -48,9 +46,11 @@ type RFState = {
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   onLayout: (direction: string | undefined) => void;
-  onSave: (data: any, event: any) => void;
-  onDraft: (data: any, e: any) => void;
-  onApply: () => void;
+  onSave: () => void;
+  onDraft: () => void;
+  onApply: (data: any, callback?: (
+    ...args: any[]
+  ) => void) => void;
   onReset: () => void;
   onAdd: (stage_name: string) => void;
   onMove: () => void;
@@ -121,21 +121,6 @@ const useDiagramStore = create<RFState>()(
       nodes: initialNodes,
       edges: initialEdges,
       rfInstance: null,
-      // actions: {
-      //   add: false,
-      //   move: false,
-      //   duplicate: false,
-      //   delete: false,
-      //   restore: false,
-      //   disjoint: false,
-      // },
-      // toggleAction: (action: string) => {
-      //   set((state) => ({
-      //     actions: {
-      //       [action]: !state.actions[action],
-      //     },
-      //   }));
-      // },
       generateNodeId: () => crypto.randomUUID(),
       getSelectedNodeId: () => get().nodes.find((node) => node.selected)?.id,
       getInputOptions: () => get().nodes.map((node) => ({
@@ -167,22 +152,12 @@ const useDiagramStore = create<RFState>()(
 
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
-      onSave: (data, event) => {
-        console.log('data:', data)
-        console.log('event:', event)
+      onSave: () => {
         console.log('save')
-
         const ApiFormat = convertToCycleStages(get().nodes, get().edges);
         console.log('ApiFormat:', ApiFormat)
       },
-      onDraft: (data, e) => {
-        get()?.setUpdateEdges?.({
-          curr_stage_uuid: data.curr_stage_uuid,
-          previous_stage: data.previous_stage,
-          next_stage: data.next_stage
-        })
-      },
-      onApply: () => {
+      onDraft: () => {
         const instance = get().rfInstance;
         const key = get().flowKey as string;
 
@@ -190,6 +165,11 @@ const useDiagramStore = create<RFState>()(
           const flow = instance.toObject();
           localStorage.setItem(key, JSON.stringify(flow));
         }
+      },
+      onApply: (data, callback) => {
+        console.log('data:', data)
+        console.log('callback:', callback)
+        console.log('apply')
       },
       onReset: () => {
         const instance = get().rfInstance;
@@ -338,8 +318,6 @@ const useWorkInProgressDiagram = () => useDiagramStore(
   useShallow((state: RFState) => ({
     nodes: state.nodes,
     edges: state.edges,
-    // actions: state.actions,
-    // toggleAction: state.toggleAction,
     getSelectedNodeId: state.getSelectedNodeId,
     getInputOptions: state.getInputOptions,
     onNodesChange: state.onNodesChange,

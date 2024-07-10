@@ -12,26 +12,17 @@ import { MultiSelect, Select } from 'react-hook-form-mantine';
 import { FormProvider, useForm } from 'react-hook-form';
 import clsx from 'clsx';
 import { Icon } from '@iconify-icon/react';
-import { useActionIcons } from './hooks/useActionIcons';
+import { ActionType, useActionIcons } from './hooks/useActionIcons';
 
 
-type ActionType = "add" | "move" | "duplicate" | "delete" | "restore" | "disjoint";
 
-const getAction = (action: Record<ActionType, boolean>): string | null => {
-  for (const key in action) {
-    if (action[key as ActionType]) {
-      return key.charAt(0).toUpperCase() + key.slice(1);
-    }
-  }
-  return null;
-};
 
 function FlowObjects() {
   const { toggleSelectedByNodeId, getSelectedNodeId, getInputOptions } = useWorkInProgressDiagram();
-  const { isEditable, toggleIsEditable } = useActionIcons();
-  const action = getAction(isEditable as { [key in ActionType]: boolean });
+  const { isEditable: isEditData, getAction, getIsAnyEditable } = useActionIcons();
+  const action = getAction(isEditData as { [key in ActionType]: boolean });
+  const isEditable = getIsAnyEditable(isEditData as { [key in ActionType]: boolean });
   const selectedNodeId = getSelectedNodeId();
-
   const { ref, height } = useElementSize();
 
 
@@ -44,13 +35,13 @@ function FlowObjects() {
 
   const InputList = [
     {
-      type: 'text', name: 'curr_stage_uuid', label: 'Stage Name', placeholder: 'Pick value', data: getInputOptions(), value: selectedNodeId, onChange: toggleSelectedByNodeId
+      type: 'text', name: 'curr_stage_uuid', label: 'Stage Name', placeholder: 'Pick value', data: getInputOptions(), value: selectedNodeId, onChange: toggleSelectedByNodeId, canShow: true,
     },
     {
       group: 'Position',
       inputs: [
-        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Pick value', data: getInputOptions(), onChange: () => { console.log("baby") } },
-        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Pick value', data: getInputOptions(), onChange: () => { console.log("baby") } },
+        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Pick value', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: true, },
+        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Pick value', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: true, },
       ]
     }
   ];
@@ -72,7 +63,7 @@ function FlowObjects() {
                 {InputList.map((input, index) => {
                   return (
                     <div key={index}>
-                      {!input.group && <InputWrapper
+                      {!input.group && input.canShow && <InputWrapper
                         key={index}
                         ref={ref}
                         label={input.label}
@@ -96,7 +87,7 @@ function FlowObjects() {
                       }
                       {input.group && <h2 className='text-sm font-semibold'>{input.group}</h2>}
                       <div className='pl-4'>
-                        {input.group && input.inputs.map((input, index) => (
+                        {input.group && input.inputs.map((input, index) => input.canShow && (
                           <InputWrapper
                             key={index}
                             ref={ref}
