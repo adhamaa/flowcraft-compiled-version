@@ -1,14 +1,14 @@
 'use client';
 
 import { Icon } from '@iconify-icon/react';
-import { ActionIcon, Button, Flex, Group, Input, Modal, ScrollArea, ScrollAreaAutosize, Text } from '@mantine/core'
+import { ActionIcon, Button, Flex, Group, InputWrapper, Modal, ScrollAreaAutosize, Text } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import Image from 'next/image';
 import * as React from 'react'
 import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
 import { FormProvider, useForm } from "react-hook-form";
-import { Radio, TextInput } from 'react-hook-form-mantine';
+import { Radio, RadioGroup, TextInput } from 'react-hook-form-mantine';
 import { Apps_label, Datasource_type, getCycleInfo, getStatusRefList, setAuditTrail, updateCycle, updateStatusCycle } from '@/lib/service/client';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
@@ -287,7 +287,7 @@ const GeneralFormContent = ({
             <DiagramBar />
             {InputList?.map((inputProps, index) =>
               ['Status'].includes(inputProps.label) ? (
-                <Input.Wrapper
+                <InputWrapper
                   key={index}
                   label={inputProps.label}
                   classNames={{
@@ -295,7 +295,7 @@ const GeneralFormContent = ({
                     label: '!text-sm !font-semibold',
                   }}>
                   <LabelTooltip label={inputProps.label} />
-                  <Radio.Group
+                  <RadioGroup
                     name={inputProps.name}
                     control={control}
                     defaultValue={inputProps.value?.toString()}
@@ -309,10 +309,10 @@ const GeneralFormContent = ({
                           label={<span className='capitalize'>{status.descriptions}</span>} />
                       ))}
                     </Group>
-                  </Radio.Group>
-                </Input.Wrapper>
+                  </RadioGroup>
+                </InputWrapper>
               ) : (
-                <Input.Wrapper key={index} label={inputProps.label} classNames={{
+                <InputWrapper key={index} label={inputProps.label} classNames={{
                   root: 'px-14 space-y-4',
                   label: '!text-sm !font-semibold',
                 }}>
@@ -325,7 +325,7 @@ const GeneralFormContent = ({
                     classNames={{
                       input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                     }} />
-                </Input.Wrapper>
+                </InputWrapper>
               ))}
           </div>
         </form>
