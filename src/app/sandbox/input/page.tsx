@@ -1,7 +1,7 @@
 'use client';
 
-import useEditableState from '@/app/cycle/_components/hooks/useEditableState';
 import InputWithOverlay from '@/components/form/InputWithOverlay';
+import useEditableState from '@/hooks/useEditableState';
 import { Button, LoadingOverlay, Stack } from '@mantine/core';
 import clsx from 'clsx';
 import * as React from 'react'

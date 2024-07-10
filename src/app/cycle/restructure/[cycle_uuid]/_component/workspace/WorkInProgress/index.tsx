@@ -4,12 +4,15 @@ import * as React from 'react'
 import { ReactFlowProvider } from 'reactflow';
 import Wip from './Wip';
 import FlowObjects from './FlowObjects';
+import { ActionIconsProvider } from './hooks/useActionIcons';
 
 const WorkInProgress = () => {
   return (
     <ReactFlowProvider>
-      <Wip />
-      <FlowObjects />
+      <ActionIconsProvider>
+        <Wip />
+        <FlowObjects />
+      </ActionIconsProvider>
     </ReactFlowProvider>
   )
 }

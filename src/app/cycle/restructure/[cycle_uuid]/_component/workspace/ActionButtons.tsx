@@ -10,17 +10,17 @@ import { addEdge, ConnectionLineType, Edge } from 'reactflow';
 
 
 const ActionButtons = () => {
-  const { onApply, onReset, onSave, nodes, edges, setUpdateEdges } = useWorkInProgressDiagram();
+  const { onApply, onReset, onSave, onDraft, setUpdateEdges } = useWorkInProgressDiagram();
   const method = useFormContext();
   const { handleSubmit } = method;
 
-  const onSaveSubmit = (data: any) => {
-    setUpdateEdges({
-      curr_stage_uuid: data.curr_stage_uuid,
-      previous_stage: data.previous_stage,
-      next_stage: data.next_stage
-    })
-  };
+  // const onDraft = (data: any) => {
+  //   setUpdateEdges({
+  //     curr_stage_uuid: data.curr_stage_uuid,
+  //     previous_stage: data.previous_stage,
+  //     next_stage: data.next_stage
+  //   })
+  // };
 
   const buttons = [
     {
@@ -40,11 +40,19 @@ const ActionButtons = () => {
       icon: { name: "heroicons-outline:check-circle", width: '1.5rem' },
     },
     {
+      label: 'Draft',
+      type: 'button',
+      disabled: false,
+      canShow: true,
+      onClick: onDraft as never,
+      icon: { name: "heroicons-outline:folder", width: '1.5rem' },
+    },
+    {
       label: 'Save',
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: onSaveSubmit as never,
+      onClick: onSave as never,
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
   ] satisfies CustomButtonProps[];

@@ -16,7 +16,7 @@ import InputWithOverlay from '@/components/form/InputWithOverlay';
 import TextareaHeader from '@/components/form/TextareaHeader';
 import { useSession } from 'next-auth/react';
 import { isObjectEmpty } from '@/lib/helper';
-import useEditableState from '../hooks/useEditableState';
+import useEditableState from '@/hooks/useEditableState';
 
 export type stagesData = {
   process_stage_name: string;

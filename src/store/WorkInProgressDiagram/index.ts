@@ -26,6 +26,7 @@ import { calculateNodePositions } from '@/components/reactflow/CalculateNodePosi
 import { useShallow } from 'zustand/react/shallow';
 import { ComboboxItem } from '@mantine/core';
 import { convertToCycleStages } from '@/lib/helper';
+import { boolean } from 'drizzle-orm/pg-core';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -38,6 +39,8 @@ type RFState = {
   nodes: Node[];
   edges: Edge[];
   rfInstance: ReactFlowInstance | null;
+  // actions: { [key: string]: boolean };
+  // toggleAction: (action: string) => void;
   getSelectedNodeId: () => string | undefined;
   getInputOptions: () => ComboboxItem[];
   generateNodeId: () => string;
@@ -46,6 +49,7 @@ type RFState = {
   onConnect: OnConnect;
   onLayout: (direction: string | undefined) => void;
   onSave: (data: any, event: any) => void;
+  onDraft: (data: any, e: any) => void;
   onApply: () => void;
   onReset: () => void;
   onAdd: (stage_name: string) => void;
@@ -117,6 +121,21 @@ const useDiagramStore = create<RFState>()(
       nodes: initialNodes,
       edges: initialEdges,
       rfInstance: null,
+      // actions: {
+      //   add: false,
+      //   move: false,
+      //   duplicate: false,
+      //   delete: false,
+      //   restore: false,
+      //   disjoint: false,
+      // },
+      // toggleAction: (action: string) => {
+      //   set((state) => ({
+      //     actions: {
+      //       [action]: !state.actions[action],
+      //     },
+      //   }));
+      // },
       generateNodeId: () => crypto.randomUUID(),
       getSelectedNodeId: () => get().nodes.find((node) => node.selected)?.id,
       getInputOptions: () => get().nodes.map((node) => ({
@@ -155,6 +174,13 @@ const useDiagramStore = create<RFState>()(
 
         const ApiFormat = convertToCycleStages(get().nodes, get().edges);
         console.log('ApiFormat:', ApiFormat)
+      },
+      onDraft: (data, e) => {
+        get()?.setUpdateEdges?.({
+          curr_stage_uuid: data.curr_stage_uuid,
+          previous_stage: data.previous_stage,
+          next_stage: data.next_stage
+        })
       },
       onApply: () => {
         const instance = get().rfInstance;
@@ -271,8 +297,8 @@ const useDiagramStore = create<RFState>()(
           animated: false,
         });
 
-        const prev2curr = previous_stage.map((prev: string) => createEdge(prev, curr_stage_uuid));
-        const curr2next = next_stage.map((next: string) => createEdge(curr_stage_uuid, next));
+        const prev2curr = previous_stage?.map((prev: string) => createEdge(prev, curr_stage_uuid)) || [];
+        const curr2next = next_stage?.map((next: string) => createEdge(curr_stage_uuid, next)) || [];
 
         const combinedEdges = [...prev2curr, ...curr2next];
 
@@ -312,6 +338,8 @@ const useWorkInProgressDiagram = () => useDiagramStore(
   useShallow((state: RFState) => ({
     nodes: state.nodes,
     edges: state.edges,
+    // actions: state.actions,
+    // toggleAction: state.toggleAction,
     getSelectedNodeId: state.getSelectedNodeId,
     getInputOptions: state.getInputOptions,
     onNodesChange: state.onNodesChange,
@@ -319,6 +347,7 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     onConnect: state.onConnect,
     onLayout: state.onLayout,
     onSave: state.onSave,
+    onDraft: state.onDraft,
     onApply: state.onApply,
     onReset: state.onReset,
     onAdd: state.onAdd,
