@@ -45,10 +45,10 @@ function FlowObjects() {
 
   const methods = useForm({
     defaultValues: {
-      curr_stage_uuid: null,
-      curr_stage_name: null,
-      previous_stage: [],
-      next_stage: []
+      curr_stage_uuid: null, // select object
+      curr_stage_name: "", // text
+      previous_stage: [], // multi select
+      next_stage: [] // multi select
     }
   });
 
