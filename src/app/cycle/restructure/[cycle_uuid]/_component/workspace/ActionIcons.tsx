@@ -21,7 +21,7 @@ interface Action {
 
 
 const ActionIcons = () => {
-  const { onAdd, onMove, onDuplicate, onDelete, onRestore, onDisjoint } = useWorkInProgressDiagram();
+  const { deselectAllNodes } = useWorkInProgressDiagram();
 
   const method = useFormContext();
   const { reset } = method;
@@ -34,36 +34,42 @@ const ActionIcons = () => {
       id: "Add", label: "Add", icon: { name: "heroicons:plus-circle", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
         toggleIsEditable('add');
         reset();
+        deselectAllNodes();
       }, color: isEditable.add ? "#895CF3" : "#F1F5F9", c: isEditable.add ? "white" : "black"
     },
     {
       id: "Move", label: "Move", icon: { name: "heroicons:arrows-pointing-in", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
         toggleIsEditable('move');
         reset();
+        deselectAllNodes();
       }, color: isEditable.move ? "#895CF3" : "#F1F5F9", c: isEditable.move ? "white" : "black"
     },
     {
       id: "Duplicate", label: "Duplicate", icon: { name: "heroicons-outline:document-duplicate", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
         toggleIsEditable('duplicate');
         reset();
+        deselectAllNodes();
       }, color: isEditable.duplicate ? "#895CF3" : "#F1F5F9", c: isEditable.duplicate ? "white" : "black"
     },
     {
       id: "Delete", label: "Delete", icon: { name: "heroicons-outline:trash", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
         toggleIsEditable('delete');
         reset();
+        deselectAllNodes();
       }, color: isEditable.delete ? "#895CF3" : "#F1F5F9", c: isEditable.delete ? "white" : "black"
     },
     {
       id: "Restore", label: "Restore", icon: { name: "heroicons-outline:refresh", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
         toggleIsEditable('restore');
         reset();
+        deselectAllNodes();
       }, color: isEditable.restore ? "#895CF3" : "#F1F5F9", c: isEditable.restore ? "white" : "black"
     },
     {
       id: "Disjoint", label: "Disjoint", icon: { name: "heroicons-outline:scissors", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
         toggleIsEditable('disjoint');
         reset();
+        deselectAllNodes();
       }, color: isEditable.disjoint ? "#895CF3" : "#F1F5F9", c: isEditable.disjoint ? "white" : "black"
     }
   ];

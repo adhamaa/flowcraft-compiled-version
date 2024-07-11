@@ -14,6 +14,21 @@ import clsx from 'clsx';
 import { Icon } from '@iconify-icon/react';
 import { ActionType, useActionIcons } from './hooks/useActionIcons';
 
+type InputType = {
+  type?: string;
+  name: string;
+  label?: string;
+  placeholder?: string;
+  data?: any;
+  value?: any;
+  onChange?: any;
+  canShow?: boolean;
+  control?: any;
+  disabled?: boolean;
+  group?: string;
+  inputs?: InputType[];
+}
+
 function FlowObjects() {
   const { toggleSelectedByNodeId, getSelectedNodeId, getInputOptions, deselectAllNodes } = useWorkInProgressDiagram();
   const { isEditable: isEditData, getAction, getIsEditable, getIsAnyEditable } = useActionIcons();
@@ -28,17 +43,15 @@ function FlowObjects() {
   const selectedNodeId = getSelectedNodeId();
   const { ref, height } = useElementSize();
 
-  const [countDummy, setCountDummy] = React.useState(0);
-
   const methods = useForm({
-    // defaultValues: {
-    //   curr_stage_uuid: '',
-    //   curr_stage_name: '',
-    //   previous_stage: '',
-    //   next_stage: ''
-    // }
+    defaultValues: {
+      curr_stage_uuid: null,
+      curr_stage_name: null,
+      previous_stage: [],
+      next_stage: []
+    }
   });
-  
+
   const { control, watch, reset } = methods;
   const watchCurrentStageUuid = watch('curr_stage_uuid');
   const watchCurrentStageName = watch('curr_stage_name');
@@ -56,10 +69,10 @@ function FlowObjects() {
     },
     {
       group: 'Position',
-      canShow: watchCurrentStageUuid || watchCurrentStageName,
+      canShow: watchCurrentStageUuid || watchCurrentStageName || false,
       inputs: [
-        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: watchCurrentStageUuid || watchCurrentStageName, control: control, disabled: !isEditable },
-        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: watchCurrentStageUuid || watchCurrentStageName, control: control, disabled: !isEditable },
+        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: watchCurrentStageUuid || watchCurrentStageName || false, control: control, disabled: !isEditable },
+        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: watchCurrentStageUuid || watchCurrentStageName || false, control: control, disabled: !isEditable },
       ]
     }
   ];
@@ -69,11 +82,6 @@ function FlowObjects() {
       <div className='h-full space-y-6'>
         <h1 className='text-xl font-semibold'>The Flow Objects</h1>
         <div className='flex flex-col h-full space-y-6'>
-          <Button onClick={() => {
-            deselectAllNodes()
-            reset()
-            setCountDummy(countDummy + 1)
-          }}>deselect nodes</Button>
           <ActionIcons />
           {/* ---------- input section ----------- */}
           <>
@@ -99,20 +107,17 @@ function FlowObjects() {
                         >
                           <LabelTooltip label={input.label} />
                           <TextInput
-                            control={input.control}
-                            name={input.name as string}
+                            name={input.name as "curr_stage_name"}
                             placeholder={input.placeholder}
                             disabled={input.disabled}
                             classNames={{
                               input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                             }}
-                          // @ts-ignore
-                          // value={input.value}
-                          // onChange={input.onChange as never}
+                            control={input.control}
                           />
                         </InputWrapper>
                       )}
-                      {isMove && !input.group && input.canShow && (
+                      {!isAdd && !input.group && input.canShow && (
                         <InputWrapper
                           key={index}
                           ref={ref}
@@ -124,8 +129,7 @@ function FlowObjects() {
                         >
                           <LabelTooltip label={input.label} />
                           <Select
-                            control={input.control}
-                            name={input.name as string}
+                            name={input.name as "curr_stage_uuid" | "previous_stage" | "next_stage"}
                             placeholder={input.placeholder}
                             checkIconPosition='right'
                             rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
@@ -135,137 +139,18 @@ function FlowObjects() {
                             classNames={{
                               input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                             }}
-                          // @ts-ignore
-                          // value={input.value}
-                          // onChange={input.onChange as never}
-                          />
-                        </InputWrapper>
-                      )}
-                      {isDuplicate && !input.group && input.canShow && (
-                        <InputWrapper
-                          key={index}
-                          ref={ref}
-                          label={input.label}
-                          classNames={{
-                            root: 'relative space-y-4',
-                            label: '!text-sm !font-semibold',
-                          }}
-                        >
-                          <LabelTooltip label={input.label} />
-                          <Select
                             control={input.control}
-                            name={input.name as string}
-                            placeholder={input.placeholder}
-                            checkIconPosition='right'
-                            rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
-                            data={input.data}
-                            disabled={input.disabled}
-                            allowDeselect
-                            classNames={{
-                              input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
-                            }}
-                          // @ts-ignore
-                          // value={input.value}
-                          // onChange={input.onChange as never}
+                            // value={input.value}
+                            onChange={input.onChange as never}
                           />
                         </InputWrapper>
                       )}
-                      {isDelete && !input.group && input.canShow && (
-                        <InputWrapper
-                          key={index}
-                          ref={ref}
-                          label={input.label}
-                          classNames={{
-                            root: 'relative space-y-4',
-                            label: '!text-sm !font-semibold',
-                          }}
-                        >
-                          <LabelTooltip label={input.label} />
-                          <Select
-                            control={input.control}
-                            name={input.name as string}
-                            placeholder={input.placeholder}
-                            checkIconPosition='right'
-                            rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
-                            data={input.data}
-                            disabled={input.disabled}
-                            allowDeselect
-                            classNames={{
-                              input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
-                            }}
-                          // @ts-ignore
-                          // value={input.value}
-                          // onChange={input.onChange as never}
-                          />
-                        </InputWrapper>
-                      )}
-                      {isRestore && !input.group && input.canShow && (
-                        <InputWrapper
-                          key={index}
-                          ref={ref}
-                          label={input.label}
-                          classNames={{
-                            root: 'relative space-y-4',
-                            label: '!text-sm !font-semibold',
-                          }}
-                        >
-                          <LabelTooltip label={input.label} />
-                          <Select
-                            control={input.control}
-                            name={input.name as string}
-                            placeholder={input.placeholder}
-                            checkIconPosition='right'
-                            rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
-                            data={input.data}
-                            disabled={input.disabled}
-                            allowDeselect
-                            classNames={{
-                              input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
-                            }}
-                          // @ts-ignore
-                          // value={input.value}
-                          // onChange={input.onChange as never}
-                          />
-                        </InputWrapper>
-                      )}
-                      {isDisjoint && !input.group && input.canShow && (
-                        <InputWrapper
-                          key={index}
-                          ref={ref}
-                          label={input.label}
-                          classNames={{
-                            root: 'relative space-y-4',
-                            label: '!text-sm !font-semibold',
-                          }}
-                        >
-                          <LabelTooltip label={input.label} />
-                          <Select
-                            control={input.control}
-                            name={input.name as string}
-                            placeholder={input.placeholder}
-                            checkIconPosition='right'
-                            rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
-                            data={input.data}
-                            disabled={input.disabled}
-                            allowDeselect
-                            classNames={{
-                              input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
-                            }}
-                          // @ts-ignore
-                          // value={input.value}
-                          // onChange={input.onChange as never}
-                          />
-                        </InputWrapper>
-                      )}
-
-
-
 
                       {input.group && input.canShow && (
                         <h2 className='text-sm font-semibold'>{input.group}</h2>
                       )}
                       <div className='pl-4'>
-                        {input.group && input.inputs.map((input, index) => input.canShow && (
+                        {input.group && input?.inputs.map((input, index) => input.canShow && (
                           <InputWrapper
                             key={index}
                             ref={ref}
@@ -277,8 +162,7 @@ function FlowObjects() {
                           >
                             <LabelTooltip label={input.label} />
                             <MultiSelect
-                              control={input.control}
-                              name={input.name}
+                              name={input.name as "curr_stage_uuid" | "curr_stage_name" | "previous_stage" | "next_stage"}
                               placeholder={input.placeholder}
                               data={input.data}
                               disabled={input.disabled}
@@ -287,8 +171,7 @@ function FlowObjects() {
                               classNames={{
                                 input: '!rounded-lg py-3 pr-3 w-full !focus:outline-none !focus:ring-2 !focus:ring-[#895CF3] !focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] !disabled:border-transparent !disabled:text-black',
                               }}
-                            // @ts-ignore
-                            // value={input.value}
+                              control={input.control}
                             // onChange={input.onChange as never}
 
                             />

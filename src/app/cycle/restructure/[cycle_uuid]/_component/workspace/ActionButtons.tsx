@@ -13,9 +13,9 @@ import { ActionType, useActionIcons } from './WorkInProgress/hooks/useActionIcon
 const ActionButtons = () => {
   const { isEditable: isEditData, toggleIsEditable, getAction } = useActionIcons();
 
-  const { onApply, onReset, onSave, onDraft } = useWorkInProgressDiagram();
+  const { onApply, onReset, onSave, onDraft, deselectAllNodes } = useWorkInProgressDiagram();
   const method = useFormContext();
-  const { handleSubmit } = method;
+  const { handleSubmit, reset } = method;
 
   const action = getAction(isEditData as { [key in ActionType]: boolean });
 
@@ -44,7 +44,11 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: onReset as never,
+      onClick: () => {
+        onReset();
+        deselectAllNodes();
+        reset();
+      },
       color: '#F1F5F9',
       icon: { name: "heroicons-outline:x-circle", width: '1.5rem' },
     },

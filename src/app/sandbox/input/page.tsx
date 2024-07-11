@@ -2,17 +2,34 @@
 
 import InputWithOverlay from '@/components/form/InputWithOverlay';
 import useEditableState from '@/hooks/useEditableState';
-import { Button, LoadingOverlay, Stack } from '@mantine/core';
+import { Button, Group, LoadingOverlay, Stack } from '@mantine/core';
 import clsx from 'clsx';
 import * as React from 'react'
-import { FormProvider, useForm } from 'react-hook-form';
+import { Form, FormProvider, useForm } from 'react-hook-form';
+import { MultiSelect, Select } from 'react-hook-form-mantine';
 
 function InputPagesTesting() {
+
+
+  return (
+    <div className='p-10 container max-w-screen-lg m-auto space-y-4'>
+      <FormOverlayWithProvider />
+      <div className="flex flex-auto space-x-4 w-full">
+        <FormWithProvider />
+        <FormWithControl />
+      </div>
+    </div >
+  )
+}
+
+export default InputPagesTesting
+
+const FormOverlayWithProvider = () => {
   const [visible, setVisible] = React.useState(false);
   const { isEditable, toggleIsEditable } = useEditableState();
 
   const method = useForm();
-  const { handleSubmit } = method;
+  const { handleSubmit, reset } = method;
 
   const onSubmit = (data: any, e: any) => {
     const target_id = e.nativeEvent.submitter.id
@@ -103,11 +120,11 @@ function InputPagesTesting() {
   };
 
   return (
-    <div className='p-10 container max-w-xl m-auto space-y-4'>
+    <FormProvider {...method}>
       <Button onClick={() => setVisible((v) => !v)} fullWidth maw={200} mx="auto" mt="xl">
         Toggle overlay
       </Button>
-      <FormProvider {...method}>
+      <div className="flex space-x-4">
         <form className='relative' onSubmit={handleSubmit(onSubmit)}>
           <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} loaderProps={{ color: '#895CF3', type: 'oval' }} />
           <Stack classNames={{
@@ -123,34 +140,41 @@ function InputPagesTesting() {
                 toggleIsEditable={() => toggleIsEditable(input.name)}
               />
             ))}
+
+            <Group justify='end'>
+              <Button type='submit'
+              >Submit</Button>
+              <Button type='button'
+                onClick={() => reset()}
+              >Reset</Button>
+            </Group>
           </Stack>
+
         </form>
-
-        <div className="flex p-4 border gap-4">
-          <div
-            id='1'
-            className={clsx('border border-yellow-600 p-4', selectedIds['1'] && 'bg-yellow-300')}
-            onClick={() => toggleId('1')}
-          >
-            1
-          </div>
-          <div
-            id='2'
-            className={clsx('border border-yellow-600 p-4', selectedIds['2'] && 'bg-yellow-300')}
-            onClick={() => toggleId('2')}
-          >
-            2
-          </div>
-          <div
-            id='3'
-            className={clsx('border border-yellow-600 p-4', selectedIds['3'] && 'bg-yellow-300')}
-            onClick={() => toggleId('3')}
-          >
-            3
-          </div>
-        </div>
-
         <div>
+          <div className="flex p-4 border gap-4">
+            <div
+              id='1'
+              className={clsx('border border-yellow-600 p-4', selectedIds['1'] && 'bg-yellow-300')}
+              onClick={() => toggleId('1')}
+            >
+              1
+            </div>
+            <div
+              id='2'
+              className={clsx('border border-yellow-600 p-4', selectedIds['2'] && 'bg-yellow-300')}
+              onClick={() => toggleId('2')}
+            >
+              2
+            </div>
+            <div
+              id='3'
+              className={clsx('border border-yellow-600 p-4', selectedIds['3'] && 'bg-yellow-300')}
+              onClick={() => toggleId('3')}
+            >
+              3
+            </div>
+          </div>
           <h1>Dynamic Divs Example</h1>
           <div className="input-group">
             <input type="text" value={inputValue} onChange={handleInputChange} placeholder="Enter ID" />
@@ -169,9 +193,81 @@ function InputPagesTesting() {
             ))}
           </div>
         </div>
-      </FormProvider>
-    </div >
+      </div>
+    </FormProvider>
   )
 }
 
-export default InputPagesTesting
+const FormWithProvider = () => {
+  const method = useForm({ defaultValues: { select: null, multiSelect: [] } });
+  const { handleSubmit, reset, control } = method;
+
+  return (
+    <FormProvider {...method}>
+      <form
+        onSubmit={handleSubmit((e) => console.log(e))}
+        className='relative w-1/2 flex-col justify-center items-center space-y-4 border p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out'
+      >
+        <strong>Provider</strong>
+        <Select
+          name='select'
+          label='Select'
+          placeholder='Select item'
+          data={['React', 'Angular', 'Vue']}
+          control={control}
+        />
+        <MultiSelect
+          name='multiSelect'
+          label='Multi Select'
+          placeholder='Select multiple items'
+          data={['React', 'Angular', 'Vue']}
+          control={control}
+        />
+        <Group>
+          <Button type='submit'
+          >Submit</Button>
+          <Button type='button'
+            onClick={() => reset()}
+          >Reset</Button>
+        </Group>
+      </form>
+    </FormProvider>
+  )
+}
+
+const FormWithControl = () => {
+  const method = useForm({ defaultValues: { select: null, multiSelect: [] } });
+  const { reset, control } = method;
+
+  return (
+    <Form
+      control={control}
+      onSubmit={(e) => console.log(e.data)}
+      onError={(e) => console.log(e)}
+      className='relative w-1/2 flex-col justify-center items-center space-y-4 border p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out'
+    >
+      <strong>Control</strong>
+      <Select
+        name='select'
+        label='Select'
+        placeholder='Select item'
+        data={['React', 'Angular', 'Vue']}
+        control={control}
+      />
+      <MultiSelect
+        name='multiSelect'
+        label='Multi Select'
+        placeholder='Select multiple items'
+        data={['React', 'Angular', 'Vue']}
+        control={control}
+      />
+      <Group>
+        <Button type='submit'
+        >Submit</Button>
+        <Button type='button'
+          onClick={() => reset()}
+        >Reset</Button>
+      </Group>
+    </Form>
+  )
+}
