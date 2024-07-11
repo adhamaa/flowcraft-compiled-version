@@ -5,6 +5,7 @@ import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { useActionIcons } from './WorkInProgress/hooks/useActionIcons';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
+import { useFormContext } from 'react-hook-form';
 
 interface Action {
   id: string;
@@ -22,16 +23,49 @@ interface Action {
 const ActionIcons = () => {
   const { onAdd, onMove, onDuplicate, onDelete, onRestore, onDisjoint } = useWorkInProgressDiagram();
 
+  const method = useFormContext();
+  const { reset } = method;
+
   const { isEditable, toggleIsEditable } = useActionIcons();
 
 
   const actionList: Action[] = [
-    { id: "Add", label: "Add", icon: { name: "heroicons:plus-circle", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => toggleIsEditable('add'), color: isEditable.add ? "#895CF3" : "#F1F5F9", c: isEditable.add ? "white" : "black" },
-    { id: "Move", label: "Move", icon: { name: "heroicons:arrows-pointing-in", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => toggleIsEditable('move'), color: isEditable.move ? "#895CF3" : "#F1F5F9", c: isEditable.move ? "white" : "black" },
-    { id: "Duplicate", label: "Duplicate", icon: { name: "heroicons-outline:document-duplicate", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => toggleIsEditable('duplicate'), color: isEditable.duplicate ? "#895CF3" : "#F1F5F9", c: isEditable.duplicate ? "white" : "black" },
-    { id: "Delete", label: "Delete", icon: { name: "heroicons-outline:trash", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => toggleIsEditable('delete'), color: isEditable.delete ? "#895CF3" : "#F1F5F9", c: isEditable.delete ? "white" : "black" },
-    { id: "Restore", label: "Restore", icon: { name: "heroicons-outline:refresh", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => toggleIsEditable('restore'), color: isEditable.restore ? "#895CF3" : "#F1F5F9", c: isEditable.restore ? "white" : "black" },
-    { id: "Disjoint", label: "Disjoint", icon: { name: "heroicons-outline:scissors", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => toggleIsEditable('disjoint'), color: isEditable.disjoint ? "#895CF3" : "#F1F5F9", c: isEditable.disjoint ? "white" : "black" }
+    {
+      id: "Add", label: "Add", icon: { name: "heroicons:plus-circle", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
+        toggleIsEditable('add');
+        reset();
+      }, color: isEditable.add ? "#895CF3" : "#F1F5F9", c: isEditable.add ? "white" : "black"
+    },
+    {
+      id: "Move", label: "Move", icon: { name: "heroicons:arrows-pointing-in", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
+        toggleIsEditable('move');
+        reset();
+      }, color: isEditable.move ? "#895CF3" : "#F1F5F9", c: isEditable.move ? "white" : "black"
+    },
+    {
+      id: "Duplicate", label: "Duplicate", icon: { name: "heroicons-outline:document-duplicate", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
+        toggleIsEditable('duplicate');
+        reset();
+      }, color: isEditable.duplicate ? "#895CF3" : "#F1F5F9", c: isEditable.duplicate ? "white" : "black"
+    },
+    {
+      id: "Delete", label: "Delete", icon: { name: "heroicons-outline:trash", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
+        toggleIsEditable('delete');
+        reset();
+      }, color: isEditable.delete ? "#895CF3" : "#F1F5F9", c: isEditable.delete ? "white" : "black"
+    },
+    {
+      id: "Restore", label: "Restore", icon: { name: "heroicons-outline:refresh", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
+        toggleIsEditable('restore');
+        reset();
+      }, color: isEditable.restore ? "#895CF3" : "#F1F5F9", c: isEditable.restore ? "white" : "black"
+    },
+    {
+      id: "Disjoint", label: "Disjoint", icon: { name: "heroicons-outline:scissors", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
+        toggleIsEditable('disjoint');
+        reset();
+      }, color: isEditable.disjoint ? "#895CF3" : "#F1F5F9", c: isEditable.disjoint ? "white" : "black"
+    }
   ];
 
   return (

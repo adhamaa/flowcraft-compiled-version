@@ -40,6 +40,7 @@ type RFState = {
   edges: Edge[];
   rfInstance: ReactFlowInstance | null;
   getSelectedNodeId: () => string | undefined;
+  deselectAllNodes: () => void;
   getInputOptions: () => ComboboxItem[];
   generateNodeId: () => string;
   onNodesChange: OnNodesChange;
@@ -53,7 +54,7 @@ type RFState = {
   ) => void) => void;
   onReset: () => void;
   onAdd: (stage_name: string) => void;
-  onMove: () => void;
+  onMove: (data: { previous_stage: string[]; next_stage: string[]; curr_stage_uuid: string }) => void;
   onDuplicate: () => void;
   onDelete: () => void;
   onRestore: () => void;
@@ -63,9 +64,9 @@ type RFState = {
   setRfInstance: (rfInstance: ReactFlowInstance) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
   toggleSelectedByNodeId: (nodeId: string) => void;
-  setUpdateEdges: (data: {
-    previous_stage: string[]; next_stage: string[]; curr_stage_uuid: string;
-  }) => void;
+  // setUpdateEdges: (data: {
+  //   previous_stage: string[]; next_stage: string[]; curr_stage_uuid: string;
+  // }) => void;
 };
 
 const storage: PersistStorage<RFState> = {
@@ -123,6 +124,14 @@ const useDiagramStore = create<RFState>()(
       rfInstance: null,
       generateNodeId: () => crypto.randomUUID(),
       getSelectedNodeId: () => get().nodes.find((node) => node.selected)?.id,
+      deselectAllNodes: () => {
+        set({
+          nodes: get().nodes.map((node) => ({
+            ...node,
+            selected: false,
+          })),
+        });
+      },
       getInputOptions: () => get().nodes.map((node) => ({
         value: node.id,
         label: node.data.label,
@@ -202,7 +211,24 @@ const useDiagramStore = create<RFState>()(
 
         set({ nodes: [...get().nodes, node] });
       },
-      onMove: () => { console.log('move') },
+      onMove: (data) => {
+        const { previous_stage, next_stage, curr_stage_uuid } = data;
+
+        const createEdge = (source: string, target: string) => ({
+          id: `${source}-${target}`,
+          source,
+          target,
+          type: ConnectionLineType.SmoothStep,
+          animated: false,
+        });
+
+        const prev2curr = previous_stage?.map((prev: string) => createEdge(prev, curr_stage_uuid)) || [];
+        const curr2next = next_stage?.map((next: string) => createEdge(curr_stage_uuid, next)) || [];
+
+        const combinedEdges = [...prev2curr, ...curr2next];
+
+        set({ edges: [...get().edges, ...combinedEdges] });
+      },
       onDuplicate: () => {
         const uuid = get().generateNodeId();
         const { nodes, edges } = get();
@@ -266,24 +292,24 @@ const useDiagramStore = create<RFState>()(
           }),
         }));
       },
-      setUpdateEdges: (data) => {
-        const { previous_stage, next_stage, curr_stage_uuid } = data;
+      // setUpdateEdges: (data) => {
+      //   const { previous_stage, next_stage, curr_stage_uuid } = data;
 
-        const createEdge = (source: string, target: string) => ({
-          id: `${source}-${target}`,
-          source,
-          target,
-          type: ConnectionLineType.SmoothStep,
-          animated: false,
-        });
+      //   const createEdge = (source: string, target: string) => ({
+      //     id: `${source}-${target}`,
+      //     source,
+      //     target,
+      //     type: ConnectionLineType.SmoothStep,
+      //     animated: false,
+      //   });
 
-        const prev2curr = previous_stage?.map((prev: string) => createEdge(prev, curr_stage_uuid)) || [];
-        const curr2next = next_stage?.map((next: string) => createEdge(curr_stage_uuid, next)) || [];
+      //   const prev2curr = previous_stage?.map((prev: string) => createEdge(prev, curr_stage_uuid)) || [];
+      //   const curr2next = next_stage?.map((next: string) => createEdge(curr_stage_uuid, next)) || [];
 
-        const combinedEdges = [...prev2curr, ...curr2next];
+      //   const combinedEdges = [...prev2curr, ...curr2next];
 
-        set({ edges: [...get().edges, ...combinedEdges] });
-      },
+      //   set({ edges: [...get().edges, ...combinedEdges] });
+      // },
       fetchNodesEdges: async ({
         cycle_id,
         apps_label,
@@ -319,6 +345,7 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     nodes: state.nodes,
     edges: state.edges,
     getSelectedNodeId: state.getSelectedNodeId,
+    deselectAllNodes: state.deselectAllNodes,
     getInputOptions: state.getInputOptions,
     onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
@@ -337,7 +364,7 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     fetchNodesEdges: state.fetchNodesEdges,
     setRfInstance: state.setRfInstance,
     toggleSelectedByNodeId: state.toggleSelectedByNodeId,
-    setUpdateEdges: state.setUpdateEdges,
+    // setUpdateEdges: state.setUpdateEdges,
   })),
 );
 

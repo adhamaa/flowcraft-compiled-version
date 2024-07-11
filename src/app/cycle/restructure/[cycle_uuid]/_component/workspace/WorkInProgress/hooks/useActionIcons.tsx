@@ -29,7 +29,8 @@ const useActionIcons = () => {
   const getAction = (action: Record<ActionType, boolean>): string | null => {
     for (const key in action) {
       if (action[key as ActionType]) {
-        return key.charAt(0).toUpperCase() + key.slice(1);
+        // return key.charAt(0).toUpperCase() + key.slice(1);
+        return key;
       }
     }
     return null;

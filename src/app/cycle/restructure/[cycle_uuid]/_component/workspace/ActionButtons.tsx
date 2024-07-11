@@ -7,23 +7,36 @@ import { Button } from '@mantine/core';
 import * as  React from 'react'
 import { useFormContext } from 'react-hook-form';
 import { addEdge, ConnectionLineType, Edge } from 'reactflow';
-import { useActionIcons } from './WorkInProgress/hooks/useActionIcons';
+import { ActionType, useActionIcons } from './WorkInProgress/hooks/useActionIcons';
 
 
 const ActionButtons = () => {
-  const { isEditable, toggleIsEditable } = useActionIcons();
+  const { isEditable: isEditData, toggleIsEditable, getAction } = useActionIcons();
 
-  const { onApply, onReset, onSave, onDraft, setUpdateEdges } = useWorkInProgressDiagram();
+  const { onApply, onReset, onSave, onDraft } = useWorkInProgressDiagram();
   const method = useFormContext();
   const { handleSubmit } = method;
 
-  // const onDraft = (data: any) => {
-  //   setUpdateEdges({
-  //     curr_stage_uuid: data.curr_stage_uuid,
-  //     previous_stage: data.previous_stage,
-  //     next_stage: data.next_stage
-  //   })
-  // };
+  const action = getAction(isEditData as { [key in ActionType]: boolean });
+
+  const onApplyHere = (data: any, e: any) => {
+    console.log('data:', data)
+    if (action === 'add') {
+      console.log('add:', data)
+    } else if (action === 'move') {
+      console.log('move:', data)
+    } else if (action === 'duplicate') {
+      console.log('duplicate:', data)
+    } else if (action === 'delete') {
+      console.log('delete:', data)
+    } else if (action === 'restore') {
+      console.log('restore:', data)
+    } else if (action === 'disjoint') {
+      console.log('disjoint:', data)
+    } else {
+      console.log('no action:', data)
+    }
+  }
 
   const buttons = [
     {
@@ -40,7 +53,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: onApply as never,
+      onClick: handleSubmit(onApplyHere) as never,
       color: '#F1F5F9',
       icon: { name: "heroicons-outline:check-circle", width: '1.5rem' },
     },
