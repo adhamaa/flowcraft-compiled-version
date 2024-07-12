@@ -20,9 +20,12 @@ type ActionButtonsType = {
 };
 
 const ActionButtons = () => {
-  const { isEditable: isEditData, toggleIsEditable, getAction } = useActionIcons();
+  const { isEditable: isEditData, toggleIsEditable, getAction, getIsAnyEditable } = useActionIcons();
 
-  const { onApply, onReset, onSave, onDraft, deselectAllNodes, onAdd, onMove, onDuplicate, onDelete, onRestore, onDisjoint } = useWorkInProgressDiagram();
+  const { onApply, onReset, onSave, onDraft, deselectAllNodes } = useWorkInProgressDiagram();
+
+  const isEditable = getIsAnyEditable(isEditData as { [key in ActionType]: boolean });
+
   const method = useFormContext();
   const { handleSubmit, reset } = method;
 
@@ -47,7 +50,7 @@ const ActionButtons = () => {
     {
       label: 'Apply',
       type: 'button',
-      disabled: false,
+      disabled: !isEditable,
       canShow: true,
       onClick: handleSubmit(onApplySubmit),
       color: '#F1F5F9',
@@ -56,7 +59,7 @@ const ActionButtons = () => {
     {
       label: 'Draft',
       type: 'button',
-      disabled: false,
+      disabled: !isEditable,
       canShow: true,
       onClick: onDraft,
       color: '#895CF3',
@@ -65,7 +68,7 @@ const ActionButtons = () => {
     {
       label: 'Save',
       type: 'button',
-      disabled: false,
+      disabled: !isEditable,
       canShow: true,
       onClick: onSave,
       color: '#895CF3',

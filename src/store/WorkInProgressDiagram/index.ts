@@ -162,16 +162,78 @@ const useDiagramStore = create<RFState>()(
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
       onSave: () => {
-        const ApiFormat = convertToCycleStages(get().nodes, get().edges);
-        console.log('ApiFormat:', ApiFormat)
+        modals.openConfirmModal({
+          title: 'Save Diagram',
+          children: 'Are you sure you want to save the diagram?',
+          labels: { cancel: 'Cancel', confirm: 'Save' },
+          radius: 'md',
+          size: 'sm',
+          overlayProps: {
+            backgroundOpacity: 0.55,
+            blur: 10,
+          },
+          withCloseButton: false,
+          confirmProps: {
+            color: '#895CF3',
+          },
+          cancelProps: {
+            color: '#0F172A',
+            variant: 'light',
+          },
+          groupProps: {
+            justify: 'center',
+            pb: 'md',
+          },
+          classNames: {
+            content: 'w-96',
+            header: '',
+            title: 'text-2xl font-semibold text-center w-full p-2',
+            body: 'flex flex-col text-center justify-center gap-6 mx-auto',
+          },
+          onConfirm: () => {
+            const ApiFormat = convertToCycleStages(get().nodes, get().edges);
+            console.log('ApiFormat:', ApiFormat);
+          },
+        });
       },
       onDraft: () => {
         const instance = get().rfInstance;
         const key = get().flowKey as string;
 
         if (instance) {
-          const flow = instance.toObject();
-          localStorage.setItem(key, JSON.stringify(flow));
+          modals.openConfirmModal({
+            title: 'Save Draft',
+            children: 'Are you sure you want to save the current diagram as a draft?',
+            labels: { cancel: 'Cancel', confirm: 'Save' },
+            radius: 'md',
+            size: 'sm',
+            overlayProps: {
+              backgroundOpacity: 0.55,
+              blur: 10,
+            },
+            withCloseButton: false,
+            confirmProps: {
+              color: '#895CF3',
+            },
+            cancelProps: {
+              color: '#0F172A',
+              variant: 'light',
+            },
+            groupProps: {
+              justify: 'center',
+              pb: 'md',
+            },
+            classNames: {
+              content: 'w-96',
+              header: '',
+              title: 'text-2xl font-semibold text-center w-full p-2',
+              body: 'flex flex-col text-center justify-center gap-6 mx-auto',
+            },
+            onConfirm: () => {
+              const flow = instance.toObject();
+              localStorage.setItem(key, JSON.stringify(flow));
+            },
+          });
         }
       },
       onApply: ({ action, data, callback }) => {
@@ -221,49 +283,101 @@ const useDiagramStore = create<RFState>()(
           }
         };
 
-        restoreFlow();
+        modals.openConfirmModal({
+          title: 'Restore Flow',
+          children: 'Are you sure you want to restore the flow?',
+          labels: { cancel: 'Cancel', confirm: 'Restore' },
+          radius: 'md',
+          size: 'sm',
+          overlayProps: {
+            backgroundOpacity: 0.55,
+            blur: 10,
+          },
+          withCloseButton: false,
+          confirmProps: {
+            color: '#895CF3',
+          },
+          cancelProps: {
+            color: '#0F172A',
+            variant: 'light',
+          },
+          groupProps: {
+            justify: 'center',
+            pb: 'md',
+          },
+          classNames: {
+            content: 'w-96',
+            header: '',
+            title: 'text-2xl font-semibold text-center w-full p-2',
+            body: 'flex flex-col text-center justify-center gap-6 mx-auto',
+          },
+          onConfirm: restoreFlow,
+        });
       },
       onAdd: (stage_name = 'New Node') => {
-        const uuid = get().generateNodeId();
-        console.log('uuid:', uuid)
-        const node = {
-          id: uuid,
-          type: 'WithEntryAndExit', // 'Start' | 'WithEntryAndExit' | 'WithEntry'| 'WithExit' | 'End'  
-          data: { label: stage_name },
-          position: {
-            x: Math.random() * window.innerWidth - 100,
-            y: Math.random() * window.innerHeight - 100,
-          },
-        };
+        try {
+          if (!stage_name) throw new Error('Stage name is required.');
 
-        set({ nodes: [...get().nodes, node] });
+          const uuid = get().generateNodeId();
+          const node = {
+            id: uuid,
+            type: 'WithEntryAndExit', // 'Start' | 'WithEntryAndExit' | 'WithEntry'| 'WithExit' | 'End'  
+            data: { label: stage_name },
+            position: {
+              x: Math.random() * window.innerWidth - 100,
+              y: Math.random() * window.innerHeight - 100,
+            },
+          };
+
+          set({ nodes: [...get().nodes, node] });
+        } catch (error: any) {
+          toast.error(error.message);
+        }
       },
       onMove: (data) => {
         const updateEdges = get().updateEdges;
-        updateEdges(data);
+        const selectedNodes = get().nodes.filter((node) => node.selected);
+
+        try {
+          if (selectedNodes.length === 0) {
+            throw new Error('No selected stage found or stage does not exist.');
+          }
+
+          updateEdges(data);
+        } catch (error: any) {
+          toast.error(error.message);
+        }
       },
       onDuplicate: () => {
         const uuid = get().generateNodeId();
         const { nodes, edges } = get();
         const selectedNodes = nodes.filter((node) => node.selected);
 
-        selectedNodes.forEach((node) => {
-          const position = {
-            x: node.position.x + 50,
-            y: node.position.y + 50,
-          };
+        try {
+          if (selectedNodes.length === 0) {
+            throw new Error('No selected stage found or stage does not exist.');
+          }
 
-          const newNode = {
-            ...node,
-            data: { ...node.data, label: `${node.data.label}-Copy` },
-            selected: false,
-            dragging: false,
-            id: uuid,
-            position,
-          };
+          selectedNodes.forEach((node) => {
+            const position = {
+              x: node.position.x + 50,
+              y: node.position.y + 50,
+            };
 
-          set({ nodes: [...nodes, newNode] });
-        });
+            const newNode = {
+              ...node,
+              data: { ...node.data, label: `${node.data.label}-Copy` },
+              selected: false,
+              dragging: false,
+              id: uuid,
+              position,
+            };
+
+            set({ nodes: [...nodes, newNode] });
+          });
+        } catch (error: any) {
+          toast.error(error.message);
+        }
       },
       onDelete: () => {
         const { nodes, edges } = get();
