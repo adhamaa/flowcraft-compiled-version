@@ -9,36 +9,28 @@ import { useFormContext } from 'react-hook-form';
 import { addEdge, ConnectionLineType, Edge } from 'reactflow';
 import { ActionType, useActionIcons } from './WorkInProgress/hooks/useActionIcons';
 
+type ActionButtonsType = {
+  label: string;
+  canShow: boolean;
+  icon: { name: string; width: string; rotate?: number };
+  onClick?: (e: any) => void;
+  color: string;
+  disabled: boolean;
+  type: 'button';
+};
 
 const ActionButtons = () => {
   const { isEditable: isEditData, toggleIsEditable, getAction } = useActionIcons();
 
-  const { onApply, onReset, onSave, onDraft, deselectAllNodes } = useWorkInProgressDiagram();
+  const { onApply, onReset, onSave, onDraft, deselectAllNodes, onAdd, onMove, onDuplicate, onDelete, onRestore, onDisjoint } = useWorkInProgressDiagram();
   const method = useFormContext();
   const { handleSubmit, reset } = method;
 
   const action = getAction(isEditData as { [key in ActionType]: boolean });
 
-  const onApplyHere = (data: any, e: any) => {
-    console.log('data:', data)
-    if (action === 'add') {
-      console.log('add:', data)
-    } else if (action === 'move') {
-      console.log('move:', data)
-    } else if (action === 'duplicate') {
-      console.log('duplicate:', data)
-    } else if (action === 'delete') {
-      console.log('delete:', data)
-    } else if (action === 'restore') {
-      console.log('restore:', data)
-    } else if (action === 'disjoint') {
-      console.log('disjoint:', data)
-    } else {
-      console.log('no action:', data)
-    }
-  }
+  const onApplySubmit = (data: any, e: any) => onApply({ action: action as ActionType, data });
 
-  const buttons = [
+  const buttons: ActionButtonsType[] = [
     {
       label: 'Reset',
       type: 'button',
@@ -57,7 +49,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: handleSubmit(onApplyHere) as never,
+      onClick: handleSubmit(onApplySubmit),
       color: '#F1F5F9',
       icon: { name: "heroicons-outline:check-circle", width: '1.5rem' },
     },
@@ -66,7 +58,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: onDraft as never,
+      onClick: onDraft,
       color: '#895CF3',
       icon: { name: "heroicons-outline:folder", width: '1.5rem' },
     },
@@ -75,7 +67,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: onSave as never,
+      onClick: onSave,
       color: '#895CF3',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },

@@ -29,6 +29,13 @@ type InputType = {
   inputs?: InputType[];
 }
 
+export type FormValues = {
+  curr_stage_uuid: null | string;
+  curr_stage_name: string;
+  previous_stage: string[];
+  next_stage: string[];
+};
+
 function FlowObjects() {
   const { toggleSelectedByNodeId, getSelectedNodeId, getInputOptions, deselectAllNodes } = useWorkInProgressDiagram();
   const { isEditable: isEditData, getAction, getIsEditable, getIsAnyEditable } = useActionIcons();
@@ -43,12 +50,12 @@ function FlowObjects() {
   const selectedNodeId = getSelectedNodeId();
   const { ref, height } = useElementSize();
 
-  const methods = useForm({
+  const methods = useForm<FormValues>({
     defaultValues: {
-      curr_stage_uuid: null, // select object
-      curr_stage_name: "", // text
-      previous_stage: [], // multi select
-      next_stage: [] // multi select
+      curr_stage_uuid: null,
+      curr_stage_name: "",
+      previous_stage: [],
+      next_stage: []
     }
   });
 
