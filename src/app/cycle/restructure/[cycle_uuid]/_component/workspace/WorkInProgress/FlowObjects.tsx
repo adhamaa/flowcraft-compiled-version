@@ -76,10 +76,10 @@ function FlowObjects() {
     },
     {
       group: 'Position',
-      canShow: watchCurrentStageUuid || watchCurrentStageName || false,
+      canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false),
       inputs: [
-        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: watchCurrentStageUuid || watchCurrentStageName || false, control: control, disabled: !isEditable },
-        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: watchCurrentStageUuid || watchCurrentStageName || false, control: control, disabled: !isEditable },
+        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false), control: control, disabled: !isEditable },
+        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false), control: control, disabled: !isEditable },
       ]
     }
   ];

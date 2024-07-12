@@ -30,6 +30,7 @@ import { boolean } from 'drizzle-orm/pg-core';
 import { ActionType } from '@/app/cycle/restructure/[cycle_uuid]/_component/workspace/WorkInProgress/hooks/useActionIcons';
 import { FormValues } from '@/app/cycle/restructure/[cycle_uuid]/_component/workspace/WorkInProgress/FlowObjects';
 import toast from '@/components/toast';
+import { modals } from '@mantine/modals';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -268,12 +269,52 @@ const useDiagramStore = create<RFState>()(
         const { nodes, edges } = get();
         const selectedNodes = nodes.filter((node) => node.selected);
 
-        selectedNodes.forEach((node) => {
-          set({
-            nodes: nodes.filter((n) => n.id !== node.id),
-            edges: edges.filter((e) => e.source !== node.id && e.target !== node.id),
+        try {
+
+          if (selectedNodes.length === 0) {
+            throw new Error('No selected stage found or stage does not exist.');
+          }
+
+          modals.openConfirmModal({
+            title: 'Delete Stage',
+            children: 'Are you sure you want to delete the selected stage?',
+            labels: { cancel: 'Cancel', confirm: 'Delete' },
+            radius: 'md',
+            size: 'sm',
+            overlayProps: {
+              backgroundOpacity: 0.55,
+              blur: 10,
+            },
+            withCloseButton: false,
+            confirmProps: {
+              color: '#895CF3',
+            },
+            cancelProps: {
+              color: '#0F172A',
+              variant: 'light',
+            },
+            groupProps: {
+              justify: 'center',
+              pb: 'md',
+            },
+            classNames: {
+              content: 'w-96',
+              header: '',
+              title: 'text-2xl font-semibold text-center w-full p-2',
+              body: 'flex flex-col text-center justify-center gap-6 mx-auto',
+            },
+            onConfirm: () => {
+              const newNodes = nodes.filter((node) => !node.selected);
+              const newEdges = edges.filter((edge) => {
+                return !selectedNodes.some((node) => node.id === edge.source || node.id === edge.target);
+              });
+
+              set({ nodes: newNodes, edges: newEdges });
+            },
           });
-        });
+        } catch (error: any) {
+          toast.error(error.message);
+        }
       },
       onRestore: () => { console.log('restore') },
       onDisjoint: () => {
