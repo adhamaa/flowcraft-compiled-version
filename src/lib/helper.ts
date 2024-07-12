@@ -87,7 +87,7 @@ export function convertToCycleStages(nodes: Node[], edges: Edge[]): CycleStage[]
       stage_uuid: node.id,
       list_prev: [],
       list_next: [],
-      duplicate_from: node.data.duplicate_from,
+      duplicate_from: node.data.duplicate_from ?? "",
     };
   });
 

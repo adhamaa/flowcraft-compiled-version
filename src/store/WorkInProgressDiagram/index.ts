@@ -29,6 +29,7 @@ import { convertToCycleStages } from '@/lib/helper';
 import { boolean } from 'drizzle-orm/pg-core';
 import { ActionType } from '@/app/cycle/restructure/[cycle_uuid]/_component/workspace/WorkInProgress/hooks/useActionIcons';
 import { FormValues } from '@/app/cycle/restructure/[cycle_uuid]/_component/workspace/WorkInProgress/FlowObjects';
+import toast from '@/components/toast';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -64,7 +65,7 @@ type RFState = {
   setRfInstance: (rfInstance: ReactFlowInstance) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
   toggleSelectedByNodeId: (nodeId: string) => void;
-  setUpdateEdges: (data: FormValues) => void;
+  updateEdges: (data: FormValues) => void;
 };
 
 const storage: PersistStorage<RFState> = {
@@ -160,7 +161,6 @@ const useDiagramStore = create<RFState>()(
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
       onSave: () => {
-        console.log('save')
         const ApiFormat = convertToCycleStages(get().nodes, get().edges);
         console.log('ApiFormat:', ApiFormat)
       },
@@ -238,7 +238,7 @@ const useDiagramStore = create<RFState>()(
         set({ nodes: [...get().nodes, node] });
       },
       onMove: (data) => {
-        const updateEdges = get().setUpdateEdges;
+        const updateEdges = get().updateEdges;
         updateEdges(data);
       },
       onDuplicate: () => {
@@ -303,23 +303,52 @@ const useDiagramStore = create<RFState>()(
           }),
         }));
       },
-      setUpdateEdges: (data) => {
+      updateEdges: (data) => {
         const { previous_stage, next_stage, curr_stage_uuid } = data;
 
-        const createEdge = (source: string, target: string) => ({
-          id: `${source}-${target}`,
-          source,
-          target,
-          type: ConnectionLineType.SmoothStep,
-          animated: false,
-        });
+        const createEdge = (source: string, target: string) => {
+          const edgeId = `${source}-${target}`;
+          const existingEdge = get().edges.find((edge) => edge.id === edgeId);
 
-        const prev2curr = previous_stage?.map((prev: string) => createEdge(prev, curr_stage_uuid!)) || [];
-        const curr2next = next_stage?.map((next: string) => createEdge(curr_stage_uuid!, next)) || [];
+          if (existingEdge) {
+            throw new Error(`Edge with id ${edgeId} already exists.`);
+          }
 
-        const combinedEdges = [...prev2curr, ...curr2next];
+          return {
+            id: edgeId,
+            source,
+            target,
+            type: ConnectionLineType.SmoothStep,
+            animated: false,
+          };
+        };
 
-        set({ edges: [...get().edges, ...combinedEdges] });
+        try {
+          const prev2curr = previous_stage?.map((prev: string) => createEdge(prev, curr_stage_uuid!)) || [];
+          const curr2next = next_stage?.map((next: string) => createEdge(curr_stage_uuid!, next)) || [];
+
+          const combinedEdges = [...prev2curr, ...curr2next];
+
+          set({ edges: [...get().edges, ...combinedEdges] });
+        } catch (error: any) {
+          toast.error(error.message);
+        }
+      },
+      replaceSelectedNodeEdges: (nodeId: string, newEdges: Edge[]) => {
+        const { nodes, edges } = get();
+        const selectedNode = nodes.find((node) => node.id === nodeId);
+
+        if (selectedNode) {
+          const connectedEdges = edges.filter((edge) => edge.source === nodeId || edge.target === nodeId);
+          const newEdgesWithId = newEdges.map((edge) => ({ ...edge, id: `${edge.source}-${edge.target}` }));
+
+          const newEdgesWithoutConnected = edges.filter((edge) => !connectedEdges.includes(edge));
+          const newEdgesWithConnected = [...newEdgesWithoutConnected, ...newEdgesWithId];
+
+          set({ edges: newEdgesWithConnected });
+        } else {
+          console.error('Node not found');
+        }
       },
       fetchNodesEdges: async ({
         cycle_id,
@@ -375,7 +404,7 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     fetchNodesEdges: state.fetchNodesEdges,
     setRfInstance: state.setRfInstance,
     toggleSelectedByNodeId: state.toggleSelectedByNodeId,
-    setUpdateEdges: state.setUpdateEdges,
+    updateEdges: state.updateEdges,
   })),
 );
 
