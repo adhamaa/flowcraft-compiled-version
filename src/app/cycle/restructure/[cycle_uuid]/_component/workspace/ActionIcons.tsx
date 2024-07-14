@@ -21,58 +21,47 @@ interface Action {
 
 
 const ActionIcons = () => {
-  const { deselectAllNodes } = useWorkInProgressDiagram();
-
   const method = useFormContext();
-  const { reset } = method;
+  const { reset, setFocus } = method;
 
   const { isEditable, toggleIsEditable } = useActionIcons();
 
+  const handleToggle = <E extends Event>(e: E): void => {
+    const action_id = (e.target as HTMLElement).offsetParent?.id;
+    toggleIsEditable(action_id as string);
+    reset();
+  };
 
   const actionList: Action[] = [
     {
-      id: "Add", label: "Add", icon: { name: "heroicons:plus-circle", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
-        toggleIsEditable('add');
-        reset();
-        deselectAllNodes();
-      }, color: isEditable.add ? "#895CF3" : "#F1F5F9", c: isEditable.add ? "white" : "black"
+      id: "add", label: "Add", icon: { name: "heroicons:plus-circle", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.add ? "#895CF3" : "#F1F5F9", c: isEditable.add ? "white" : "black"
     },
     {
-      id: "Move", label: "Move", icon: { name: "heroicons:arrows-pointing-in", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
-        toggleIsEditable('move');
-        reset();
-        deselectAllNodes();
-      }, color: isEditable.move ? "#895CF3" : "#F1F5F9", c: isEditable.move ? "white" : "black"
+      id: "move", label: "Move", icon: { name: "heroicons:arrows-pointing-in", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.move ? "#895CF3" : "#F1F5F9", c: isEditable.move ? "white" : "black"
     },
     {
-      id: "Duplicate", label: "Duplicate", icon: { name: "heroicons-outline:document-duplicate", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
-        toggleIsEditable('duplicate');
-        reset();
-        deselectAllNodes();
-      }, color: isEditable.duplicate ? "#895CF3" : "#F1F5F9", c: isEditable.duplicate ? "white" : "black"
+      id: "duplicate", label: "Duplicate", icon: { name: "heroicons-outline:document-duplicate", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.duplicate ? "#895CF3" : "#F1F5F9", c: isEditable.duplicate ? "white" : "black"
     },
     {
-      id: "Delete", label: "Delete", icon: { name: "heroicons-outline:trash", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
-        toggleIsEditable('delete');
-        reset();
-        deselectAllNodes();
-      }, color: isEditable.delete ? "#895CF3" : "#F1F5F9", c: isEditable.delete ? "white" : "black"
+      id: "delete", label: "Delete", icon: { name: "heroicons-outline:trash", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.delete ? "#895CF3" : "#F1F5F9", c: isEditable.delete ? "white" : "black"
     },
     {
-      id: "Restore", label: "Restore", icon: { name: "heroicons-outline:refresh", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
-        toggleIsEditable('restore');
-        reset();
-        deselectAllNodes();
-      }, color: isEditable.restore ? "#895CF3" : "#F1F5F9", c: isEditable.restore ? "white" : "black"
+      id: "restore", label: "Restore", icon: { name: "heroicons-outline:refresh", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.restore ? "#895CF3" : "#F1F5F9", c: isEditable.restore ? "white" : "black"
     },
     {
-      id: "Disjoint", label: "Disjoint", icon: { name: "heroicons-outline:scissors", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: () => {
-        toggleIsEditable('disjoint');
-        reset();
-        deselectAllNodes();
-      }, color: isEditable.disjoint ? "#895CF3" : "#F1F5F9", c: isEditable.disjoint ? "white" : "black"
+      id: "disjoint", label: "Disjoint", icon: { name: "heroicons-outline:scissors", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.disjoint ? "#895CF3" : "#F1F5F9", c: isEditable.disjoint ? "white" : "black"
     }
   ];
+
+  React.useEffect(() => {
+    if (isEditable.add) {
+      setFocus('curr_stage_name');
+    }
+    if (!isEditable.add) {
+      setFocus('curr_stage_uuid');
+    }
+  }, [isEditable, setFocus]);
+
 
   return (
     <div className='flex gap-3'>

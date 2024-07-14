@@ -39,11 +39,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: () => {
-        onReset();
-        deselectAllNodes();
-        reset();
-      },
+      onClick: () => onReset(reset),
       color: '#F1F5F9',
       icon: { name: "heroicons-outline:x-circle", width: '1.5rem' },
     },
@@ -53,18 +49,18 @@ const ActionButtons = () => {
       disabled: !isEditable,
       canShow: true,
       onClick: handleSubmit(onApplySubmit),
-      color: '#F1F5F9',
+      color: '#895CF3',
       icon: { name: "heroicons-outline:check-circle", width: '1.5rem' },
     },
-    {
-      label: 'Draft',
-      type: 'button',
-      disabled: !isEditable,
-      canShow: true,
-      onClick: onDraft,
-      color: '#895CF3',
-      icon: { name: "heroicons-outline:folder", width: '1.5rem' },
-    },
+    // {
+    //   label: 'Draft',
+    //   type: 'button',
+    //   disabled: !isEditable,
+    //   canShow: true,
+    //   onClick: onDraft,
+    //   color: '#895CF3',
+    //   icon: { name: "heroicons-outline:folder", width: '1.5rem' },
+    // },
     {
       label: 'Save',
       type: 'button',
