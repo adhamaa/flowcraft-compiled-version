@@ -46,6 +46,11 @@ type RFState = {
   getSelectedNodeId: () => string | undefined;
   deselectAllNodes: () => void;
   getInputOptions: () => ComboboxItem[];
+  getInputOptionsByNodesId: (nodesId: string[]) => ComboboxItem[];
+  getPreviousNodesId: (nodeId?: string) => string[];
+  getNextNodesId: (nodeId?: string) => string[];
+  // getAllEdgesByNodeId: (nodeId?: string) => Edge[];
+  // getAllPreviousAndNextNodesId: (nodeId?: string) => string[];
   generateNodeId: () => string;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
@@ -54,22 +59,24 @@ type RFState = {
   onSave: () => void;
   onDraft: () => void;
   onApply: (items: { action: ActionType; data: FormValues; callback?: (...args: any[]) => void }) => void;
-  onReset: () => void;
-  onAdd: (stage_name: string) => void;
+  onAdd: (data: FormValues) => void;
+  onReset: (callback?: (...args: any[]) => void) => void;
   onMove: (data: FormValues) => void;
   onDuplicate: () => void;
   onDelete: () => void;
   onRestore: () => void;
-  onDisjoint: (nodeId: string) => void;
+  onDisjoint: (data: FormValues) => void;
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   setRfInstance: (rfInstance: ReactFlowInstance) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
   toggleSelectedByNodeId: (nodeId: string) => void;
   updateEdges: (data: FormValues) => void;
+  removeEdges: (nodeId: string) => void;
+  removeEdgeById: (data: FormValues) => void;
 };
 
-const storage: PersistStorage<RFState> = {
+const storage: PersistStorage<Omit<RFState, 'flowKey'>> = {
   getItem: (name) => {
     const str = localStorage.getItem(name)
     if (!str) return null
@@ -136,6 +143,42 @@ const useDiagramStore = create<RFState>()(
         value: node.id,
         label: node.data.label,
       })),
+      getInputOptionsByNodesId: (nodesId: string[]) => {
+        const { nodes } = get();
+        return nodes
+          .filter((node) => nodesId.includes(node.id))
+          .map((node) => ({
+            value: node.id,
+            label: node.data.label,
+          }));
+      },
+      getPreviousNodesId: (nodeId?: string) => {
+        const { nodes, edges } = get();
+        nodeId = nodeId ?? nodes.find((node) => node.selected)?.id;
+
+        const previousEdges = edges.filter((edge) => edge.target === nodeId);
+        return previousEdges.map((edge) => edge.source);
+      },
+      getNextNodesId: (nodeId?: string) => {
+        const { nodes, edges } = get();
+        nodeId = nodeId ?? nodes.find((node) => node.selected)?.id;
+
+        const nextEdges = edges.filter((edge) => edge.source === nodeId);
+        return nextEdges.map((edge) => edge.target);
+      },
+      // getAllEdgesByNodeId: (nodeId?: string) => {
+      //   const { edges } = get();
+      //   nodeId = nodeId ?? get().getSelectedNodeId();
+
+      //   return edges.filter((edge) => edge.source === nodeId || edge.target === nodeId);
+      // },
+      // getAllPreviousAndNextNodesId: (nodeId?: string) => {
+      //   const { edges } = get();
+      //   nodeId = nodeId ?? get().getSelectedNodeId();
+
+      //   const allEdgesNodesId = edges.filter((edge) => edge.source === nodeId || edge.target === nodeId);
+      //   return allEdgesNodesId.map((edge) => edge.source === nodeId ? edge.target : edge.source);
+      // },
       onNodesChange: (changes: NodeChange[]) => {
         set({
           nodes: applyNodeChanges(changes, get().nodes),
@@ -162,9 +205,10 @@ const useDiagramStore = create<RFState>()(
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
       onSave: () => {
+        const setToDraft = get().onDraft;
         modals.openConfirmModal({
-          title: 'Save Diagram',
-          children: 'Are you sure you want to save the diagram?',
+          title: 'Save Cycle',
+          children: 'Are you confirm to save this cycle to the latest one? ',
           labels: { cancel: 'Cancel', confirm: 'Save' },
           radius: 'md',
           size: 'sm',
@@ -192,6 +236,8 @@ const useDiagramStore = create<RFState>()(
           },
           onConfirm: () => {
             const ApiFormat = convertToCycleStages(get().nodes, get().edges);
+
+            setToDraft();
             console.log('ApiFormat:', ApiFormat);
           },
         });
@@ -201,39 +247,39 @@ const useDiagramStore = create<RFState>()(
         const key = get().flowKey as string;
 
         if (instance) {
-          modals.openConfirmModal({
-            title: 'Save Draft',
-            children: 'Are you sure you want to save the current diagram as a draft?',
-            labels: { cancel: 'Cancel', confirm: 'Save' },
-            radius: 'md',
-            size: 'sm',
-            overlayProps: {
-              backgroundOpacity: 0.55,
-              blur: 10,
-            },
-            withCloseButton: false,
-            confirmProps: {
-              color: '#895CF3',
-            },
-            cancelProps: {
-              color: '#0F172A',
-              variant: 'light',
-            },
-            groupProps: {
-              justify: 'center',
-              pb: 'md',
-            },
-            classNames: {
-              content: 'w-96',
-              header: '',
-              title: 'text-2xl font-semibold text-center w-full p-2',
-              body: 'flex flex-col text-center justify-center gap-6 mx-auto',
-            },
-            onConfirm: () => {
-              const flow = instance.toObject();
-              localStorage.setItem(key, JSON.stringify(flow));
-            },
-          });
+          // modals.openConfirmModal({
+          //   title: 'Save Draft',
+          //   children: 'Are you sure you want to save the current diagram as a draft?',
+          //   labels: { cancel: 'Cancel', confirm: 'Save' },
+          //   radius: 'md',
+          //   size: 'sm',
+          //   overlayProps: {
+          //     backgroundOpacity: 0.55,
+          //     blur: 10,
+          //   },
+          //   withCloseButton: false,
+          //   confirmProps: {
+          //     color: '#895CF3',
+          //   },
+          //   cancelProps: {
+          //     color: '#0F172A',
+          //     variant: 'light',
+          //   },
+          //   groupProps: {
+          //     justify: 'center',
+          //     pb: 'md',
+          //   },
+          //   classNames: {
+          //     content: 'w-96',
+          //     header: '',
+          //     title: 'text-2xl font-semibold text-center w-full p-2',
+          //     body: 'flex flex-col text-center justify-center gap-6 mx-auto',
+          //   },
+          //   onConfirm: () => {
+          const flow = instance.toObject();
+          localStorage.setItem(key, JSON.stringify(flow));
+          //   },
+          // });
         }
       },
       onApply: ({ action, data, callback }) => {
@@ -246,7 +292,7 @@ const useDiagramStore = create<RFState>()(
 
         switch (action) {
           case 'add':
-            addNode(data.curr_stage_name);
+            addNode(data);
             break;
           case 'move':
             moveNode(data);
@@ -261,7 +307,7 @@ const useDiagramStore = create<RFState>()(
             console.log('restore')
             break;
           case 'disjoint':
-            console.log('disjoint')
+            disjointNode(data);
             break;
           default:
             break;
@@ -269,7 +315,7 @@ const useDiagramStore = create<RFState>()(
 
 
       },
-      onReset: () => {
+      onReset: (callback) => {
         const instance = get().rfInstance;
         const key = get().flowKey as string;
 
@@ -280,13 +326,16 @@ const useDiagramStore = create<RFState>()(
             const { x = 0, y = 0, zoom = 1 } = flow.viewport;
             set({ nodes: flow.nodes || [], edges: flow.edges || [] });
             instance?.setViewport({ x, y, zoom });
+
+            if (typeof callback === 'function') callback();
+            // toast.success('Cycle has been reset successfully.');
           }
         };
 
         modals.openConfirmModal({
-          title: 'Restore Flow',
-          children: 'Are you sure you want to restore the flow?',
-          labels: { cancel: 'Cancel', confirm: 'Restore' },
+          title: 'Reset Cycle',
+          children: 'Are you sure you want to reset this cycle to the previous one? You can’t undo this action.',
+          labels: { cancel: 'Cancel', confirm: 'Reset' },
           radius: 'md',
           size: 'sm',
           overlayProps: {
@@ -314,7 +363,9 @@ const useDiagramStore = create<RFState>()(
           onConfirm: restoreFlow,
         });
       },
-      onAdd: (stage_name = 'New Node') => {
+      onAdd: (data) => {
+        const { curr_stage_name: stage_name = 'New Node', previous_stage, next_stage } = data;
+        const updateEdges = get().updateEdges;
         try {
           if (!stage_name) throw new Error('Stage name is required.');
 
@@ -330,6 +381,7 @@ const useDiagramStore = create<RFState>()(
           };
 
           set({ nodes: [...get().nodes, node] });
+
         } catch (error: any) {
           toast.error(error.message);
         }
@@ -366,7 +418,7 @@ const useDiagramStore = create<RFState>()(
 
             const newNode = {
               ...node,
-              data: { ...node.data, label: `${node.data.label}-Copy` },
+              data: { ...node.data, label: `${node.data.label}-Copy`, duplicate_from: node.id },
               selected: false,
               dragging: false,
               id: uuid,
@@ -431,10 +483,35 @@ const useDiagramStore = create<RFState>()(
         }
       },
       onRestore: () => { console.log('restore') },
-      onDisjoint: () => {
-        const { nodes, edges } = get();
-        const selectedNode = nodes.find((node) => node.selected);
-        console.log('selectedNode:', selectedNode)
+      onDisjoint: (data) => {
+        // const removeEdges = get().removeEdges;
+        // const { nodes, edges } = get();
+        // const selectedNode = nodes.find((node) => node.selected);
+        // console.log('selectedNode:', selectedNode)
+
+        // removeEdges(selectedNode?.id as string);
+
+        const selectedNodes = get().nodes.filter((node) => node.selected);
+
+        try {
+          if (selectedNodes.length === 0) {
+            throw new Error('No selected stage found or stage does not exist.');
+          }
+
+          const prevStage = get().getPreviousNodesId();
+          console.log('prevStage:', prevStage)
+          const nextStage = get().getNextNodesId();
+          console.log('nextStage:', nextStage)
+
+          const arrOfinputOptions = get().getInputOptionsByNodesId(nextStage);
+          console.log('arrOfinputOptions:', arrOfinputOptions)
+
+          get().removeEdgeById(data);
+
+        } catch (error: any) {
+          toast.error(error.message);
+        }
+
       },
       setNodes: (nodes: Node[]) => {
         set({ nodes });
@@ -489,20 +566,38 @@ const useDiagramStore = create<RFState>()(
           toast.error(error.message);
         }
       },
-      replaceSelectedNodeEdges: (nodeId: string, newEdges: Edge[]) => {
-        const { nodes, edges } = get();
-        const selectedNode = nodes.find((node) => node.id === nodeId);
+      removeEdges: (nodeId: string) => {
+        try {
+          const edges = get().edges;
+          const updatedEdges = edges.filter((edge) => edge.source !== nodeId && edge.target !== nodeId);
 
-        if (selectedNode) {
-          const connectedEdges = edges.filter((edge) => edge.source === nodeId || edge.target === nodeId);
-          const newEdgesWithId = newEdges.map((edge) => ({ ...edge, id: `${edge.source}-${edge.target}` }));
+          if (edges.length === updatedEdges.length) {
+            throw new Error(`No edges found for node with id ${nodeId}.`);
+          }
 
-          const newEdgesWithoutConnected = edges.filter((edge) => !connectedEdges.includes(edge));
-          const newEdgesWithConnected = [...newEdgesWithoutConnected, ...newEdgesWithId];
+          set({ edges: updatedEdges });
+        } catch (error: any) {
+          toast.error(error.message);
+        }
+      },
+      removeEdgeById: (data) => {
+        try {
+          const { nodes, edges } = get();
 
-          set({ edges: newEdgesWithConnected });
-        } else {
-          console.error('Node not found');
+          const selectedNodeId = nodes.find((node) => node.selected)?.id;
+          const edgesInSelectedNode = edges.filter((edge) => edge.source === selectedNodeId || edge.target === selectedNodeId);
+
+
+          // if (edgeIndex === -1) {
+          //   throw new Error(`Edge with id ${edgeId} does not exist.`);
+          // }
+
+          // const updatedEdges = [...edges];
+          // updatedEdges.splice(edgeIndex, 1);
+
+          // set({ edges: updatedEdges });
+        } catch (error: any) {
+          toast.error(error.message);
         }
       },
       fetchNodesEdges: async ({
@@ -531,6 +626,10 @@ const useDiagramStore = create<RFState>()(
     {
       name: 'wip-diagram-storage',
       storage,
+      partialize: ({ flowKey, ...state }) => ({ ...state, rfInstance: null }),
+      // partialize: (state) => Object.fromEntries(
+      //   Object.entries(state).filter(([key]) => !['flowKey'].includes(key)),
+      // ),
     },
   ),
 );
@@ -560,6 +659,7 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     setRfInstance: state.setRfInstance,
     toggleSelectedByNodeId: state.toggleSelectedByNodeId,
     updateEdges: state.updateEdges,
+    removeEdges: state.removeEdges,
   })),
 );
 

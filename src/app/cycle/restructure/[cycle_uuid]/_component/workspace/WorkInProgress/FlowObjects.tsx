@@ -136,7 +136,7 @@ function FlowObjects() {
                         >
                           <LabelTooltip label={input.label} />
                           <Select
-                            name={input.name as "curr_stage_uuid" | "previous_stage" | "next_stage"}
+                            name={input.name as "curr_stage_uuid"}
                             placeholder={input.placeholder}
                             checkIconPosition='right'
                             rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
