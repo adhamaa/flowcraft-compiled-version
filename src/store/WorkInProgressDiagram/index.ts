@@ -21,12 +21,10 @@ import {
 
 import initialNodes from '@/components/reactflow/nodes';
 import initialEdges from '@/components/reactflow/edges';
-import { Apps_label, getDiagramData } from '@/lib/service/client';
-import { calculateNodePositions } from '@/components/reactflow/CalculateNodePositions';
+import { Apps_label, getDiagramData, restructureBizProcess } from '@/lib/service/client';
 import { useShallow } from 'zustand/react/shallow';
 import { ComboboxItem } from '@mantine/core';
 import { convertToCycleStages } from '@/lib/helper';
-import { boolean } from 'drizzle-orm/pg-core';
 import { ActionType } from '@/app/cycle/restructure/[cycle_uuid]/_component/workspace/WorkInProgress/hooks/useActionIcons';
 import { FormValues } from '@/app/cycle/restructure/[cycle_uuid]/_component/workspace/WorkInProgress/FlowObjects';
 import toast from '@/components/toast';
@@ -56,13 +54,13 @@ type RFState = {
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   onLayout: (direction: string | undefined) => void;
-  onSave: () => void;
+  onSave: (cycle_uuid: string) => void;
   onDraft: () => void;
   onApply: (items: { action: ActionType; data: FormValues; callback?: (...args: any[]) => void }) => void;
   onAdd: (data: FormValues) => void;
   onReset: (callback?: (...args: any[]) => void) => void;
   onMove: (data: FormValues) => void;
-  onDuplicate: () => void;
+  onDuplicate: (data: FormValues) => void;
   onDelete: () => void;
   onRestore: () => void;
   onDisjoint: (data: FormValues) => void;
@@ -74,6 +72,7 @@ type RFState = {
   updateEdges: (data: FormValues) => void;
   removeEdges: (nodeId: string) => void;
   removeEdgeById: (data: FormValues) => void;
+  resetDiagramLocalStorage: () => void;
 };
 
 const storage: PersistStorage<Omit<RFState, 'flowKey'>> = {
@@ -190,7 +189,6 @@ const useDiagramStore = create<RFState>()(
         });
       },
       onConnect: (connection: Connection) => {
-        console.log('connection:', connection)
         set({
           edges: addEdge(connection, get().edges),
         });
@@ -204,7 +202,7 @@ const useDiagramStore = create<RFState>()(
 
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
-      onSave: () => {
+      onSave: (cycle_uuid) => {
         const setToDraft = get().onDraft;
         modals.openConfirmModal({
           title: 'Save Cycle',
@@ -234,11 +232,20 @@ const useDiagramStore = create<RFState>()(
             title: 'text-2xl font-semibold text-center w-full p-2',
             body: 'flex flex-col text-center justify-center gap-6 mx-auto',
           },
-          onConfirm: () => {
-            const ApiFormat = convertToCycleStages(get().nodes, get().edges);
+          onConfirm: async () => {
+            try {
+              const ApiFormat = convertToCycleStages(get().nodes, get().edges);
 
-            setToDraft();
-            console.log('ApiFormat:', ApiFormat);
+              setToDraft();
+              console.log('ApiFormat:', ApiFormat);
+              const saveToDB = await restructureBizProcess({ cycle_uuid: cycle_uuid, body: ApiFormat })
+              console.log('saveToDB:', saveToDB)
+
+            } catch (error) {
+              console.log('Error:', error);
+              toast.error('An error occurred while saving the cycle.');
+            }
+
           },
         });
       },
@@ -298,13 +305,13 @@ const useDiagramStore = create<RFState>()(
             moveNode(data);
             break;
           case 'duplicate':
-            duplicateNode();
+            duplicateNode(data);
             break;
           case 'delete':
             deleteNode();
             break;
           case 'restore':
-            console.log('restore')
+            restoreNode();
             break;
           case 'disjoint':
             disjointNode(data);
@@ -313,6 +320,7 @@ const useDiagramStore = create<RFState>()(
             break;
         }
 
+        if (typeof callback === 'function') callback();
 
       },
       onReset: (callback) => {
@@ -382,27 +390,36 @@ const useDiagramStore = create<RFState>()(
 
           set({ nodes: [...get().nodes, node] });
 
+          if (previous_stage || next_stage) {
+            updateEdges({ ...data, curr_stage_uuid: uuid });
+          }
+
         } catch (error: any) {
           toast.error(error.message);
         }
       },
       onMove: (data) => {
-        const updateEdges = get().updateEdges;
-        const selectedNodes = get().nodes.filter((node) => node.selected);
+        const { nodes, removeEdges, updateEdges } = get();
+        const selectedNodeId = nodes.find((node) => node.selected)?.id;
 
         try {
-          if (selectedNodes.length === 0) {
+          if (!selectedNodeId) {
             throw new Error('No selected stage found or stage does not exist.');
           }
+
+          removeEdges(selectedNodeId as string);
 
           updateEdges(data);
         } catch (error: any) {
           toast.error(error.message);
         }
       },
-      onDuplicate: () => {
+      onDuplicate: (data) => {
+        const { previous_stage, next_stage } = data;
+
         const uuid = get().generateNodeId();
-        const { nodes, edges } = get();
+        const { nodes, updateEdges } = get();
+
         const selectedNodes = nodes.filter((node) => node.selected);
 
         try {
@@ -426,6 +443,11 @@ const useDiagramStore = create<RFState>()(
             };
 
             set({ nodes: [...nodes, newNode] });
+
+            if (previous_stage || next_stage) {
+              updateEdges({ ...data, curr_stage_uuid: uuid });
+            }
+
           });
         } catch (error: any) {
           toast.error(error.message);
@@ -604,6 +626,8 @@ const useDiagramStore = create<RFState>()(
         cycle_id,
         apps_label,
       }) => {
+        const setToDraft = get().onDraft;
+
         const diagramData = await getDiagramData({ cycle_id, apps_label });
         const editedNodes = diagramData.nodes.map(({ position, ...node }: Node) => {
           return { ...node, position: { x: 0, y: 0 } } // remove position and set x, y to 0
@@ -621,7 +645,14 @@ const useDiagramStore = create<RFState>()(
           nodes: layoutedNodes,
           edges: layoutedEdges,
         });
+
+        setToDraft();
       },
+      resetDiagramLocalStorage: () => {
+        const key = get().flowKey as string;
+        localStorage.removeItem(key);
+        localStorage.removeItem('wip-diagram-storage');
+      }
     }),
     {
       name: 'wip-diagram-storage',
@@ -660,6 +691,7 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     toggleSelectedByNodeId: state.toggleSelectedByNodeId,
     updateEdges: state.updateEdges,
     removeEdges: state.removeEdges,
+    resetDiagramLocalStorage: state.resetDiagramLocalStorage,
   })),
 );
 

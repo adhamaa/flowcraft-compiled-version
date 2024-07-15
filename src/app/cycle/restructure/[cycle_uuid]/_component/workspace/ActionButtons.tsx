@@ -8,6 +8,7 @@ import * as  React from 'react'
 import { useFormContext } from 'react-hook-form';
 import { addEdge, ConnectionLineType, Edge } from 'reactflow';
 import { ActionType, useActionIcons } from './WorkInProgress/hooks/useActionIcons';
+import { useParams } from 'next/navigation';
 
 type ActionButtonsType = {
   label: string;
@@ -20,6 +21,9 @@ type ActionButtonsType = {
 };
 
 const ActionButtons = () => {
+  const params = useParams();
+  const cycle_uuid = params.cycle_uuid as string;
+
   const { isEditable: isEditData, toggleIsEditable, getAction, getIsAnyEditable } = useActionIcons();
 
   const { onApply, onReset, onSave, onDraft, deselectAllNodes } = useWorkInProgressDiagram();
@@ -31,7 +35,7 @@ const ActionButtons = () => {
 
   const action = getAction(isEditData as { [key in ActionType]: boolean });
 
-  const onApplySubmit = (data: any, e: any) => onApply({ action: action as ActionType, data });
+  const onApplySubmit = (data: any, e: any) => onApply({ action: action as ActionType, data, callback: reset });
 
   const buttons: ActionButtonsType[] = [
     {
@@ -66,7 +70,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: !isEditable,
       canShow: true,
-      onClick: onSave,
+      onClick: () => onSave(cycle_uuid),
       color: '#895CF3',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },

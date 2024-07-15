@@ -12,6 +12,7 @@ import { Icon } from "@iconify-icon/react";
 import { Apps_label, duplicateCycle, reloadBizProcess } from '@/lib/service/client';
 import { modals } from '@mantine/modals';
 import toast from '@/components/toast';
+import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 
 const TabularSection = ({ opened,
   statusIndicator,
@@ -23,6 +24,7 @@ const TabularSection = ({ opened,
   isPagination?: boolean;
   cycleData: CycleData[];
 }) => {
+  const { resetDiagramLocalStorage } = useWorkInProgressDiagram();
   const [tableData, setTableData] = React.useState<CycleData[]>([]);
   const router = useRouter();
   const pathname = usePathname();
@@ -193,7 +195,11 @@ const TabularSection = ({ opened,
     pageSize: 10, //customize the default page size
   });
 
-  const handleCellClick = (cell: MRT_Cell<CycleData>, row: MRT_Row<CycleData>) => cell.column.id !== 'mrt-row-actions' && router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''))
+  const handleCellClick = (cell: MRT_Cell<CycleData>, row: MRT_Row<CycleData>) => {
+    cell.column.id !== 'mrt-row-actions' && router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''))
+
+    resetDiagramLocalStorage();
+  }
 
   const table = useMantineReactTable({
     columns,
