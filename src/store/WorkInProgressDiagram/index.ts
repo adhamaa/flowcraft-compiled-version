@@ -237,13 +237,15 @@ const useDiagramStore = create<RFState>()(
               const ApiFormat = convertToCycleStages(get().nodes, get().edges);
 
               setToDraft();
-              console.log('ApiFormat:', ApiFormat);
               const saveToDB = await restructureBizProcess({ cycle_uuid: cycle_uuid, body: ApiFormat })
-              console.log('saveToDB:', saveToDB)
 
-            } catch (error) {
-              console.log('Error:', error);
-              toast.error('An error occurred while saving the cycle.');
+              if (saveToDB.error) {
+                throw new Error(saveToDB.error_message);
+              }
+
+              toast.success(saveToDB.message);
+            } catch (error: any) {
+              toast.error(error.message ?? 'An error occurred while saving the cycle.');
             }
 
           },
