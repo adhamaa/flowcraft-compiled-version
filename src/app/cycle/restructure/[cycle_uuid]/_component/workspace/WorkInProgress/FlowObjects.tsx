@@ -6,13 +6,15 @@ import ActionIcons from '../ActionIcons';
 import ActionButtons from '../ActionButtons';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
-import { Button, InputWrapper } from '@mantine/core';
+import { Button, ComboboxItem, InputWrapper } from '@mantine/core';
 import { useElementSize } from '@mantine/hooks';
 import { MultiSelect, Select, TextInput } from 'react-hook-form-mantine';
 import { FormProvider, useForm } from 'react-hook-form';
 import clsx from 'clsx';
 import { Icon } from '@iconify-icon/react';
 import { ActionType, useActionIcons } from './hooks/useActionIcons';
+import { useSearchParams } from 'next/navigation';
+import { Apps_label } from '@/lib/service/client';
 
 type InputType = {
   type?: string;
@@ -37,7 +39,11 @@ export type FormValues = {
 };
 
 function FlowObjects() {
-  const { toggleSelectedByNodeId, getSelectedNodeId, getInputOptions, deselectAllNodes } = useWorkInProgressDiagram();
+  const searchParams = useSearchParams();
+  const cycle_id = searchParams.get('cycle_id');
+  const selected_app = searchParams.get('selected_app');
+
+  const { getSelectedNodeId, getInputOptions, getPreviousInputOptions, getNextInputOptions, toggleSelectedByNodeId, fetchDeletedNodes } = useWorkInProgressDiagram();
   const { isEditable: isEditData, getAction, getIsEditable, getIsAnyEditable } = useActionIcons();
   const action = getAction(isEditData as { [key in ActionType]: boolean });
   const isAdd = getIsEditable(isEditData as { [key in ActionType]: boolean }, 'add');
@@ -48,6 +54,13 @@ function FlowObjects() {
   const isDisjoint = getIsEditable(isEditData as { [key in ActionType]: boolean }, 'disjoint');
   const isEditable = getIsAnyEditable(isEditData as { [key in ActionType]: boolean });
   const selectedNodeId = getSelectedNodeId();
+
+  const inputOptions = getInputOptions();
+  const previousInputOptions = getPreviousInputOptions();
+  const nextInputOptions = getNextInputOptions();
+  const [deletedInputOptions, setDeletedInputOptions] = React.useState<any[]>([]);
+  const DeletedLabel = deletedInputOptions[0]?.label;
+
   const { ref, height } = useElementSize();
 
   const methods = useForm<FormValues>({
@@ -59,30 +72,37 @@ function FlowObjects() {
     }
   });
 
-  const { control, watch, reset } = methods;
+  const { control, watch, setValue } = methods;
   const watchCurrentStageUuid = watch('curr_stage_uuid');
   const watchCurrentStageName = watch('curr_stage_name');
 
-  const onSaveSubmit = (data: any) => {
-    console.log(data);
-  };
-
   const InputList = [
     {
-      type: 'text', name: 'curr_stage_uuid', label: 'Stage Name', placeholder: 'Choose Stage', data: getInputOptions(), value: selectedNodeId, onChange: toggleSelectedByNodeId, canShow: !isAdd, control: control, disabled: !isEditable
+      type: 'text', name: 'curr_stage_uuid', label: 'Stage Name', placeholder: 'Choose Stage', data: isRestore ? deletedInputOptions : inputOptions, value: selectedNodeId, onChange: isRestore ? () => {
+        setValue("curr_stage_name", DeletedLabel)
+      } : toggleSelectedByNodeId, canShow: !isAdd, control: control, disabled: !isEditable
     },
     {
-      type: 'text', name: 'curr_stage_name', label: 'Stage Name', placeholder: 'Name your stage', data: getInputOptions(), value: selectedNodeId, onChange: toggleSelectedByNodeId, canShow: isAdd, control: control, disabled: !isEditable
+      type: 'text', name: 'curr_stage_name', label: 'Stage Name', placeholder: 'Name your stage', data: inputOptions, value: selectedNodeId, onChange: toggleSelectedByNodeId, canShow: isAdd, control: control, disabled: !isEditable
     },
     {
       group: 'Position',
       canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false),
       inputs: [
-        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false), control: control, disabled: !isEditable },
-        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Choose Stage', data: getInputOptions(), onChange: () => { console.log("baby") }, canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false), control: control, disabled: !isEditable },
+        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Choose Stage', data: isDisjoint ? previousInputOptions : inputOptions, onChange: () => { }, canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false), control: control, disabled: !isEditable },
+        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Choose Stage', data: isDisjoint ? nextInputOptions : inputOptions, onChange: () => { }, canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false), control: control, disabled: !isEditable },
       ]
     }
   ];
+
+  React.useEffect(() => {
+    if (isRestore) {
+      fetchDeletedNodes({
+        apps_label: selected_app as Apps_label,
+        cycle_id: cycle_id as string
+      }).then(setDeletedInputOptions)
+    }
+  }, [isRestore])
 
   return (
     <FormProvider {...methods}>
@@ -96,7 +116,6 @@ function FlowObjects() {
             <div className='border border-black rounded-xl pb-2'>
               {<form
                 className={clsx('space-y-4 p-4')}
-              // onSubmit={handleSubmit(onSaveSubmit)}
               >
 
                 {InputList.map((input, index) => {
@@ -178,6 +197,7 @@ function FlowObjects() {
                               classNames={{
                                 input: '!rounded-lg py-3 pr-3 w-full !focus:outline-none !focus:ring-2 !focus:ring-[#895CF3] !focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] !disabled:border-transparent !disabled:text-black',
                               }}
+                              nothingFoundMessage="No stage found"
                               control={input.control}
                             // onChange={input.onChange as never}
 

@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import * as React from 'react';
 import { Handle, Position, NodeResizer, NodeProps } from 'reactflow';
 
-const WithEntryAndExitNode = ({ data: { label }, selected }: NodeProps) => {
+const Standard = ({ data: { label }, selected }: NodeProps) => {
   return (
     <div className={clsx(
       'flex flex-col items-center w-60',
@@ -21,4 +21,4 @@ const WithEntryAndExitNode = ({ data: { label }, selected }: NodeProps) => {
   )
 };
 
-export default React.memo(WithEntryAndExitNode);
+export default React.memo(Standard);

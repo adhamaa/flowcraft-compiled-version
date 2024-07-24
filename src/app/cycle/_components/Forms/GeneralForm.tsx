@@ -17,6 +17,7 @@ import clsx from 'clsx';
 import { LabelTooltip } from './LabelTooltip';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 
 // function useWaitQuery(props: { cycle_id: string, apps_label: string, datasource_type: string }) {
 //   const query = useSuspenseQuery({
@@ -34,7 +35,6 @@ import { useSession } from 'next-auth/react';
 const GeneralForm = () => {
   const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
-  const [data, setData] = React.useState<CycleData>();
   const searchParams = useSearchParams();
   const params = useParams();
   const router = useRouter();
@@ -43,7 +43,7 @@ const GeneralForm = () => {
   const datasource_type = searchParams.get('data_source');
   const cycle_id = params.cycle_id;
   const stage_uuid = params.stage_uuid;
-
+  const { currentCycleInfo, setCycleInfo } = useWorkInProgressDiagram();
   const toggleEdit = () => setIsEdit(!isEdit);
 
   /**
@@ -56,7 +56,7 @@ const GeneralForm = () => {
         cycle_id: cycle_id as string,
         datasource_type: datasource_type as Datasource_type
       });
-      setData(cycleInfoDataRes)
+      setCycleInfo(cycleInfoDataRes);
     }
 
     if (cycle_id && selected_app && datasource_type) {
@@ -73,10 +73,10 @@ const GeneralForm = () => {
       transitionProps={{ transition: 'fade', duration: 200 }}
       withCloseButton={false}
     >
-      <GeneralFormContent {...{ data, toggleEdit, isEdit, open, close, toggle }} />
+      <GeneralFormContent {...{ data: currentCycleInfo, toggleEdit, isEdit, open, close, toggle }} />
     </Modal>
   ) : (
-    <GeneralFormContent {...{ data, toggleEdit, isEdit, open, close, toggle }} />
+    <GeneralFormContent {...{ data: currentCycleInfo, toggleEdit, isEdit, open, close, toggle }} />
   )
 }
 
@@ -98,7 +98,7 @@ const GeneralFormContent = ({
   isEdit,
   toggle: toggleExpand
 }: {
-  data: CycleData | undefined;
+  data: Record<string, CycleData> | undefined;
   open: () => void;
   close: () => void;
   toggleEdit: () => void;
@@ -134,8 +134,8 @@ const GeneralFormContent = ({
   const { control, handleSubmit, setValue } = methods;
 
   const onSubmit = async (formdata: any) => {
-    const hasStatusChange = !compareStates((data?.cycle_active as number).toString(), formdata.cycle_active);
-    const hasDescriptionChange = !compareStates(data?.cycle_description as string, formdata.cycle_description);
+    const hasStatusChange = !compareStates((data?.cycle_active as unknown as number).toString(), formdata.cycle_active);
+    const hasDescriptionChange = !compareStates(data?.cycle_description as unknown as string, formdata.cycle_description);
     modals.open({
       title: 'Confirm update',
       children: (
@@ -160,7 +160,7 @@ const GeneralFormContent = ({
                         status_code: formdata.cycle_active
                       }),
                       updateCycle({
-                        cycle_uuid: data?.cycle_uuid as string,
+                        cycle_uuid: data?.cycle_uuid as unknown as string,
                         body: {
                           cycle_description: formdata.cycle_description
                         }

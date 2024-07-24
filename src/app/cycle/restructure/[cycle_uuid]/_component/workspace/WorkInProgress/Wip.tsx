@@ -14,6 +14,7 @@ import WithExit from '@/components/reactflow/nodeTypes/Restructure/WithExit';
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
+import Standard from '@/components/reactflow/nodeTypes/Restructure/Standard';
 
 const nodeTypes = {
   Start: StartNode,
@@ -21,12 +22,12 @@ const nodeTypes = {
   WithExit: WithExit,
   WithEntryAndExit: WithEntryAndExitNode,
   End: EndNode,
+  Standard: Standard
 };
 
 const edgeTypes = { floating: FloatingEdge };
 
 function Wip() {
-  const params = useParams();
   const searchParams = useSearchParams();
   const cycle_id = searchParams.get('cycle_id');
   const selected_app = searchParams.get('selected_app');

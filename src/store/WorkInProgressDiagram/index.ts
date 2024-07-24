@@ -21,7 +21,7 @@ import {
 
 import initialNodes from '@/components/reactflow/nodes';
 import initialEdges from '@/components/reactflow/edges';
-import { Apps_label, getDiagramData, restructureBizProcess } from '@/lib/service/client';
+import { Apps_label, getDeletedStageList, getDiagramData, restructureBizProcess } from '@/lib/service/client';
 import { useShallow } from 'zustand/react/shallow';
 import { ComboboxItem } from '@mantine/core';
 import { convertToCycleStages } from '@/lib/helper';
@@ -29,6 +29,7 @@ import { ActionType } from '@/app/cycle/restructure/[cycle_uuid]/_component/work
 import { FormValues } from '@/app/cycle/restructure/[cycle_uuid]/_component/workspace/WorkInProgress/FlowObjects';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
+import { CycleData } from '@/app/cycle/_components/HomeContent';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -38,13 +39,16 @@ const nodeHeight = 200; // vertical space between nodes
 
 type RFState = {
   flowKey: string | undefined;
+  currentCycleInfo: Record<string, CycleData>;
   nodes: Node[];
   edges: Edge[];
   rfInstance: ReactFlowInstance | null;
   getSelectedNodeId: () => string | undefined;
   deselectAllNodes: () => void;
-  getInputOptions: () => ComboboxItem[];
   getInputOptionsByNodesId: (nodesId: string[]) => ComboboxItem[];
+  getInputOptions: (data?: Record<string, string>[]) => ComboboxItem[];
+  getPreviousInputOptions: () => ComboboxItem[];
+  getNextInputOptions: () => ComboboxItem[];
   getPreviousNodesId: (nodeId?: string) => string[];
   getNextNodesId: (nodeId?: string) => string[];
   // getAllEdgesByNodeId: (nodeId?: string) => Edge[];
@@ -62,12 +66,14 @@ type RFState = {
   onMove: (data: FormValues) => void;
   onDuplicate: (data: FormValues) => void;
   onDelete: () => void;
-  onRestore: () => void;
+  onRestore: (data: FormValues) => void;
   onDisjoint: (data: FormValues) => void;
+  setCycleInfo: (data: Record<string, any>) => void;
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   setRfInstance: (rfInstance: ReactFlowInstance) => void;
   fetchNodesEdges: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<void>;
+  fetchDeletedNodes: (props: { cycle_id: string; apps_label: Apps_label }) => Promise<ComboboxItem[]>;
   toggleSelectedByNodeId: (nodeId: string) => void;
   updateEdges: (data: FormValues) => void;
   removeEdges: (nodeId: string) => void;
@@ -125,6 +131,7 @@ const useDiagramStore = create<RFState>()(
   persist(
     (set, get) => ({
       flowKey: 'wip-flow',
+      currentCycleInfo: {},
       nodes: initialNodes,
       edges: initialEdges,
       rfInstance: null,
@@ -138,10 +145,6 @@ const useDiagramStore = create<RFState>()(
           })),
         });
       },
-      getInputOptions: () => get().nodes.map((node) => ({
-        value: node.id,
-        label: node.data.label,
-      })),
       getInputOptionsByNodesId: (nodesId: string[]) => {
         const { nodes } = get();
         return nodes
@@ -150,6 +153,33 @@ const useDiagramStore = create<RFState>()(
             value: node.id,
             label: node.data.label,
           }));
+      },
+      getInputOptions: (data) => {
+        if (data) {
+          return data.map((deletedData) => {
+            return {
+              value: deletedData.stage_uuid,
+              label: deletedData.stage_name,
+            }
+          });
+        } else {
+          return get().nodes.map((node) => ({
+            value: node.id,
+            label: node.data.label,
+          }))
+        }
+      },
+      getPreviousInputOptions: () => {
+        const selectedNodeId = get().getSelectedNodeId();
+        const previousNodesId = get().getPreviousNodesId(selectedNodeId);
+
+        return get().getInputOptionsByNodesId(previousNodesId);
+      },
+      getNextInputOptions: () => {
+        const selectedNodeId = get().getSelectedNodeId();
+        const nextNodesId = get().getNextNodesId(selectedNodeId);
+
+        return get().getInputOptionsByNodesId(nextNodesId);
       },
       getPreviousNodesId: (nodeId?: string) => {
         const { nodes, edges } = get();
@@ -313,7 +343,7 @@ const useDiagramStore = create<RFState>()(
             deleteNode();
             break;
           case 'restore':
-            restoreNode();
+            restoreNode(data);
             break;
           case 'disjoint':
             disjointNode(data);
@@ -382,11 +412,11 @@ const useDiagramStore = create<RFState>()(
           const uuid = get().generateNodeId();
           const node = {
             id: uuid,
-            type: 'WithEntryAndExit', // 'Start' | 'WithEntryAndExit' | 'WithEntry'| 'WithExit' | 'End'  
+            type: 'Standard', // 'Standard' | 'Start' | 'WithEntryAndExit' | 'WithEntry'| 'WithExit' | 'End'  
             data: { label: stage_name },
             position: {
-              x: Math.random() * window.innerWidth - 100,
-              y: Math.random() * window.innerHeight - 100,
+              x: Math.random() * window.innerWidth - 50,
+              y: Math.random() * window.innerHeight - 50,
             },
           };
 
@@ -506,36 +536,57 @@ const useDiagramStore = create<RFState>()(
           toast.error(error.message);
         }
       },
-      onRestore: () => { console.log('restore') },
-      onDisjoint: (data) => {
-        // const removeEdges = get().removeEdges;
-        // const { nodes, edges } = get();
-        // const selectedNode = nodes.find((node) => node.selected);
-        // console.log('selectedNode:', selectedNode)
-
-        // removeEdges(selectedNode?.id as string);
-
-        const selectedNodes = get().nodes.filter((node) => node.selected);
+      onRestore: (data) => {
+        const { previous_stage, next_stage, curr_stage_uuid, curr_stage_name } = data;
+        const { nodes, updateEdges } = get();
 
         try {
+          // Create a new node
+          const newNode = {
+            id: curr_stage_uuid as string,
+            data: { label: curr_stage_name },
+            type: 'Standard',
+            position: {
+              x: Math.random() * window.innerWidth - 50,
+              y: Math.random() * window.innerHeight - 50,
+            },
+          };
+
+          // Add the new node to the nodes array
+          const updatedNodes = [...nodes, newNode];
+          set({ nodes: updatedNodes });
+
+          // If there are previous or next stages, update the edges
+          if (previous_stage || next_stage) {
+            // Prepare data for updating edges
+            const edgeData = { ...data };
+
+            // Update edges
+            updateEdges(edgeData);
+          }
+
+        } catch (error: any) {
+          toast.error(error.message);
+        }
+      },
+      onDisjoint: (data) => {
+        try {
+          const removeEdgesById = get().removeEdgeById;
+          const selectedNodes = get().nodes.filter((node) => node.selected);
+
           if (selectedNodes.length === 0) {
             throw new Error('No selected stage found or stage does not exist.');
           }
 
-          const prevStage = get().getPreviousNodesId();
-          console.log('prevStage:', prevStage)
-          const nextStage = get().getNextNodesId();
-          console.log('nextStage:', nextStage)
-
-          const arrOfinputOptions = get().getInputOptionsByNodesId(nextStage);
-          console.log('arrOfinputOptions:', arrOfinputOptions)
-
-          get().removeEdgeById(data);
+          removeEdgesById(data);
 
         } catch (error: any) {
           toast.error(error.message);
         }
 
+      },
+      setCycleInfo: (data) => {
+        set({ currentCycleInfo: data });
       },
       setNodes: (nodes: Node[]) => {
         set({ nodes });
@@ -561,17 +612,17 @@ const useDiagramStore = create<RFState>()(
       },
       updateEdges: (data) => {
         const { previous_stage, next_stage, curr_stage_uuid } = data;
+        const { edges } = get();
+
+        // Function to generate unique IDs for edges
+        let edgeIdCounter = edges.length > 0 ? Math.max(...edges.map(edge => edge.id) as any) : 0;
+        const generateEdgeId = () => ++edgeIdCounter;
 
         const createEdge = (source: string, target: string) => {
-          const edgeId = `${source}-${target}`;
-          const existingEdge = get().edges.find((edge) => edge.id === edgeId);
-
-          if (existingEdge) {
-            throw new Error(`Edge with id ${edgeId} already exists.`);
-          }
+          const edgeId = generateEdgeId();
 
           return {
-            id: edgeId,
+            id: edgeId as any,
             source,
             target,
             type: ConnectionLineType.SmoothStep,
@@ -585,7 +636,7 @@ const useDiagramStore = create<RFState>()(
 
           const combinedEdges = [...prev2curr, ...curr2next];
 
-          set({ edges: [...get().edges, ...combinedEdges] });
+          set({ edges: [...edges, ...combinedEdges] });
         } catch (error: any) {
           toast.error(error.message);
         }
@@ -606,20 +657,24 @@ const useDiagramStore = create<RFState>()(
       },
       removeEdgeById: (data) => {
         try {
-          const { nodes, edges } = get();
+          const { edges, getSelectedNodeId } = get();
 
-          const selectedNodeId = nodes.find((node) => node.selected)?.id;
-          const edgesInSelectedNode = edges.filter((edge) => edge.source === selectedNodeId || edge.target === selectedNodeId);
+          const selectedNodeId = getSelectedNodeId();
 
+          const previousEdges = data.previous_stage || [];  // Ensure it's an array of edge IDs
+          const nextEdges = data.next_stage || [];          // Ensure it's an array of edge IDs
 
-          // if (edgeIndex === -1) {
-          //   throw new Error(`Edge with id ${edgeId} does not exist.`);
-          // }
+          // Function to determine if an edge should be removed
+          const filterRemoveEdge = (edge: Edge) => {
+            return !((previousEdges.includes(edge.source) || nextEdges.includes(edge.target)) && (edge.source === selectedNodeId || edge.target === selectedNodeId));
+          };
 
-          // const updatedEdges = [...edges];
-          // updatedEdges.splice(edgeIndex, 1);
+          // Filter out edges that should not be removed
+          const updatedEdges = edges.filter((edge) => filterRemoveEdge(edge));
 
-          // set({ edges: updatedEdges });
+          // Update the state with the filtered edges
+          set({ edges: updatedEdges });
+
         } catch (error: any) {
           toast.error(error.message);
         }
@@ -650,6 +705,15 @@ const useDiagramStore = create<RFState>()(
 
         setToDraft();
       },
+      fetchDeletedNodes: async ({
+        cycle_id,
+        apps_label,
+      }) => {
+        const deletedNodes = await getDeletedStageList({ cycle_id, apps_label });
+        const convertedDeletedNodes = await get().getInputOptions(deletedNodes);
+
+        return convertedDeletedNodes;
+      },
       resetDiagramLocalStorage: () => {
         const key = get().flowKey as string;
         localStorage.removeItem(key);
@@ -669,11 +733,16 @@ const useDiagramStore = create<RFState>()(
 
 const useWorkInProgressDiagram = () => useDiagramStore(
   useShallow((state: RFState) => ({
+    currentCycleInfo: state.currentCycleInfo,
     nodes: state.nodes,
     edges: state.edges,
     getSelectedNodeId: state.getSelectedNodeId,
+    getPreviousNodesId: state.getPreviousNodesId,
+    getNextNodesId: state.getNextNodesId,
     deselectAllNodes: state.deselectAllNodes,
     getInputOptions: state.getInputOptions,
+    getPreviousInputOptions: state.getPreviousInputOptions,
+    getNextInputOptions: state.getNextInputOptions,
     onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
@@ -689,7 +758,9 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     onRestore: state.onRestore,
     onDisjoint: state.onDisjoint,
     fetchNodesEdges: state.fetchNodesEdges,
+    fetchDeletedNodes: state.fetchDeletedNodes,
     setRfInstance: state.setRfInstance,
+    setCycleInfo: state.setCycleInfo,
     toggleSelectedByNodeId: state.toggleSelectedByNodeId,
     updateEdges: state.updateEdges,
     removeEdges: state.removeEdges,

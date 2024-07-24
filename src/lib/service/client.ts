@@ -244,7 +244,7 @@ export const getDeletedStageList = async ({
 }: {
   cycle_id: string;
   apps_label: Apps_label;
-  datasource_type: Datasource_type;
+  datasource_type?: Datasource_type;
 }) => {
   if (!cycle_id) return [];
   if (!apps_label) return [];
