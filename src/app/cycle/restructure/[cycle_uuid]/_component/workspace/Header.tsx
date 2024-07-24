@@ -13,6 +13,8 @@ function Header() {
 
   const { currentCycleInfo } = useWorkInProgressDiagram();
 
+  const cycle_name = currentCycleInfo?.cycle_name;
+
   return <div className='flex items-center gap-4 p-8 border-b-2'>
     <Tooltip label="Back">
       <ActionIcon
@@ -33,7 +35,7 @@ function Header() {
           className='hover:text-[#7d1aff]' />
       </ActionIcon>
     </Tooltip>
-    <h1 className='text-xl font-bold'> {currentCycleInfo.cycle_name}</h1>
+    <h1 className='text-xl font-bold'> {cycle_name as unknown as string}</h1>
   </div>;
 };
 
