@@ -14,6 +14,7 @@ import useCurrentDiagram from '@/store/CurrentDiagram';
 
 import 'reactflow/dist/style.css';
 import '@/components/reactflow/style.css';
+import Standard from '@/components/reactflow/nodeTypes/Restructure/Standard';
 
 const nodeTypes = {
   Start: StartNode,
@@ -21,6 +22,7 @@ const nodeTypes = {
   WithExit: WithExit,
   WithEntryAndExit: WithEntryAndExitNode,
   End: EndNode,
+  Standard: Standard
 };
 
 const edgeTypes = { floating: FloatingEdge };

@@ -56,13 +56,9 @@ function FlowObjects() {
   const selectedNodeId = getSelectedNodeId();
 
   const inputOptions = getInputOptions();
-  console.log('inputOptions:', inputOptions)
   const previousInputOptions = getPreviousInputOptions();
-  console.log('previousInputOptions:', previousInputOptions)
   const nextInputOptions = getNextInputOptions();
-  console.log('nextInputOptions:', nextInputOptions)
   const [deletedInputOptions, setDeletedInputOptions] = React.useState<any[]>([]);
-  console.log('deletedInputOptions:', deletedInputOptions)
   const DeletedLabel = deletedInputOptions[0]?.label;
 
   const { ref, height } = useElementSize();
@@ -121,8 +117,8 @@ function FlowObjects() {
           name: 'previous_stage',
           label: 'Choose previous stage',
           placeholder: 'Choose Stage',
-          // data: isDisjoint ? previousInputOptions : inputOptions,
-          data: [],
+          data: isDisjoint ? previousInputOptions : inputOptions,
+          // data: [],
           onChange: () => { },
           canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false),
           control: control,
@@ -133,8 +129,9 @@ function FlowObjects() {
           name: 'next_stage',
           label: 'Choose next stage',
           placeholder: 'Choose Stage',
-          // data: isDisjoint ? nextInputOptions : inputOptions, onChange: () => { },
-          data: [],
+          data: isDisjoint ? nextInputOptions : inputOptions,
+          // data: [],
+          onChange: () => { },
           canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false),
           control: control,
           disabled: !isEditable

@@ -499,10 +499,9 @@ const useDiagramStore = create<RFState>()(
       onRestore: (data) => {
         const { previous_stage, next_stage, curr_stage_uuid, curr_stage_name } = data;
         const { nodes, updateEdges } = get();
-        const selectedNodes = nodes.filter((node) => node.selected);
 
         try {
-          if (selectedNodes.length === 0) throw new Error('No selected stage found or stage does not exist.');
+          if (!curr_stage_uuid) throw new Error('No selected stage found or stage does not exist.');
 
           // Create a new node
           const newNode = {
