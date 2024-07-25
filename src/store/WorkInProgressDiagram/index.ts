@@ -264,20 +264,23 @@ const useDiagramStore = create<RFState>()(
           },
           onConfirm: async () => {
             try {
+              if (!cycle_uuid) throw new Error('Cycle UUID is required.');
+
               const ApiFormat = convertToCycleStages(get().nodes, get().edges);
 
               setToDraft();
               const saveToDB = await restructureBizProcess({ cycle_uuid: cycle_uuid, body: ApiFormat })
 
-              if (saveToDB.error) {
-                throw new Error(saveToDB.error_message);
-              }
+              if (saveToDB.error) throw new Error(saveToDB.error_message);
 
               toast.success(saveToDB.message);
+              return {
+                success: true,
+                data: saveToDB,
+              }
             } catch (error: any) {
               toast.error(error.message ?? 'An error occurred while saving the cycle.');
             }
-
           },
         });
       },
@@ -573,17 +576,16 @@ const useDiagramStore = create<RFState>()(
         try {
           const removeEdgesById = get().removeEdgeById;
           const selectedNodes = get().nodes.filter((node) => node.selected);
+          const { previous_stage, next_stage } = data;
 
-          if (selectedNodes.length === 0) {
-            throw new Error('No selected stage found or stage does not exist.');
-          }
+          if (previous_stage.length === 0 && next_stage.length === 0) throw new Error('Pick at least one previous or next stage to disjoint.');
+
+          if (selectedNodes.length === 0) throw new Error('No selected stage found or stage does not exist.');
 
           removeEdgesById(data);
-
         } catch (error: any) {
           toast.error(error.message);
         }
-
       },
       setCycleInfo: (data) => {
         set({ currentCycleInfo: data });

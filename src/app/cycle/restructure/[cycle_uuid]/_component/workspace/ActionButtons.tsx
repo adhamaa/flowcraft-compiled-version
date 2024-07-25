@@ -24,7 +24,7 @@ const ActionButtons = () => {
   const params = useParams();
   const cycle_uuid = params.cycle_uuid as string;
 
-  const { isEditable: isEditData, toggleIsEditable, getAction, getIsAnyEditable } = useActionIcons();
+  const { isEditable: isEditData, reset: resetIsEditable, getAction, getIsAnyEditable } = useActionIcons();
 
   const { onApply, onReset, onSave, onDraft, deselectAllNodes } = useWorkInProgressDiagram();
 
@@ -70,7 +70,10 @@ const ActionButtons = () => {
       type: 'button',
       disabled: !isEditable,
       canShow: true,
-      onClick: () => onSave(cycle_uuid),
+      onClick: () => {
+        onSave(cycle_uuid);
+        resetIsEditable();
+      },
       color: '#895CF3',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },

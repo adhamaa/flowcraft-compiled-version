@@ -6,15 +6,16 @@ type ActionType = "add" | "move" | "duplicate" | "delete" | "restore" | "disjoin
 interface EditableContextType {
   isEditable: { [key: string]: boolean; };
   toggleIsEditable: (id: string) => void;
+  reset: () => void;
 };
 
 const ActionIconsContext = React.createContext<EditableContextType | undefined>(undefined);
 
 
 function ActionIconsProvider({ children }: { children: React.ReactNode }) {
-  const { isEditable, toggleIsEditable } = useEditableState();
+  const editFeatures = useEditableState();
   return (
-    <ActionIconsContext.Provider value={{ isEditable, toggleIsEditable }}>
+    <ActionIconsContext.Provider value={editFeatures}>
       {children}
     </ActionIconsContext.Provider>
   )

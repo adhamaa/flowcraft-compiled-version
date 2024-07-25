@@ -162,6 +162,7 @@ function FlowObjects() {
                             data={input.data}
                             disabled={input.disabled}
                             allowDeselect
+                            nothingFoundMessage="No stage found"
                             classNames={{
                               input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                             }}
