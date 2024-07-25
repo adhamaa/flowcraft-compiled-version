@@ -56,9 +56,13 @@ function FlowObjects() {
   const selectedNodeId = getSelectedNodeId();
 
   const inputOptions = getInputOptions();
+  console.log('inputOptions:', inputOptions)
   const previousInputOptions = getPreviousInputOptions();
+  console.log('previousInputOptions:', previousInputOptions)
   const nextInputOptions = getNextInputOptions();
+  console.log('nextInputOptions:', nextInputOptions)
   const [deletedInputOptions, setDeletedInputOptions] = React.useState<any[]>([]);
+  console.log('deletedInputOptions:', deletedInputOptions)
   const DeletedLabel = deletedInputOptions[0]?.label;
 
   const { ref, height } = useElementSize();
@@ -78,19 +82,63 @@ function FlowObjects() {
 
   const InputList = [
     {
-      type: 'text', name: 'curr_stage_uuid', label: 'Stage Name', placeholder: 'Choose Stage', data: isRestore ? deletedInputOptions : inputOptions, value: selectedNodeId, onChange: isRestore ? () => {
-        setValue("curr_stage_name", DeletedLabel)
-      } : toggleSelectedByNodeId, canShow: !isAdd, control: control, disabled: !isEditable
+      type: 'text',
+      name: 'curr_stage_uuid',
+      label: 'Stage Name',
+      placeholder: 'Choose Stage',
+      data: isRestore ? deletedInputOptions : inputOptions,
+      // data: [],
+      value: selectedNodeId,
+      onChange:
+        isRestore
+          ? () => {
+            setValue("curr_stage_name", DeletedLabel)
+          }
+          : toggleSelectedByNodeId,
+      canShow: !isAdd,
+      control: control,
+      disabled: !isEditable
     },
     {
-      type: 'text', name: 'curr_stage_name', label: 'Stage Name', placeholder: 'Name your stage', data: inputOptions, value: selectedNodeId, onChange: toggleSelectedByNodeId, canShow: isAdd, control: control, disabled: !isEditable
+      type: 'text',
+      name: 'curr_stage_name',
+      label: 'Stage Name',
+      placeholder: 'Name your stage',
+      data: inputOptions,
+      // data: [],
+      value: selectedNodeId,
+      onChange: toggleSelectedByNodeId,
+      canShow: isAdd,
+      control: control,
+      disabled: !isEditable
     },
     {
       group: 'Position',
       canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false),
       inputs: [
-        { type: 'text', name: 'previous_stage', label: 'Choose previous stage', placeholder: 'Choose Stage', data: isDisjoint ? previousInputOptions : inputOptions, onChange: () => { }, canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false), control: control, disabled: !isEditable },
-        { type: 'text', name: 'next_stage', label: 'Choose next stage', placeholder: 'Choose Stage', data: isDisjoint ? nextInputOptions : inputOptions, onChange: () => { }, canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false), control: control, disabled: !isEditable },
+        {
+          type: 'text',
+          name: 'previous_stage',
+          label: 'Choose previous stage',
+          placeholder: 'Choose Stage',
+          // data: isDisjoint ? previousInputOptions : inputOptions,
+          data: [],
+          onChange: () => { },
+          canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false),
+          control: control,
+          disabled: !isEditable
+        },
+        {
+          type: 'text',
+          name: 'next_stage',
+          label: 'Choose next stage',
+          placeholder: 'Choose Stage',
+          // data: isDisjoint ? nextInputOptions : inputOptions, onChange: () => { },
+          data: [],
+          canShow: !isDelete && (watchCurrentStageUuid || watchCurrentStageName || false),
+          control: control,
+          disabled: !isEditable
+        },
       ]
     }
   ];

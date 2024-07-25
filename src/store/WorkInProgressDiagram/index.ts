@@ -195,19 +195,6 @@ const useDiagramStore = create<RFState>()(
         const nextEdges = edges.filter((edge) => edge.source === nodeId);
         return nextEdges.map((edge) => edge.target);
       },
-      // getAllEdgesByNodeId: (nodeId?: string) => {
-      //   const { edges } = get();
-      //   nodeId = nodeId ?? get().getSelectedNodeId();
-
-      //   return edges.filter((edge) => edge.source === nodeId || edge.target === nodeId);
-      // },
-      // getAllPreviousAndNextNodesId: (nodeId?: string) => {
-      //   const { edges } = get();
-      //   nodeId = nodeId ?? get().getSelectedNodeId();
-
-      //   const allEdgesNodesId = edges.filter((edge) => edge.source === nodeId || edge.target === nodeId);
-      //   return allEdgesNodesId.map((edge) => edge.source === nodeId ? edge.target : edge.source);
-      // },
       onNodesChange: (changes: NodeChange[]) => {
         set({
           nodes: applyNodeChanges(changes, get().nodes),
@@ -289,39 +276,8 @@ const useDiagramStore = create<RFState>()(
         const key = get().flowKey as string;
 
         if (instance) {
-          // modals.openConfirmModal({
-          //   title: 'Save Draft',
-          //   children: 'Are you sure you want to save the current diagram as a draft?',
-          //   labels: { cancel: 'Cancel', confirm: 'Save' },
-          //   radius: 'md',
-          //   size: 'sm',
-          //   overlayProps: {
-          //     backgroundOpacity: 0.55,
-          //     blur: 10,
-          //   },
-          //   withCloseButton: false,
-          //   confirmProps: {
-          //     color: '#895CF3',
-          //   },
-          //   cancelProps: {
-          //     color: '#0F172A',
-          //     variant: 'light',
-          //   },
-          //   groupProps: {
-          //     justify: 'center',
-          //     pb: 'md',
-          //   },
-          //   classNames: {
-          //     content: 'w-96',
-          //     header: '',
-          //     title: 'text-2xl font-semibold text-center w-full p-2',
-          //     body: 'flex flex-col text-center justify-center gap-6 mx-auto',
-          //   },
-          //   onConfirm: () => {
           const flow = instance.toObject();
           localStorage.setItem(key, JSON.stringify(flow));
-          //   },
-          // });
         }
       },
       onApply: ({ action, data, callback }) => {
@@ -434,13 +390,14 @@ const useDiagramStore = create<RFState>()(
         }
       },
       onMove: (data) => {
+        const { previous_stage, next_stage } = data;
         const { nodes, removeEdges, updateEdges } = get();
         const selectedNodeId = nodes.find((node) => node.selected)?.id;
 
         try {
-          if (!selectedNodeId) {
-            throw new Error('No selected stage found or stage does not exist.');
-          }
+          if (!selectedNodeId) throw new Error('No selected stage found or stage does not exist.');
+
+          if (previous_stage.length === 0 && next_stage.length === 0) throw new Error('Pick at least one previous or next stage to move the selected stage.');
 
           removeEdges(selectedNodeId as string);
 
@@ -542,8 +499,11 @@ const useDiagramStore = create<RFState>()(
       onRestore: (data) => {
         const { previous_stage, next_stage, curr_stage_uuid, curr_stage_name } = data;
         const { nodes, updateEdges } = get();
+        const selectedNodes = nodes.filter((node) => node.selected);
 
         try {
+          if (selectedNodes.length === 0) throw new Error('No selected stage found or stage does not exist.');
+
           // Create a new node
           const newNode = {
             id: curr_stage_uuid as string,
@@ -578,9 +538,9 @@ const useDiagramStore = create<RFState>()(
           const selectedNodes = get().nodes.filter((node) => node.selected);
           const { previous_stage, next_stage } = data;
 
-          if (previous_stage.length === 0 && next_stage.length === 0) throw new Error('Pick at least one previous or next stage to disjoint.');
-
           if (selectedNodes.length === 0) throw new Error('No selected stage found or stage does not exist.');
+
+          if (previous_stage.length === 0 && next_stage.length === 0) throw new Error('Pick at least one previous or next stage to disjoint.');
 
           removeEdgesById(data);
         } catch (error: any) {
