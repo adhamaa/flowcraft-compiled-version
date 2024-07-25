@@ -27,11 +27,8 @@ type Breadcrumb = {
 export function createBreadcrumbs(url: string): Breadcrumb[] {
   // Parse the URL
   const parsedUrl = new URL(url);
-  console.log('parsedUrl:', parsedUrl)
   const pathSegments = parsedUrl.pathname.split('/').filter(segment => segment.length > 0);
-  console.log('pathSegments:', pathSegments)
   const queryParams = parsedUrl.searchParams;
-  console.log('queryParams:', queryParams)
 
   // Start with the base path
   let path = '/';
@@ -49,7 +46,6 @@ export function createBreadcrumbs(url: string): Breadcrumb[] {
   pathSegments.forEach((segment, index) => {
     path += `${segment}/`;
     const label = segmentLabels[segment] || segment;
-    console.log('label:', label)
     breadcrumbs.push({ title: label, href: path });
   });
 

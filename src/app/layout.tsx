@@ -1,3 +1,5 @@
+import Segment from '@/components/Breadcrumbs/Segment';
+import Segments from '@/components/Breadcrumbs/Segments';
 import Providers from '@/provider';
 import '@/styles/globals.css';
 
@@ -33,6 +35,8 @@ export default async function RootLayout({ children }: {
       </head>
       <body className={inter.className}>
         <Providers>
+          <Segment />
+          <Segments />
           {children}
         </Providers>
       </body>
