@@ -1,25 +1,36 @@
 "use client";
 
-import { createBreadcrumbs } from '@/lib/helper';
-import { Breadcrumbs as BC, Anchor } from '@mantine/core';
-import { usePathname } from 'next/navigation';
+import useBreadcrumbs, { Breadcrumb } from '@/hooks/useBreadcrumbs';
+import { Icon } from '@iconify-icon/react';
+import { Breadcrumbs as MantineBreadcrumbs, Anchor } from '@mantine/core';
+import clsx from 'clsx';
 
 
-function Breadcrumbs() {
-  const pathname = usePathname()
-  const generatedBreadcrumbs = createBreadcrumbs(`http://localhost:3030/${pathname}`);
-  const items = generatedBreadcrumbs.map((item, index) => (
-    <Anchor href={item.href} key={index}>
-      {item.title}
-    </Anchor>
-  ));
-
+function Breadcrumbs({ className }: { className?: string }) {
+  const { breadcrumbs: items } = useBreadcrumbs();
+  
   return (
-    <>
-      <BC separator="→" separatorMargin="md" mt="xs">
-        {items}
-      </BC>
-    </>
+    <div className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-6 gap-4 w-screen', className)}>
+      <MantineBreadcrumbs
+        separator={
+          <Icon icon="tabler:chevron-right" width="1.2rem" />
+        }
+        separatorMargin="md"
+        mt="xs"
+      >
+        {items.map((item, index) => (
+          <Anchor
+            key={index}
+            href={item.href}
+            
+            c="#0F172A"
+            size='lg'
+          >
+            {item.icon ? <Icon icon={item.icon as string}></Icon> : item.title}
+          </Anchor>
+        ))}
+      </MantineBreadcrumbs>
+    </div>
   );
 };
 

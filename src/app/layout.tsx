@@ -1,3 +1,4 @@
+import Breadcrumbs from '@/components/Breadcrumbs';
 import Segment from '@/components/Breadcrumbs/Segment';
 import Segments from '@/components/Breadcrumbs/Segments';
 import Providers from '@/provider';
@@ -35,8 +36,7 @@ export default async function RootLayout({ children }: {
       </head>
       <body className={inter.className}>
         <Providers>
-          <Segment />
-          <Segments />
+          {/* <Breadcrumbs /> */}
           {children}
         </Providers>
       </body>
