@@ -13,6 +13,7 @@ import { Apps_label, duplicateCycle, reloadBizProcess } from '@/lib/service/clie
 import { modals } from '@mantine/modals';
 import toast from '@/components/toast';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
+import useQueryString from '@/hooks/useQueryString';
 
 const TabularSection = ({ opened,
   statusIndicator,
@@ -26,6 +27,7 @@ const TabularSection = ({ opened,
 }) => {
   const { resetDiagramLocalStorage } = useWorkInProgressDiagram();
   const [tableData, setTableData] = React.useState<CycleData[]>([]);
+  const { createQueryString } = useQueryString();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -139,18 +141,6 @@ const TabularSection = ({ opened,
       ],
     }
   ]
-
-  const createQueryString = React.useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (name !== '' && value !== '') {
-        params.set(name, value)
-      }
-
-      return params.toString()
-    },
-    [searchParams]
-  )
 
   const columns: MRT_ColumnDef<CycleData>[] = [
     {

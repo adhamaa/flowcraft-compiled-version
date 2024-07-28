@@ -7,12 +7,14 @@ import { useDisclosure } from '@mantine/hooks';
 import { ScrollAreaAutosize, Tabs, TabsList, TabsPanel, TabsTab, Tooltip } from '@mantine/core';
 import FooterButton from './footer';
 import clsx from 'clsx';
+import useQueryString from '@/hooks/useQueryString';
 
 function SideMenus() {
   const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
   const [stageData, setStageData] = React.useState<any[]>();
   const [cycleUuid, setCycleUuid] = React.useState<string>();
   const [deletedStageData, setDeletedStageData] = React.useState<any[]>();
+  const { createQueryString, remainQueryString } = useQueryString();
   const searchParams = useSearchParams();
   const params = useParams();
   const router = useRouter();
@@ -25,28 +27,6 @@ function SideMenus() {
 
   const renderStageData = deleted_stage_route ? deletedStageData : stageData;
 
-  const createQueryString = React.useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (name !== '' && value !== '') {
-        params.set(name, value);
-      }
-
-      return params.toString();
-    },
-    [searchParams]
-  )
-
-  const removeQueryString = React.useCallback((param: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete(param);
-    return params.toString();
-  }, [searchParams]);
-
-  const remainQueryString = React.useCallback(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    return params.toString();
-  }, [searchParams]);
 
   /**
    * Fetch stage list data
