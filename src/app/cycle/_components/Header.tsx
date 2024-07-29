@@ -35,7 +35,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
     { value: "cycle", label: "Cycle", disabled: false },
     { value: "maintenance", label: "Maintenance", disabled: true },
     { value: "documentation", label: "Documentation", disabled: false },
-    { value: "about", label: "About", disabled: true },
+    { value: "about", label: "About", disabled: false },
   ]
 
   return (

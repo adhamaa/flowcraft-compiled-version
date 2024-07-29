@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { useParams, useSearchParams, useSelectedLayoutSegment, useSelectedLayoutSegments } from 'next/navigation';
-import useQueryString from './useQueryString';
-import { Apps_label, Datasource_type, getDeletedStageList, getStageList } from '@/lib/service/client';
+import { useSelectedLayoutSegments } from 'next/navigation';
 
 export type Breadcrumb = {
   title: string;
@@ -24,60 +22,34 @@ const DEFAULT_BREADCRUMBS = [
     icon: 'heroicons:home-solid',
     href: '/',
     disabled: false
-  }, { // add cycle to the list
-    title: 'cycle',
-    href: '/cycle',
-    disabled: false
   }]
 
 
-const useBreadcrumbs = (): {
-  breadcrumbs: Breadcrumb[];
-  filterBreadcrumbs: FilterBreadcrumbs;
-} => {
-  const [stageData, setStageData] = React.useState<any[]>();
-  const [deletedStageData, setDeletedStageData] = React.useState<any[]>();
-  const { createQueryString, removeQueryString, remainQueryString } = useQueryString();
+const filterBreadcrumbsCylePage: FilterBreadcrumbs = ({ segments }) => {
+  if (segments.includes("stage")) {
+    return segments.includes("deleted") ? "Deleted Stages" : "Stages";
+  }
+  return "General Information";
+};
+
+const useBreadcrumbs = ({
+  route,
+}: {
+  route?: string;
+}): { breadcrumbs: Breadcrumb[]; } => {
   const segments = useSelectedLayoutSegments();
-  const segment = useSelectedLayoutSegment();
-  const params = useParams();
-  const searchParams = useSearchParams();
 
-  const cycle_id = params.cycle_id;
-  const stage_uuid = params.stage_uuid;
-  const selected_app = searchParams.get('selected_app');
-  const datasource_type = searchParams.get('data_source');
-
-  React.useEffect(() => {
-    async function getStageListData() {
-      const stageListDeletedDataRes = await getDeletedStageList({
-        cycle_id: cycle_id as string,
-        apps_label: selected_app as Apps_label,
-        datasource_type: datasource_type as Datasource_type
-      });
-      const stageListDataRes = await getStageList({
-        cycle_id: cycle_id as string,
-        apps_label: selected_app as Apps_label,
-        datasource_type: datasource_type as Datasource_type
-      });
-
-      setStageData(stageListDataRes)
-      setDeletedStageData(stageListDeletedDataRes)
-    }
-
-    if (cycle_id && selected_app && datasource_type) {
-      getStageListData()
-    }
-  }, [cycle_id, datasource_type, selected_app])
-
-  const filteredBreadcrumbs = filterBreadcrumbs({ segments } as FilterBreadcrumbsArgs);
-
-  const breadcrumbs = React.useMemo(() => {
-
+  const getCycleBreadcrumbs = React.useMemo(() => {
+    const filteredBreadcrumbsTitle = filterBreadcrumbsCylePage({ segments } as FilterBreadcrumbsArgs);
     const mergedList = [
       ...DEFAULT_BREADCRUMBS,
+      { // add cycle to the list
+        title: 'cycle',
+        href: '/cycle',
+        disabled: false
+      },
       {
-        title: filteredBreadcrumbs,
+        title: filteredBreadcrumbsTitle,
         href: "",
         disabled: true
       }];
@@ -86,24 +58,10 @@ const useBreadcrumbs = (): {
 
   }, [segments]);
 
-  function filterBreadcrumbs({ segments }: { segments: string[] }) {
-    let selectedMenu = "General Information"; // Default value
+  const breadcrumbs = route === "cycle" ? getCycleBreadcrumbs : [];
 
-    // Check if segments is not empty
-    if (segments.length) {
-      if (segments.includes("stage")) {
-        if (segments.includes("deleted")) {
-          selectedMenu = "Deleted Stages";
-        } else {
-          selectedMenu = "Stages";
-        }
-      }
-    }
 
-    return selectedMenu;
-  }
-
-  return { breadcrumbs, filterBreadcrumbs };
+  return { breadcrumbs };
 };
 
 export default useBreadcrumbs;

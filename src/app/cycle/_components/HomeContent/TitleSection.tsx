@@ -8,7 +8,7 @@ import * as React from "react";
 const TitleSection = ({ title, className }: { title: string; className?: string; }) => {
   return (
     <section className={clsx('flex items-center px-20 py-10', className)}>
-      <h1 className='font-bold text-xl'>{title}</h1>
+      <h1 className='font-semibold text-xl'>{title}</h1>
       {title === 'Business Process Cycle' && <Button
         disabled
         variant='filled'

@@ -1,12 +1,9 @@
-import Breadcrumbs from '@/components/Breadcrumbs';
-import Segment from '@/components/Breadcrumbs/Segment';
-import Segments from '@/components/Breadcrumbs/Segments';
+
 import Providers from '@/provider';
 import '@/styles/globals.css';
 
 import { ColorSchemeScript } from '@mantine/core';
 import type { Metadata } from "next";
-import { SessionProvider } from 'next-auth/react';
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -36,7 +33,6 @@ export default async function RootLayout({ children }: {
       </head>
       <body className={inter.className}>
         <Providers>
-          {/* <Breadcrumbs /> */}
           {children}
         </Providers>
       </body>

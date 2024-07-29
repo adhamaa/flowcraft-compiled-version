@@ -6,9 +6,13 @@ import { Breadcrumbs as MantineBreadcrumbs, Anchor } from '@mantine/core';
 import clsx from 'clsx';
 
 
-function Breadcrumbs({ className }: { className?: string }) {
-  const { breadcrumbs: items } = useBreadcrumbs();
-  
+function Breadcrumbs({ items, className, route }: {
+  items?: Breadcrumb[];
+  className?: string;
+  route?: string;
+}) {
+  const breadcrumbs = useBreadcrumbs({ route }).breadcrumbs;
+  items = items ? items : breadcrumbs;
   return (
     <div className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-6 gap-4 w-screen', className)}>
       <MantineBreadcrumbs
@@ -22,7 +26,7 @@ function Breadcrumbs({ className }: { className?: string }) {
           <Anchor
             key={index}
             href={item.href}
-            
+
             c="#0F172A"
             size='lg'
           >

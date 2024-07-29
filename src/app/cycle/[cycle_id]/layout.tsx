@@ -16,7 +16,7 @@ export default async function Layout({
 
   return (
     <>
-      <Breadcrumbs />
+      <Breadcrumbs route="cycle" />
       <div className="flex h-[calc(100vh-66px)]">
         {/* --------- right side collapsable menus ---------- */}
         <SideMenus />
