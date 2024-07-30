@@ -1,5 +1,5 @@
 import * as React from "react";
-import SideMenus from "../_components/ColapsableMenu/menus";
+import SideMenus from "../_components/SideMenus/menus";
 import { Metadata } from "next";
 import Breadcrumbs from "@/components/Breadcrumbs";
 

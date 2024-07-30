@@ -356,7 +356,7 @@ const TabularSection = ({ opened,
                 classNames={{
                   root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
                 }}
-                onClick={() => router.push('/manage-claim')}
+                onClick={() => router.push('/manage-claim/pending-claim')}
               >
                 Manage Claim
               </Button>

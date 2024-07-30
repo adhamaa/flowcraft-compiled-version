@@ -107,7 +107,7 @@ export default function HomeContent({
       className={clsx('overflow-y-auto',
         'w-full'
       )}>
-      <TitleSection title='Business Process Cycle' />
+      <TitleSection title='Claim Management' />
       <ApplicationSection {...{ opened, toggle, applicationData, cycleData }} />
       <TabularSection isPagination {...{ opened, cycleData }} />
     </div>
