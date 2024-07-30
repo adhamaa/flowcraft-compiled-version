@@ -13,56 +13,6 @@ export const isObjectEmpty = (objectName: { constructor?: any }) => {
   );
 };
 
-// Define the breadcrumb type
-type Breadcrumb = {
-  title: string;
-  href: string;
-};
-
-/**------------------------------------------------
- * Create a list of breadcrumbs from a URL
- * @param url - The URL to create breadcrumbs from
- * @returns Breadcrumb[] - A list of breadcrumbs
- -------------------------------------------------*/
-export function createBreadcrumbs(url: string): Breadcrumb[] {
-  // Parse the URL
-  const parsedUrl = new URL(url);
-  console.log('parsedUrl:', parsedUrl)
-  const pathSegments = parsedUrl.pathname.split('/').filter(segment => segment.length > 0);
-  console.log('pathSegments:', pathSegments)
-  const queryParams = parsedUrl.searchParams;
-  console.log('queryParams:', queryParams)
-
-  // Start with the base path
-  let path = '/';
-  const breadcrumbs: Breadcrumb[] = [];
-
-  // Map for readable labels based on URL segments or query parameters
-  const segmentLabels: { [key: string]: string } = {
-    home: 'Home',
-    cycle: 'Cycle',
-    stage: 'Stage',
-    // Add more mappings if necessary
-  };
-
-  // Create breadcrumbs from path segments
-  pathSegments.forEach((segment, index) => {
-    path += `${segment}/`;
-    const label = segmentLabels[segment] || segment;
-    console.log('label:', label)
-    breadcrumbs.push({ title: label, href: path });
-  });
-
-  // Handle query parameters as part of the breadcrumb path
-  queryParams.forEach((value, key) => {
-    const readableKey = key.replace('_', ' '); // Example transformation
-    const label = `${readableKey}: ${value}`;
-    breadcrumbs.push({ title: label, href: `${path}?${key}=${value}` });
-  });
-
-  return breadcrumbs;
-};
-
 /**------------------------------------------------
  * Convert the nodes and edges of a cycle diagram to a list of cycle stages
  * @param nodes - The nodes of the cycle diagram

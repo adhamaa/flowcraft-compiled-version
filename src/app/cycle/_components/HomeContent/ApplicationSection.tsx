@@ -8,6 +8,7 @@ import { ApplicationData, CycleData } from '.';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import useQueryString from '@/hooks/useQueryString';
 
 const ApplicationSection = ({
   opened,
@@ -21,21 +22,11 @@ const ApplicationSection = ({
   cycleData: CycleData[];
 }) => {
   const { selectedApp, setSelectedApp } = useGlobalState();
+  const { createQueryString } = useQueryString();
   const searchParams = useSearchParams();
   const selected_app_param = searchParams.get('selected_app');
   const router = useRouter();
   const pathname = usePathname();
-  const createQueryString = React.useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (name !== '' && value !== '') {
-        params.set(name, value)
-      }
-
-      return params.toString()
-    },
-    [searchParams]
-  )
 
   // const listApps = useQuery({
   //   queryKey: ["applications"],
