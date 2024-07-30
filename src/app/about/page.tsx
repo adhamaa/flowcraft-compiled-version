@@ -5,7 +5,7 @@ import AboutContent from './_components/aboutContent'
 
 const AboutPage = () => {
   return (
-    <div className={clsx('flex flex-col h-[calc(100vh-66px)]'
+    <div className={clsx('flex flex-col h-full'
     )}>
       <TitleSection title='About Flowcraft' className='h-max w-full border-b-2 border-[#EBEAEA]' />
       <AboutContent />
