@@ -32,7 +32,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
   }, [isLight]);
 
   const menulist = [
-    { value: "cycle", label: "Cycle", disabled: false },
+    { value: "cycle", label: "Home", disabled: false },
     { value: "maintenance", label: "Maintenance", disabled: true },
     { value: "documentation", label: "Documentation", disabled: false },
     { value: "about", label: "About", disabled: false },

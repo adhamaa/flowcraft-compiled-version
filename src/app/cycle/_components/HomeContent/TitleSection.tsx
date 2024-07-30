@@ -9,7 +9,7 @@ const TitleSection = ({ title, className }: { title: string; className?: string;
   return (
     <section className={clsx('flex items-center px-20 py-10', className)}>
       <h1 className='font-semibold text-xl'>{title}</h1>
-      {title === 'Business Process Cycle' && <Button
+      {/* {title === 'Business Process Cycle' && <Button
         disabled
         variant='filled'
         color='#F1F5F9'
@@ -27,7 +27,7 @@ const TitleSection = ({ title, className }: { title: string; className?: string;
         }}
       >
         Add Business Process
-      </Button>}
+      </Button>} */}
     </section>
   )
 };

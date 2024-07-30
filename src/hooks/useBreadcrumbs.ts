@@ -35,7 +35,8 @@ const filterBreadcrumbsCylePage: FilterBreadcrumbs = ({ segments }) => {
 
 const getTitles = (pathname: string) => {
   const segment = pathname.replace(/\//g, '');
-  const capitalizedSegment = segment.replace(/(^|\s)\S/g, (char) => char.toUpperCase());
+  const replaceHyphen = segment.replace(/-/g, ' ');
+  const capitalizedSegment = replaceHyphen.replace(/(^|\s)\S/g, (char) => char.toUpperCase());
   return capitalizedSegment;
 }
 

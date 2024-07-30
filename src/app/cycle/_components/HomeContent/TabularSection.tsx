@@ -27,7 +27,7 @@ const TabularSection = ({ opened,
 }) => {
   const { resetDiagramLocalStorage } = useWorkInProgressDiagram();
   const [tableData, setTableData] = React.useState<CycleData[]>([]);
-  const { createQueryString } = useQueryString();
+  const { createQueryString, } = useQueryString();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -282,6 +282,7 @@ const TabularSection = ({ opened,
     {
       tooltip: "Reload Business Process (All)",
       icon: "heroicons-outline:refresh",
+      disabled: false,
       onClick: async () => {
         modals.open({
           title: 'Confirm update',
@@ -320,16 +321,16 @@ const TabularSection = ({ opened,
         });
       },
     },
-    {
-      tooltip: "Filter",
-      icon: "heroicons-outline:adjustments",
-      disabled: true,
-    },
-    {
-      tooltip: "Sort",
-      icon: "heroicons-outline:switch-vertical",
-      disabled: true,
-    },
+    // {
+    //   tooltip: "Filter",
+    //   icon: "heroicons-outline:adjustments",
+    //   disabled: true,
+    // },
+    // {
+    //   tooltip: "Sort",
+    //   icon: "heroicons-outline:switch-vertical",
+    //   disabled: true,
+    // },
   ];
 
 
@@ -342,7 +343,7 @@ const TabularSection = ({ opened,
               root: 'px-20',
             }}>
               <Button
-                disabled
+                // disabled
                 variant='filled'
                 color='#F1F5F9'
                 c='#0F172A'
@@ -350,14 +351,14 @@ const TabularSection = ({ opened,
                 size="sm"
                 fz={14}
                 mr='auto'
-                leftSection={< Icon className='cursor-pointer rounded' icon="heroicons-outline:plus-circle" width="1rem" height="1rem" />}
+                // leftSection={< Icon className='cursor-pointer rounded' icon="heroicons-outline:plus-circle" width="1rem" height="1rem" />}
                 // onClick={onClick}
                 classNames={{
                   root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
                 }}
-
+                onClick={() => router.push('/manage-claim')}
               >
-                Add Cycle
+                Manage Claim
               </Button>
 
               <MRT_GlobalFilterTextInput
@@ -380,7 +381,7 @@ const TabularSection = ({ opened,
                   actionIcons.map((icon, i) => (
                     <Tooltip key={icon.tooltip + i} label={icon.tooltip}>
                       <ActionIcon
-                        disabled={icon.disabled}
+                        disabled={icon?.disabled}
                         onClick={icon.onClick}
                         variant="transparent"
                         bg="#F1F5F9"
