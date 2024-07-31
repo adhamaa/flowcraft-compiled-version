@@ -1,5 +1,4 @@
 import * as React from "react";
-import Header from "./_components/Header";
 import clsx from "clsx";
 import { BASE_PATH, auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
@@ -18,12 +17,8 @@ export default async function Layout({
   const session = await auth();
   return (
     <SessionProvider basePath={BASE_PATH} session={session}>
-      <div className="flex h-full">
-        <div className={clsx('grid grid-rows-[4rem_auto] h-screen transition-all duration-300 overflow-hidden')}
-        >
-          <Header />
-          {children}
-        </div>
+      <div className="flex h-full w-full">
+        {children}
       </div>
     </SessionProvider>
   );

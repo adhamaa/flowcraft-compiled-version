@@ -3,6 +3,7 @@ import TitleSection from '../cycle/_components/HomeContent/TitleSection'
 import clsx from 'clsx'
 import AboutContent from './_components/aboutContent'
 import { rem, ScrollAreaAutosize } from '@mantine/core'
+import Footer from '@/components/Footer'
 
 const AboutPage = () => {
   return (
@@ -11,6 +12,7 @@ const AboutPage = () => {
       )}>
         <TitleSection title='About Flowcraft' className='h-max w-full border-b-2 border-[#EBEAEA]' />
         <AboutContent />
+        <Footer />
       </div>
     </ScrollAreaAutosize>
   )

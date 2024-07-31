@@ -16,7 +16,10 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
   const profilePage = pathname.split('/')[1] === 'profile';
   const { setSelectedApp } = useGlobalState();
 
-  const [activeTab] = React.useState<string | null>(pathname.split('/')[1] || '/');
+  const [activeTab, setActiveTab] = React.useReducer((_: any, value: any) => {
+    router.push(`/${value}`);
+    return value;
+  }, "cycle");
   const switchRef = React.useRef<HTMLInputElement>(null);
   const { colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
@@ -39,7 +42,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
   ]
 
   return (
-    <header className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-8 gap-4 w-screen', className)}>
+    <header className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-8 gap-4 w-screen h-[66px] sticky top-0 bg-white z-10', className)}>
       <h1
         className="text-2xl font-bold cursor-pointer transition-all duration-300 ease-in-out hover:text-[#895CF3] dark:hover:text-[#895CF3]"
         onClick={() => {
@@ -53,7 +56,8 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
           tab: "!py-[1.6rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:text-[#895CF3] data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:font-semibold",
         }}
         value={activeTab as string}
-        onChange={(value) => router.push(`/${value}`)}>
+        onChange={setActiveTab}
+      >
         <Tabs.List>
           {menulist.map((tab) => ["Documentation"].includes(tab.label) ? (
             <Menu
@@ -67,9 +71,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
                   {tab.label}
                 </Tabs.Tab>
               </Menu.Target>
-
               <Menu.Dropdown>
-
                 {[{
                   label: "White Paper",
                   value: "white-paper",
@@ -94,7 +96,6 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
           ))}
         </Tabs.List>
       </Tabs>
-
       <div className="flex items-center gap-4">
         <Anchor
           component="button"
@@ -108,9 +109,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
         >
           How To Use?
         </Anchor>
-
         <SpotlightSearch />
-
         <Menu
           shadow="md"
           width={200}
@@ -134,7 +133,6 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
               }
             </Anchor>
           </Menu.Target>
-
           <Menu.Dropdown>
             <Menu.Label><span className="text-[0.6rem]">{session?.user?.name}</span></Menu.Label>
             <Menu.Item
@@ -146,18 +144,15 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
             >
               Log out
             </Menu.Item>
-
             {/* <Menu.Divider /> */}
-
             {/* <Menu.Label>Danger zone</Menu.Label>
-            <Menu.Item
-              color="red"
-            >
-              Delete my account
-            </Menu.Item> */}
+              <Menu.Item
+                color="red"
+              >
+                Delete my account
+              </Menu.Item> */}
           </Menu.Dropdown>
         </Menu>
-
         {darkmode && <Switch
           ref={switchRef}
           classNames={{
@@ -173,6 +168,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
         />}
       </div>
     </header >
+
   )
 }
 

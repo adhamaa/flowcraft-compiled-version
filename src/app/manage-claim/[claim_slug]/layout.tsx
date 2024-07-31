@@ -1,6 +1,6 @@
 import * as React from "react";
-import SideMenus from "../_components/SideMenus/menus";
 import { Metadata } from "next";
+import SideMenus from "./_components/SideMenus/menus";
 
 export const metadata: Metadata = {
   title: "Cycle Info",

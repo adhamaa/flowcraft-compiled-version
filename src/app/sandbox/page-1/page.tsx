@@ -1,6 +1,5 @@
 "use client";
 
-import Breadcrumbs from '@/components/Breadcrumbs'
 import { useSelectedLayoutSegments } from 'next/navigation';
 import * as React from 'react'
 
@@ -10,7 +9,6 @@ const Page_1 = () => {
 
   return (
     <div>
-      <Breadcrumbs />
       <h1>Page_1</h1>
 
       <ul>

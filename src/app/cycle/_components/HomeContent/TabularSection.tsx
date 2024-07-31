@@ -30,6 +30,8 @@ const TabularSection = ({ opened,
   const { createQueryString, } = useQueryString();
   const router = useRouter();
   const pathname = usePathname();
+  const isManageClaim = pathname === '/manage-claim';
+  const isCycle = pathname === '/cycle';
 
   const searchParams = useSearchParams();
   const selected_app = searchParams.get('selected_app');
@@ -321,18 +323,56 @@ const TabularSection = ({ opened,
         });
       },
     },
-    // {
-    //   tooltip: "Filter",
-    //   icon: "heroicons-outline:adjustments",
-    //   disabled: true,
-    // },
-    // {
-    //   tooltip: "Sort",
-    //   icon: "heroicons-outline:switch-vertical",
-    //   disabled: true,
-    // },
+    ...(isManageClaim ? [] : [{
+      tooltip: "Filter",
+      icon: "heroicons-outline:adjustments",
+      disabled: true,
+    },
+    {
+      tooltip: "Sort",
+      icon: "heroicons-outline:switch-vertical",
+      disabled: true,
+    }])
   ];
 
+  const buttons = [
+    {
+      label: 'Manage Claim',
+      type: 'button' as React.ButtonHTMLAttributes<HTMLButtonElement>["type"],
+      disabled: false,
+      canShow: isManageClaim,
+      onClick: () => router.push('/manage-claim/pending-claim'),
+      variant: "filled",
+      color: "#F1F5F9",
+      c: "#0F172A",
+      radius: "md",
+      size: "sm",
+      fz: 14,
+      mr: "auto",
+      classNames: {
+        root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+      },
+      icon: "",
+    },
+    {
+      label: 'Add Cycle',
+      type: 'button' as React.ButtonHTMLAttributes<HTMLButtonElement>["type"],
+      disabled: true,
+      canShow: isCycle,
+      onClick: () => router.push('#'),
+      variant: "filled",
+      color: "#F1F5F9",
+      c: "#0F172A",
+      radius: "md",
+      size: "sm",
+      fz: 14,
+      mr: "auto",
+      classNames: {
+        root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+      },
+      icon: < Icon className='cursor-pointer rounded' icon="heroicons-outline:plus-circle" width="1rem" height="1rem" />,
+    },
+  ]
 
   return (
     <section className='flex flex-col items-center'>
@@ -342,97 +382,84 @@ const TabularSection = ({ opened,
             <Flex justify="end" align="center" classNames={{
               root: 'px-20',
             }}>
-              <Button
-                // disabled
-                variant='filled'
-                color='#F1F5F9'
-                c='#0F172A'
-                radius='md'
-                size="sm"
-                fz={14}
-                mr='auto'
-                // leftSection={< Icon className='cursor-pointer rounded' icon="heroicons-outline:plus-circle" width="1rem" height="1rem" />}
-                // onClick={onClick}
-                classNames={{
-                  root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-                }}
-                onClick={() => router.push('/manage-claim')}
-              >
-                Manage Claim
-              </Button>
 
-              <MRT_GlobalFilterTextInput
-                table={table}
-                placeholder='Search Cycle'
-                leftSection={
-                  <Icon
-                    icon="mingcute:search-line"
-                    width={20}
-                    onClick={() => console.log("clicked search")}
-                    className="hover:text-[#895CF3] cursor-pointer" />
-                }
-                classNames={{
-                  input: '!rounded-lg border border-gray-300 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white placeholder:ml-8',
-                }} />
-              {isPagination && <MRT_TablePagination table={table} color='#895CF3' />}
+              {buttons.map(({ label, canShow, icon, ...button }, i) => canShow && (
+                <Button key={label + i} leftSection={icon} {...button} >{label}</Button>
+              ))}
 
-              <div className='flex ml-2 gap-4'>
-                {
-                  actionIcons.map((icon, i) => (
-                    <Tooltip key={icon.tooltip + i} label={icon.tooltip}>
-                      <ActionIcon
-                        disabled={icon?.disabled}
-                        onClick={icon.onClick}
-                        variant="transparent"
-                        bg="#F1F5F9"
-                        color='black'
-                        size="lg"
-                        radius="md"
-                        aria-label="Settings">
-                        <Icon icon={icon.icon} width="1rem" height="1rem" />
-                      </ActionIcon>
-                    </Tooltip>
-                  ))
-                }
-              </div>
+              {isCycle && <>
+                <MRT_GlobalFilterTextInput
+                  table={table}
+                  placeholder='Search Cycle'
+                  leftSection={
+                    <Icon
+                      icon="mingcute:search-line"
+                      width={20}
+                      onClick={() => console.log("clicked search")}
+                      className="hover:text-[#895CF3] cursor-pointer" />
+                  }
+                  classNames={{
+                    input: '!rounded-lg border border-gray-300 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white placeholder:ml-8',
+                  }} />
+                {isPagination && <MRT_TablePagination table={table} color='#895CF3' />}
+                <div className='flex ml-2 gap-4'>
+                  {
+                    actionIcons.map((icon, i) => (
+                      <Tooltip key={icon.tooltip + i} label={icon.tooltip}>
+                        <ActionIcon
+                          disabled={icon?.disabled}
+                          onClick={icon.onClick}
+                          variant="transparent"
+                          bg="#F1F5F9"
+                          color='black'
+                          size="lg"
+                          radius="md"
+                          aria-label="Settings">
+                          <Icon icon={icon.icon} width="1rem" height="1rem" />
+                        </ActionIcon>
+                      </Tooltip>
+                    ))
+                  }
+                </div>
+              </>}
             </Flex>
 
-            <Tabs
-              color='#895CF3'
-              variant='default'
-              // defaultValue="database"
-              value={activeTab as string}
-              onChange={(value) => {
-                router.push(pathname + '?' + createQueryString('data_source', value as string))
-                setActiveTab(value)
-              }}
-              classNames={{
-                root: "m-auto",
-                tab: "!py-[1.6rem] !border-white data-[active=true]:text-[#895CF3] data-[active=true]:!border-[#895CF3] hover:bg-transparent",
-                list: 'before:!content-none',
-              }}
-
-            >
-              <Tabs.List>
-                {datasourceList
-                  .map((tab) => (
-                    <Tabs.Tab
-                      key={tab.name}
-                      disabled={tab.disabled}
-                      value={tab.name}
-                      fz={20}
-                      fw={600}>
-                      <span className="capitalize ~text-base/lg">{tab.name}</span>
-                    </Tabs.Tab>
-                  ))}
-              </Tabs.List>
-            </Tabs>
-
-            <div className="relative overflow-auto w-screen">
-              <div className='absolute top-12 border w-full border-black/5 z-50' />
-              <MantineReactTable table={table} />
-            </div>
-            <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
+            {isCycle ? <>
+              <Tabs
+                color='#895CF3'
+                variant='default'
+                // defaultValue="database"
+                value={activeTab as string}
+                onChange={(value) => {
+                  router.push(pathname + '?' + createQueryString('data_source', value as string))
+                  setActiveTab(value)
+                }}
+                classNames={{
+                  root: "m-auto",
+                  tab: "!py-[1.6rem] !border-white data-[active=true]:text-[#895CF3] data-[active=true]:!border-[#895CF3] hover:bg-transparent",
+                  list: 'before:!content-none',
+                }}
+              >
+                <Tabs.List>
+                  {datasourceList
+                    .map((tab) => (
+                      <Tabs.Tab
+                        key={tab.name}
+                        disabled={tab.disabled}
+                        value={tab.name}
+                        fz={20}
+                        fw={600}>
+                        <span className="capitalize ~text-base/lg">{tab.name}</span>
+                      </Tabs.Tab>
+                    ))}
+                </Tabs.List>
+              </Tabs>
+              <div className="relative w-screen">
+                <div className='absolute top-12 border w-full border-black/5 z-50' />
+                <MantineReactTable table={table} />
+              </div>
+              <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
+            </> : <div className='h-screen'></div>}
           </Stack>
         </>
       ) : (
@@ -442,8 +469,7 @@ const TabularSection = ({ opened,
           )} alt='process illustration' />
           <span>Explore business process cycles by clicking on the application</span>
         </div>
-      )
-      }
+      )}
     </section >
   )
 }
