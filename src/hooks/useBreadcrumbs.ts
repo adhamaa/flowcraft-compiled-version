@@ -26,13 +26,6 @@ const DEFAULT_BREADCRUMBS: Breadcrumb[] = [
   }]
 
 
-const filterBreadcrumbsCylePage: FilterBreadcrumbs = ({ segments }) => {
-  if (segments.includes("stage")) {
-    return segments.includes("deleted") ? "Deleted Stages" : "Stages";
-  }
-  return "General Information";
-};
-
 const getTitles = (pathname: string) => {
   const segment = pathname.replace(/\//g, '');
   const replaceHyphen = segment.replace(/-/g, ' ');
@@ -47,40 +40,49 @@ const useBreadcrumbs = ({
 }): { breadcrumbs: Breadcrumb[]; } => {
   const segments = useSelectedLayoutSegments();
   const pathname = usePathname();
+  const params = useParams();
+  const cycle_id = params?.cycle_id as string;
+  const stage_uuid = params?.stage_uuid as string;
 
-  const getCycleBreadcrumbs = React.useMemo(() => {
-    const filteredBreadcrumbsTitle = filterBreadcrumbsCylePage({ segments } as FilterBreadcrumbsArgs);
-    const mergedList = [
-      ...DEFAULT_BREADCRUMBS,
-      { // add cycle to the list
-        title: 'Cycle',
-        href: "",
-        disabled: false
-      },
-      {
-        title: filteredBreadcrumbsTitle,
-        href: "",
-        disabled: true
-      }];
-
-    return mergedList;
-
-  }, [segments]);
 
   const getGeneralBreadcrumbs = React.useMemo(() => {
-    const pathTitles = !(!!segments.length) && getTitles(pathname)
+    const generalInformation = pathname === `/cycle/${cycle_id}`
+    const stages = pathname === `/cycle/${cycle_id}/stage/${stage_uuid}`
+    const deletedStages = pathname === `/cycle/${cycle_id}/stage/deleted/${stage_uuid}`
+    const cycleCrumbsTitle = deletedStages ? "Deleted Stages" : stages ? "Stages" : generalInformation ? "General Information" : "";
+
+    const pathTitles = !!segments.length && getTitles(pathname)
+
     return [
       ...DEFAULT_BREADCRUMBS, // add home|cycle to the list
-      {
+      ...(!pathname.includes("cycle") && !pathname.includes("manage-claim") ? [{
         title: pathTitles as string,
         href: "",
         disabled: true
-      }];
+      },] : []),
+      ...(pathname.includes("cycle") ? [{ // add cycle to the list
+        title: 'Cycle',
+        href: "",
+        disabled: false
+      }, {
+        title: cycleCrumbsTitle as string,
+        href: "",
+        disabled: true
+      }] : []),
+      ...(pathname.includes("manage-claim") ? segments.map((segment, index) => {
+        let href = segments.slice(0, index + 1).join('/');
+        return {
+          title: segment,
+          href: `/${href}`,
+          disabled: true
+        }
+      }) : [])
+    ];
 
 
   }, [segments]);
 
-  const breadcrumbs = pathname.includes("/cycle") ? getCycleBreadcrumbs : getGeneralBreadcrumbs;
+  const breadcrumbs = getGeneralBreadcrumbs;
 
 
   return { breadcrumbs };

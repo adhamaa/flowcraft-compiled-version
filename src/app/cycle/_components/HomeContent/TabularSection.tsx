@@ -454,7 +454,7 @@ const TabularSection = ({ opened,
                     ))}
                 </Tabs.List>
               </Tabs>
-              <div className="relative overflow-auto w-screen">
+              <div className="relative w-screen">
                 <div className='absolute top-12 border w-full border-black/5 z-50' />
                 <MantineReactTable table={table} />
               </div>

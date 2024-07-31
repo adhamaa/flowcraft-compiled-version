@@ -15,7 +15,7 @@ function Header() {
 
   const cycle_name = currentCycleInfo?.cycle_name;
 
-  return <div className='flex items-center gap-4 p-8 border-b-2'>
+  return <div className='row-span-1 col-span-3 flex items-center gap-4 p-8 border-b-2 h-24'>
     <Tooltip label="Back">
       <ActionIcon
         id="Back"

@@ -106,8 +106,7 @@ export default function HomeContent({
 
   return (
     <div
-      className={clsx('overflow-y-auto',
-        'w-full'
+      className={clsx('w-full'
       )}>
       <TitleSection title={['Business Process', 'Claim Management']} multiple />
       <ApplicationSection {...{ opened, toggle, applicationData, cycleData }} />

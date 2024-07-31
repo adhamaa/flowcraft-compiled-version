@@ -15,7 +15,7 @@ function Breadcrumbs({ items, className, route }: {
   const pathname = usePathname();
   const breadcrumbs = useBreadcrumbs({ route }).breadcrumbs;
   items = items ? items : breadcrumbs;
-  return (pathname !== "/manage-claim" && pathname !== "/cycle") && (
+  return (pathname !== "/manage-claim" && pathname !== "/cycle" && !pathname.includes("/cycle/restructure")) && (
     <div className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-6 gap-4 w-screen h-max', className)}>
       <MantineBreadcrumbs
         separator={

@@ -1,4 +1,6 @@
 
+import Breadcrumbs from '@/components/Breadcrumbs';
+import Header from '@/components/Header';
 import Providers from '@/provider';
 import '@/styles/globals.css';
 
@@ -33,6 +35,8 @@ export default async function RootLayout({ children }: {
       </head>
       <body className={inter.className}>
         <Providers>
+          <Header />
+          <Breadcrumbs />
           {children}
         </Providers>
       </body>
