@@ -53,8 +53,8 @@ const useBreadcrumbs = ({
     const mergedList = [
       ...DEFAULT_BREADCRUMBS,
       { // add cycle to the list
-        title: 'cycle',
-        href: '/cycle',
+        title: 'Cycle',
+        href: "",
         disabled: false
       },
       {
@@ -76,18 +76,11 @@ const useBreadcrumbs = ({
         href: "",
         disabled: true
       }];
-    // return segments.reduce((acc, segment, index) => {
-    //   const href = `/${segments.slice(0, index + 1).join("/")}`;
-    //   const title = pathTitles as string;
-    //   // const icon = segment === "cycle" ? "heroicons:home-solid" : undefined;
-    //   const disabled = segment === "cycle";
-    //   acc.push({ title, href, disabled });
-    //   return acc;
-    // }, DEFAULT_BREADCRUMBS);
+
 
   }, [segments]);
 
-  const breadcrumbs = route === "cycle" ? getCycleBreadcrumbs : getGeneralBreadcrumbs;
+  const breadcrumbs = pathname.includes("/cycle") ? getCycleBreadcrumbs : getGeneralBreadcrumbs;
 
 
   return { breadcrumbs };

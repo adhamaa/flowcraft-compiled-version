@@ -4,6 +4,7 @@ import useBreadcrumbs, { Breadcrumb } from '@/hooks/useBreadcrumbs';
 import { Icon } from '@iconify-icon/react';
 import { Breadcrumbs as MantineBreadcrumbs, Anchor } from '@mantine/core';
 import clsx from 'clsx';
+import { usePathname } from 'next/navigation';
 
 
 function Breadcrumbs({ items, className, route }: {
@@ -11,9 +12,10 @@ function Breadcrumbs({ items, className, route }: {
   className?: string;
   route?: string;
 }) {
+  const pathname = usePathname();
   const breadcrumbs = useBreadcrumbs({ route }).breadcrumbs;
   items = items ? items : breadcrumbs;
-  return (
+  return (pathname !== "/manage-claim" && pathname !== "/cycle") && (
     <div className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-6 gap-4 w-screen h-max', className)}>
       <MantineBreadcrumbs
         separator={
