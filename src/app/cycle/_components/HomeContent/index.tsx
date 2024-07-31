@@ -11,6 +11,8 @@ import clsx from 'clsx';
 import TitleSection from './TitleSection';
 import ApplicationSection from './ApplicationSection';
 import TabularSection from './TabularSection';
+import { Popover, PopoverDropdown, PopoverTarget } from '@mantine/core';
+import { Icon } from '@iconify-icon/react';
 
 export type ApplicationData = {
   apps_label: string;
@@ -107,7 +109,7 @@ export default function HomeContent({
       className={clsx('overflow-y-auto',
         'w-full'
       )}>
-      <TitleSection title='Claim Management' />
+      <TitleSection title={['Business Process', 'Claim Management']} multiple />
       <ApplicationSection {...{ opened, toggle, applicationData, cycleData }} />
       <TabularSection isPagination {...{ opened, cycleData }} />
     </div>

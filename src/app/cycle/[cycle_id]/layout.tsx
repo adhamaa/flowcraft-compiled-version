@@ -15,15 +15,12 @@ export default async function Layout({
 }) {
 
   return (
-    <>
-      <Breadcrumbs route="cycle" />
-      <div className="flex h-[calc(100vh-146.5px)]">
-        {/* --------- right side collapsable menus ---------- */}
-        <SideMenus />
-        {/* ----------- left side content */}
-        {children}
-      </div>
-    </>
+    <div className="flex h-[calc(100vh-146.5px)]">
+      {/* --------- right side collapsable menus ---------- */}
+      <SideMenus />
+      {/* ----------- left side content */}
+      {children}
+    </div>
   );
 };
 

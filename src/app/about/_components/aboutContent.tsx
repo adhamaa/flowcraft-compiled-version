@@ -4,11 +4,11 @@ import * as React from 'react'
 
 function AboutContent() {
   return (
-    <main className='py-14 space-y-16'>
+    <main className='pt-14 space-y-16'>
       {/* section 1 */}
       <section className='relative text-center text-xl font-semibold space-y-4 max-w-3xl mx-auto'>
         <h1 className='text-5xl flex justify-center items-center'>Welcome to&nbsp;<img src='/about/fc_logo_word.png' width={254} height={87} alt='fc logo' className='inline-block' /></h1>
-        <p className='w-[52ch] mx-auto'>The premier platform designed to empower <img src='/about/schinkels_technik_logo.png' width={84} height={30} alt='schinkels technik logo' className='inline-block' /> IT department
+        <p className='w-[52ch] mx-auto'>The premier platform designed to empower IT department
           in revolutionizing business processes, managing requirements, and optimizing instance cycles effortlessly.</p>
       </section>
       {/* section 2 */}
@@ -24,8 +24,8 @@ function AboutContent() {
       <section className='relative flex flex-col text-center h-full py-8 mx-auto space-y-6'>
         <img src="/about/bg_blured.png" alt="bg blured" className='absolute w-full h-full mx-auto inset-0' />
         <span>
-          <h1 className="font-semibold text-3xl">SAFWA PORTAL</h1>
-          <p className="font-semibold text-5xl tracking-[0.28em] ml-4">VISION</p>
+          <h1 className="font-semibold text-3xl">FLOWCRAFT</h1>
+          <p className="font-semibold text-5xl tracking-[0.28em]">VISION</p>
         </span>
         <p className='w-[84ch] mx-auto'>We envision a world where administrative IT professionals have the power to manage business processes, driving innovation and efficiency across organizations of all sizes and industries.</p>
       </section>
@@ -52,10 +52,10 @@ function AboutContent() {
         </div>
       </section>
       {/* section 5 */}
-      <section className='relative flex flex-col text-center h-full py-8 mx-auto space-y-6'>
+      <section className='relative flex flex-col text-center h-96 py-8 mx-auto space-y-6'>
         <img src="/about/bg_blured.png" alt="bg blured" className='absolute w-full h-full mx-auto inset-0' />
-        <h1 className="font-semibold text-3xl">Developers</h1>
-        <p className='text-left max-w-xl mx-auto'>Process leads by Hassan Nusi Atan from Safwa Global Ventures (M) Sdn Bhd & Powered by a team from Schinkels Technik Sdn Bhd from the good fellowship of Bani Dom. Stickynotebrain. Adham AA. Ajiq. Aliah Ali. Ema. Fred. Kashaf. Wan. AmadZufa. Hisyamdarwis.</p>
+        {/* <h1 className="font-semibold text-3xl">Developers</h1>
+        <p className='text-left max-w-xl mx-auto'>Process leads by Hassan Nusi Atan from Safwa Global Ventures (M) Sdn Bhd & Powered by a team from Schinkels Technik Sdn Bhd from the good fellowship of Bani Dom. Stickynotebrain. Adham AA. Ajiq. Aliah Ali. Ema. Fred. Kashaf. Wan. AmadZufa. Hisyamdarwis.</p> */}
       </section>
     </main>
   )

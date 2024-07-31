@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { BASE_PATH, auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const metadata: Metadata = {
   title: "Cycle",
@@ -22,6 +23,7 @@ export default async function Layout({
         <div className={clsx('grid grid-rows-[4rem_auto] h-screen transition-all duration-300 overflow-hidden')}
         >
           <Header />
+          <Breadcrumbs />
           {children}
         </div>
       </div>
