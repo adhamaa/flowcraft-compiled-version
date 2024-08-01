@@ -8,7 +8,7 @@ import * as  React from 'react'
 import { useFormContext } from 'react-hook-form';
 import { addEdge, ConnectionLineType, Edge } from 'reactflow';
 import { ActionType, useActionIcons } from './WorkInProgress/hooks/useActionIcons';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 type ActionButtonsType = {
   label: string;
@@ -21,6 +21,7 @@ type ActionButtonsType = {
 };
 
 const ActionButtons = () => {
+  const router = useRouter();
   const params = useParams();
   const cycle_uuid = params.cycle_uuid as string;
 
@@ -71,12 +72,25 @@ const ActionButtons = () => {
       disabled: !isEditable,
       canShow: true,
       onClick: () => {
-        onSave(cycle_uuid);
-        resetIsEditable();
+        onSave(cycle_uuid, (message) => {
+          if (message.success) {
+            resetIsEditable();
+            window.location.reload();
+          }
+        });
       },
       color: '#895CF3',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
+    // {
+    //   label: 'Refresh',
+    //   type: 'button',
+    //   disabled: false,
+    //   canShow: true,
+    //   onClick: () => window.location.reload(),
+    //   color: '#F1F5F9',
+    //   icon: { name: "heroicons:refresh", width: '1.5rem' },
+    // }
   ] satisfies CustomButtonProps[];
 
   return (

@@ -708,7 +708,7 @@ export const restructureBizProcess = async ({
       next: { tags: ['restructureprocess'] }
     });
 
-    clientRevalidateTag('cyclelist');
+    clientRevalidateTag('diagramdata');
     return await response.json();
   } catch (error) {
     console.error('Error occurred while restructuring business process:', error);

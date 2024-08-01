@@ -17,7 +17,6 @@ export default RenderContextPage
 
 function ContextPage() {
   const { isEditable, toggleIsEditable } = useAction();
-  console.log('isEditable:', isEditable)
 
   return (
     <div className="p-4">
@@ -58,7 +57,6 @@ function TestDrive() {
 
 function Section({ children }: { children: React.ReactNode }) {
   const level = React.useContext(LevelContext);
-  console.log('level:', level)
   return (
     <section className="border-2 border-black p-4">
       <LevelContext.Provider value={level + 1}>

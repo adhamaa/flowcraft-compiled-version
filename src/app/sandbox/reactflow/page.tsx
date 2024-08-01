@@ -109,7 +109,6 @@ const LayoutFlow = () => {
 
   const onConnect = React.useCallback(
     (params: Edge | Connection) => {
-      console.log('params:', params)
       setEdges((eds) =>
         addEdge({ ...params, type: ConnectionLineType.Step, animated: true }, eds)
       )

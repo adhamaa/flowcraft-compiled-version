@@ -1,27 +1,23 @@
 'use client';
 
 import * as React from 'react'
-import { useParams, useSearchParams } from 'next/navigation';
-import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType } from 'reactflow';
+import { useSearchParams } from 'next/navigation';
+import ReactFlow, { Background, Controls, DefaultEdgeOptions, FitViewOptions, MarkerType, ReactFlowState, useReactFlow, useStore, useStoreApi, useUpdateNodeInternals } from 'reactflow';
 import FloatingEdge from '@/components/reactflow/edgeTypes/FloatingEdge';
 import FloatingConnectionLine from '@/components/reactflow/edgeTypes/FloatingConnectionLine';
-import StartNode from '@/components/reactflow/nodeTypes/Restructure/StartNode';
-import EndNode from '@/components/reactflow/nodeTypes/Restructure/EndNode';
-import WithEntryAndExitNode from '@/components/reactflow/nodeTypes/Restructure/WithEntryAndExitNode';
-import WithEntry from '@/components/reactflow/nodeTypes/Restructure/WithEntry';
-import WithExit from '@/components/reactflow/nodeTypes/Restructure/WithExit';
-
-import 'reactflow/dist/style.css';
-import '@/components/reactflow/style.css';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import Standard from '@/components/reactflow/nodeTypes/Restructure/Standard';
 
+import { shallow } from 'zustand/shallow';
+import 'reactflow/dist/style.css';
+import '@/components/reactflow/style.css';
+
 const nodeTypes = {
-  Start: StartNode,
-  WithEntry: WithEntry,
-  WithExit: WithExit,
-  WithEntryAndExit: WithEntryAndExitNode,
-  End: EndNode,
+  Start: Standard,
+  WithEntry: Standard,
+  WithExit: Standard,
+  WithEntryAndExit: Standard,
+  End: Standard,
   Standard: Standard
 };
 
@@ -33,6 +29,18 @@ function Wip() {
   const selected_app = searchParams.get('selected_app');
 
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setRfInstance, fetchNodesEdges } = useWorkInProgressDiagram();
+
+  const store = useStoreApi();
+
+  const { isInteractive } = useStore((s) => ({
+    isInteractive: s.nodesDraggable || s.nodesConnectable || s.elementsSelectable
+  }), shallow);
+
+  const handleInteractivity = (state: boolean) => store.setState({
+    nodesDraggable: state,
+    nodesConnectable: state,
+    elementsSelectable: state,
+  });
 
   const fitViewOptions: FitViewOptions = {
     padding: 0.2,
@@ -50,6 +58,12 @@ function Wip() {
       apps_label: selected_app as any
     });
   }, [cycle_id, selected_app]);
+
+  React.useEffect(() => {
+    if (isInteractive) {
+      handleInteractivity(false);
+    }
+  }, []);
 
   return (
     <div className='h-full space-y-6'>
@@ -71,7 +85,11 @@ function Wip() {
           nodesDraggable={false}
         >
           <Background />
-          <Controls />
+          <Controls showInteractive={true} onInteractiveChange={
+            (isInteractive) => {
+              console.log('Interactive change:', isInteractive);
+            }
+          } />
           {/* <DevTools /> */}
 
           {/* <span className='absolute top-3 right-3 text-xs text-safwa-gray-3'>
