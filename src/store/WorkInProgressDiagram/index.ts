@@ -30,6 +30,7 @@ import { FormValues } from '@/app/cycle/restructure/[cycle_uuid]/_component/work
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import { CycleData } from '@/app/cycle/_components/HomeContent';
+import { revalidateCustomPath } from '@/actions/revalidatePath';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -58,7 +59,7 @@ type RFState = {
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   onLayout: (direction: string | undefined) => void;
-  onSave: (cycle_uuid: string) => void;
+  onSave: (cycle_uuid: string, callback?: (...args: any[]) => void) => void;
   onDraft: () => void;
   onApply: (items: { action: ActionType; data: FormValues; callback?: (...args: any[]) => void }) => void;
   onAdd: (data: FormValues) => void;
@@ -219,7 +220,7 @@ const useDiagramStore = create<RFState>()(
 
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
-      onSave: (cycle_uuid) => {
+      onSave: async (cycle_uuid, callback) => {
         const setToDraft = get().onDraft;
         modals.openConfirmModal({
           title: 'Save Cycle',
@@ -261,10 +262,8 @@ const useDiagramStore = create<RFState>()(
               if (saveToDB.error) throw new Error(saveToDB.error_message);
 
               toast.success(saveToDB.message);
-              return {
-                success: true,
-                data: saveToDB,
-              }
+              revalidateCustomPath("/cycle/restructure");
+              callback?.();
             } catch (error: any) {
               toast.error(error.message ?? 'An error occurred while saving the cycle.');
             }
@@ -556,6 +555,7 @@ const useDiagramStore = create<RFState>()(
         set({ edges });
       },
       setRfInstance: (rfInstance: any) => {
+
         set({ rfInstance });
       },
       toggleSelectedByNodeId: (nodeId: string) => {

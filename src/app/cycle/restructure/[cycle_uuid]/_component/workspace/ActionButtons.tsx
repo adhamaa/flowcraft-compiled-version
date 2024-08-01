@@ -8,7 +8,7 @@ import * as  React from 'react'
 import { useFormContext } from 'react-hook-form';
 import { addEdge, ConnectionLineType, Edge } from 'reactflow';
 import { ActionType, useActionIcons } from './WorkInProgress/hooks/useActionIcons';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 type ActionButtonsType = {
   label: string;
@@ -21,6 +21,7 @@ type ActionButtonsType = {
 };
 
 const ActionButtons = () => {
+  const router = useRouter();
   const params = useParams();
   const cycle_uuid = params.cycle_uuid as string;
 
@@ -71,7 +72,7 @@ const ActionButtons = () => {
       disabled: !isEditable,
       canShow: true,
       onClick: () => {
-        onSave(cycle_uuid);
+        onSave(cycle_uuid, () => router.refresh());
         resetIsEditable();
       },
       color: '#895CF3',
