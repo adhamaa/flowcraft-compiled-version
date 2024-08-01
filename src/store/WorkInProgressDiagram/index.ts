@@ -221,6 +221,7 @@ const useDiagramStore = create<RFState>()(
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
       onSave: async (cycle_uuid, callback) => {
+
         const setToDraft = get().onDraft;
         modals.openConfirmModal({
           title: 'Save Cycle',
@@ -251,24 +252,34 @@ const useDiagramStore = create<RFState>()(
             body: 'flex flex-col text-center justify-center gap-6 mx-auto',
           },
           onConfirm: async () => {
+
             try {
               if (!cycle_uuid) throw new Error('Cycle UUID is required.');
 
               const ApiFormat = convertToCycleStages(get().nodes, get().edges);
 
               setToDraft();
-              const saveToDB = await restructureBizProcess({ cycle_uuid: cycle_uuid, body: ApiFormat })
+              await restructureBizProcess({ cycle_uuid: cycle_uuid, body: ApiFormat }).then((res) => {
+                if (res.error) throw new Error(res.error_message);
 
-              if (saveToDB.error) throw new Error(saveToDB.error_message);
+                toast.success(res.message);
+                callback?.({
+                  success: true,
+                  message: res.message,
+                  cycle_uuid,
+                });
 
-              toast.success(saveToDB.message);
-              revalidateCustomPath("/cycle/restructure");
-              callback?.();
+                return;
+              });
+
             } catch (error: any) {
               toast.error(error.message ?? 'An error occurred while saving the cycle.');
             }
           },
         });
+
+
+
       },
       onDraft: () => {
         const instance = get().rfInstance;

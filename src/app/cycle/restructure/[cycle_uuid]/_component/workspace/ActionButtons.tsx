@@ -72,12 +72,25 @@ const ActionButtons = () => {
       disabled: !isEditable,
       canShow: true,
       onClick: () => {
-        onSave(cycle_uuid, () => router.refresh());
-        resetIsEditable();
+        onSave(cycle_uuid, (message) => {
+          if (message.success) {
+            resetIsEditable();
+            window.location.reload();
+          }
+        });
       },
       color: '#895CF3',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
+    // {
+    //   label: 'Refresh',
+    //   type: 'button',
+    //   disabled: false,
+    //   canShow: true,
+    //   onClick: () => window.location.reload(),
+    //   color: '#F1F5F9',
+    //   icon: { name: "heroicons:refresh", width: '1.5rem' },
+    // }
   ] satisfies CustomButtonProps[];
 
   return (
