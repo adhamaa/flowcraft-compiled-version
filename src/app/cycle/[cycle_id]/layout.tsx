@@ -14,10 +14,8 @@ export default async function Layout({
 }) {
 
   return (
-    <div className="flex h-screen w-full">
-      {/* --------- right side collapsable menus ---------- */}
+    <div className="flex h-[calc(100vh-146.5px)] w-full overflow-hidden">
       <SideMenus />
-      {/* ----------- left side content */}
       {children}
     </div>
   );

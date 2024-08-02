@@ -121,7 +121,7 @@ function SideMenus() {
           root: 'h-full',
           tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
           tabLabel: '~text-md/lg',
-          panel: ''
+          list: 'flex-nowrap',
         }}>
         <TabsList>
           <></>
@@ -157,7 +157,7 @@ function SideMenus() {
                   ),
                   tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
                   tabLabel: '~text-md/lg',
-                  panel: ''
+                  list: 'flex-nowrap',
                 }}
               >
                 {!isSideMenuCollapse &&
@@ -181,6 +181,7 @@ function SideMenus() {
                             root: 'h-full',
                             tab: 'w-40 !border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
                             tabLabel: '~text-md/lg',
+                            list: 'flex-nowrap',
                           }}
                           onChange={child.onChange}
                         >
@@ -190,14 +191,14 @@ function SideMenus() {
                               &&
                               <TabsList>
                                 <></>
-                                <ScrollAreaAutosize mah={768}>
+                                <ScrollAreaAutosize>
                                   {child.children?.map((stage, i) => (
                                     <Tooltip key={i} label={stage.name} position='right'>
                                       <TabsTab
                                         key={stage.value}
                                         value={stage.value}
                                         classNames={{
-                                          tabLabel: 'truncate'
+                                          tabLabel: 'truncate',
                                         }}
                                       >
                                         {stage.name}
@@ -207,7 +208,7 @@ function SideMenus() {
 
                                 </ScrollAreaAutosize>
 
-                                {!deleted_stage_route && <FooterButton
+                                {<FooterButton
                                   {...{ isSideMenuCollapse }}
                                   isRestructure
                                   onClick={() => router.push(`/cycle/restructure/${cycleUuid}?` + createQueryString('cycle_id', cycle_id as string))}

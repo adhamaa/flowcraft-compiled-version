@@ -479,10 +479,10 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
   const max_h_768 = useMediaQuery('(max-height: 768px)');
 
   return (
-    <ScrollAreaAutosize mah={max_h_768 ? 700 : 768}>
+    <ScrollAreaAutosize>
       <FormProvider {...methods}>
         <form
-          className={clsx('space-y-4 pb-4', max_h_768 && 'pb-14')}
+          className={clsx('space-y-4 h-[calc(100vh-146.5px)]')}
           onSubmit={handleSubmit(onSaveSubmit)}
         >
           <HeaderForm type='stages' {...{ toggleExpand }} />
