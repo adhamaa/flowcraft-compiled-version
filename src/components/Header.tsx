@@ -2,7 +2,7 @@
 import { Anchor, Avatar, Menu, Switch, Tabs, useMantineColorScheme } from "@mantine/core";
 import { Icon } from '@iconify-icon/react';
 import * as React from 'react'
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
 import { useGlobalState } from "@/hooks/useGlobalState";
 import { signOut } from "@/app/auth/signout/_action";
@@ -13,13 +13,17 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams();
+  const cycle_id = params.cycle_id;
   const profilePage = pathname.split('/')[1] === 'profile';
   const { setSelectedApp } = useGlobalState();
 
-  const [activeTab, setActiveTab] = React.useReducer((_: any, value: any) => {
+  const [activeTab, setActiveTab] = React.useReducer((state: any, value: any) => {
     router.push(`/${value}`);
-    return value;
+    state = value;
+    return state;
   }, "cycle");
+  console.log('activeTab:', activeTab)
   const switchRef = React.useRef<HTMLInputElement>(null);
   const { colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
@@ -55,7 +59,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
           root: "mr-auto",
           tab: "!py-[1.6rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:text-[#895CF3] data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:font-semibold",
         }}
-        value={activeTab as string}
+        value={!cycle_id ? activeTab as string: "none"}
         onChange={setActiveTab}
       >
         <Tabs.List>
