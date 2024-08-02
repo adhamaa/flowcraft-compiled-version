@@ -8,11 +8,13 @@ import Footer from '@/components/Footer'
 const AboutPage = () => {
   return (
     <ScrollAreaAutosize>
-      <div className={clsx('flex flex-col h-full'
+      <div className={clsx('flex flex-col h-[calc(100vh-146.5px)] '
       )}>
         <TitleSection title='About Flowcraft' className='h-max w-full border-b-2 border-[#EBEAEA]' />
-        <AboutContent />
-        <Footer />
+        <div>
+          <AboutContent />
+          <Footer />
+        </div>
       </div>
     </ScrollAreaAutosize>
   )
