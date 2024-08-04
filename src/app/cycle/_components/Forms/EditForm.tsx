@@ -522,7 +522,7 @@ export const TableStages = ({ data }: { data: stagesData; }) => {
   ];
 
   const table = useMantineReactTable({
-    columns,
+    columns: React.useMemo(() => columns, [columns]),
     data: React.useMemo(() => tableData, [tableData]),
     initialState: { density: 'xs' },
     onPaginationChange: setPagination,
