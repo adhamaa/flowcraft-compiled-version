@@ -2,7 +2,7 @@
 'use server';
 
 import { decryptPassword } from "../crypt";
-import { clientRevalidateTag } from "./server";
+import { clientRevalidateTag } from "./helper";
 import { datasource_mapping } from "@/constant/datasource";
 
 export type Datasource_type = 'database' | 'memory' | 'cache';
@@ -714,4 +714,43 @@ export const restructureBizProcess = async ({
     console.error('Error occurred while restructuring business process:', error);
     throw error;
   }
-}
+};
+
+export const getAllClaim = async ({
+  claim_id,
+  per_page,
+  page,
+  stage_name,
+  actor_name
+}: {
+  page?: number;
+  per_page?: number;
+  claim_id?: number;
+  stage_name?: string;
+  actor_name?: string;
+}) => {
+  const url = new URL('/businessProcess/allClaims', baseUrl);
+
+  url.searchParams.set('claim_id', claim_id?.toString() || '');
+  url.searchParams.set('per_page', per_page?.toString() || '');
+  url.searchParams.set('page', page?.toString() || '');
+  url.searchParams.set('stage_name', stage_name || '');
+  url.searchParams.set('actor_name', actor_name || '');
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    next: { tags: ['allclaim'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch all claim.');
+  }
+  const data = await response.json();
+  return data;
+};

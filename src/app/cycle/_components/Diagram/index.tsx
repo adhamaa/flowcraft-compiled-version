@@ -2,7 +2,7 @@
 'use client';
 
 import toast from '@/components/toast';
-import { Apps_label, getDiagramData } from '@/lib/service/client';
+import { Apps_label, getDiagramData } from '@/lib/service';
 import { Icon } from '@iconify-icon/react';
 import { Modal, Button, Popover, Accordion } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';

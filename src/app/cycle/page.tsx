@@ -1,6 +1,6 @@
 import * as React from 'react'
 import HomeContent from './_components/HomeContent'
-import { Apps_label, getApplicationList, getCycleList } from '@/lib/service/client';
+import { Apps_label, getApplicationList, getCycleList } from '@/lib/service';
 import { DatasourceType } from '@/constant/datasource';
 
 async function HomePage({

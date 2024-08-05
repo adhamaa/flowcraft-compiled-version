@@ -14,7 +14,7 @@ import clsx from 'clsx';
 import { Icon } from '@iconify-icon/react';
 import { ActionType, useActionIcons } from './hooks/useActionIcons';
 import { useSearchParams } from 'next/navigation';
-import { Apps_label } from '@/lib/service/client';
+import { Apps_label } from '@/lib/service';
 
 type InputType = {
   type?: string;

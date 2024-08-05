@@ -1,5 +1,5 @@
 import NextAuth, { Account, CredentialsSignin, NextAuthConfig, Profile, Session, User } from "next-auth"
-import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, publicRoutes } from "../routes"
+import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, protectedRoutes, publicRoutes } from "../routes"
 import { NextResponse } from "next/server"
 import Credentials from "next-auth/providers/credentials"
 import { JWT, encode } from "next-auth/jwt"
@@ -145,16 +145,11 @@ export const authConfig = {
     authorized({ auth, request }) {
       const { nextUrl } = request;
       const isLoggedIn = !!auth?.user;
-      const paths = [
-        ...(process.env.WITH_AUTH ? ["/cycle"] : []),
-        "/profile",
-        "/documentation",
-        "/maintenance"
-      ];
+      
       const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
       const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
       const isAuthRoute = authRoutes.includes(nextUrl.pathname);
-      const isProtected = paths.some((path) => nextUrl.pathname.startsWith(path))
+      const isProtected = protectedRoutes.some((path) => nextUrl.pathname.startsWith(path))
 
       if (isPublicRoute) {
         return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, request.url))

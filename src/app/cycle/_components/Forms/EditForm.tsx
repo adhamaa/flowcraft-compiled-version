@@ -9,7 +9,7 @@ import { StageInfoData } from '../HomeContent';
 import { FormProvider, useForm } from 'react-hook-form';
 import { MRT_ColumnDef, MantineReactTable, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
-import { Apps_label, Datasource_type, evaluateSemantics, getSemanticsErrorMessages, getStageInfo, getSyntaxErrorMessages, setAuditTrail, testSemanticStageName, testSyntaxStageName, updateStage, verifySyntax } from '@/lib/service/client';
+import { Apps_label, Datasource_type, evaluateSemantics, getSemanticsErrorMessages, getStageInfo, getSyntaxErrorMessages, setAuditTrail, testSemanticStageName, testSyntaxStageName, updateStage, verifySyntax } from '@/lib/service';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import InputWithOverlay from '@/components/form/InputWithOverlay';
@@ -522,7 +522,7 @@ export const TableStages = ({ data }: { data: stagesData; }) => {
   ];
 
   const table = useMantineReactTable({
-    columns,
+    columns: React.useMemo(() => columns, [columns]),
     data: React.useMemo(() => tableData, [tableData]),
     initialState: { density: 'xs' },
     onPaginationChange: setPagination,

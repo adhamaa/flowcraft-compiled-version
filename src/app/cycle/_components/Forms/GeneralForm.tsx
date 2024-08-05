@@ -9,7 +9,7 @@ import { CycleData } from '../HomeContent';
 import HeaderForm from './HeaderForm';
 import { FormProvider, useForm } from "react-hook-form";
 import { Radio, RadioGroup, TextInput } from 'react-hook-form-mantine';
-import { Apps_label, Datasource_type, getCycleInfo, getStatusRefList, setAuditTrail, updateCycle, updateStatusCycle } from '@/lib/service/client';
+import { Apps_label, Datasource_type, getCycleInfo, getStatusRefList, setAuditTrail, updateCycle, updateStatusCycle } from '@/lib/service';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
 import Diagram from '../Diagram';

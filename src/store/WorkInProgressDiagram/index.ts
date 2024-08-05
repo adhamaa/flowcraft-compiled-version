@@ -21,7 +21,7 @@ import {
 
 import initialNodes from '@/components/reactflow/nodes';
 import initialEdges from '@/components/reactflow/edges';
-import { Apps_label, getDeletedStageList, getDiagramData, restructureBizProcess } from '@/lib/service/client';
+import { Apps_label, getDeletedStageList, getDiagramData, restructureBizProcess } from '@/lib/service';
 import { useShallow } from 'zustand/react/shallow';
 import { ComboboxItem } from '@mantine/core';
 import { convertToCycleStages } from '@/lib/helper';

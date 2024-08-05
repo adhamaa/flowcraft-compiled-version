@@ -16,6 +16,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
   const params = useParams();
   const cycle_id = params.cycle_id;
   const profilePage = pathname.split('/')[1] === 'profile';
+  const excludePaths = !pathname.includes("/auth");
   const { setSelectedApp } = useGlobalState();
 
   const [activeTab, setActiveTab] = React.useReducer((state: any, value: any) => {
@@ -44,7 +45,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
     { value: "about", label: "About", disabled: false },
   ]
 
-  return (
+  return excludePaths && (
     <header className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-8 gap-4 w-screen h-[66px] sticky top-0 bg-white z-10', className)}>
       <h1
         className="text-2xl font-bold cursor-pointer transition-all duration-300 ease-in-out hover:text-[#895CF3] dark:hover:text-[#895CF3]"
@@ -58,7 +59,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
           root: "mr-auto",
           tab: "!py-[1.6rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:text-[#895CF3] data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:font-semibold",
         }}
-        value={!cycle_id ? activeTab as string: "none"}
+        value={!cycle_id ? activeTab as string : "none"}
         onChange={setActiveTab}
       >
         <Tabs.List>
