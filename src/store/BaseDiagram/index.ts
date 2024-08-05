@@ -19,7 +19,7 @@ import {
 
 import initialNodes from '@/components/reactflow/nodes';
 import initialEdges from '@/components/reactflow/edges';
-import { Apps_label, getDiagramData } from '@/lib/service/client';
+import { Apps_label, getDiagramData } from '@/lib/service';
 import { calculateNodePositions } from '@/components/reactflow/CalculateNodePositions';
 import { useShallow } from 'zustand/react/shallow';
 

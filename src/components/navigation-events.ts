@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { setAuditTrail } from '@/lib/service/client';
+import { setAuditTrail } from '@/lib/service';
 import { useSession } from 'next-auth/react';
 
 export function NavigationEvents() {

@@ -2,7 +2,7 @@
 
 import { DatasourceType } from "@/constant/datasource";
 /* eslint-disable react-hooks/rules-of-hooks */
-import { Apps_label, getApplicationList, getCycleInfo, getCycleList, getStageInfo, getStageList, updateCycle } from "@/lib/service/client";
+import { Apps_label, getApplicationList, getCycleInfo, getCycleList, getStageInfo, getStageList, updateCycle } from "@/lib/service";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 export const useData = () => {

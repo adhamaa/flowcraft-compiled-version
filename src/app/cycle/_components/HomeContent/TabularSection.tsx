@@ -9,7 +9,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MRT_Cell, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_Row, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, MantineReactTable, flexRender, useMantineReactTable } from "mantine-react-table";
 import { ActionIcon, Button, Flex, Menu, Stack, Table, Tabs, Text, Tooltip } from "@mantine/core";
 import { Icon } from "@iconify-icon/react";
-import { Apps_label, duplicateCycle, reloadBizProcess } from '@/lib/service/client';
+import { Apps_label, duplicateCycle, reloadBizProcess } from '@/lib/service';
 import { modals } from '@mantine/modals';
 import toast from '@/components/toast';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';

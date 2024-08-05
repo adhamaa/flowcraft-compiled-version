@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Apps_label, getApplicationList, getCycleList } from '@/lib/service/client';
+import { Apps_label, getApplicationList, getCycleList } from '@/lib/service';
 import { DatasourceType } from '@/constant/datasource';
 import HomeContent from '../cycle/_components/HomeContent';
 

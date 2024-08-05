@@ -75,7 +75,7 @@ const ActionButtons = () => {
         onSave(cycle_uuid, (message) => {
           if (message.success) {
             resetIsEditable();
-            // window.location.reload();
+            window.location.reload();
           }
         });
       },

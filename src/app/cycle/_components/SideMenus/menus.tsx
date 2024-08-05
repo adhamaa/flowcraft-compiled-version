@@ -2,7 +2,7 @@
 
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react'
-import { Apps_label, Datasource_type, getCycleInfo, getDeletedStageList, getStageList } from '@/lib/service/client';
+import { Apps_label, Datasource_type, getCycleInfo, getDeletedStageList, getStageList } from '@/lib/service';
 import { useDisclosure } from '@mantine/hooks';
 import { ScrollAreaAutosize, Tabs, TabsList, TabsPanel, TabsTab, Tooltip } from '@mantine/core';
 import FooterButton from './footer';

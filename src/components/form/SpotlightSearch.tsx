@@ -6,7 +6,7 @@ import { Spotlight, SpotlightActionData, SpotlightActionGroupData, spotlight } f
 import { Text, UnstyledButton } from '@mantine/core';
 import '@mantine/spotlight/styles.css';
 import { CycleData } from '@/app/cycle/_components/HomeContent';
-import { getCycleList } from '@/lib/service/client';
+import { getCycleList } from '@/lib/service';
 import { useRouter } from 'next/navigation';
 
 function SpotlightSearch() {

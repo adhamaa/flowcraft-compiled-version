@@ -6,6 +6,19 @@
 export const publicRoutes = ["/"];
 export type PublicRoutes = typeof publicRoutes;
 /**
+ * An array of routes which are protected
+ * These routes are protected and require authentication
+ * @type {string[]}
+ */
+export const protectedRoutes = [
+  ...(process.env.WITH_AUTH ? ["/cycle"] : []),
+  "/profile",
+  "/documentation",
+  "/maintenance",
+  "/manage-claim"
+];
+export type ProtectedRoutes = typeof protectedRoutes;
+/**
  * An array of routes which are used for authentication
  * These routes used to redirect the authenticated users to the /settings
  * @type {string[]}
