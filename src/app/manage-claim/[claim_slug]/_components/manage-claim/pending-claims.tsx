@@ -2,10 +2,14 @@
 
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import { getAllClaim } from '@/lib/service';
+import { Icon } from '@iconify-icon/react';
 import { Button, Flex, Stack } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
 import clsx from 'clsx';
-import { MantineReactTable, MRT_ColumnDef, MRT_RowSelectionState, MRT_TablePagination, useMantineReactTable } from 'mantine-react-table';
+import { MantineReactTable, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_RowSelectionState, MRT_TablePagination, useMantineReactTable } from 'mantine-react-table';
 import * as React from 'react'
+import { Form, useForm } from 'react-hook-form';
+import { NumberInput, TextInput } from 'react-hook-form-mantine';
 
 type AllClaimType = {
   actor_name: string;
@@ -38,8 +42,15 @@ function PendingClaim() {
 export default PendingClaim
 
 const TableClaims = (props?: PendingClaimProps) => {
+  const methods = useForm();
+  const { control, watch } = methods;
+
+  const [debouncedClaimIdFilter] = useDebouncedValue(watch('claim_id'), 200, { leading: false });
+  const [debouncedActorFilter] = useDebouncedValue(watch('actor_name'), 200, { leading: false });
+  const [debouncedStageFilter] = useDebouncedValue(watch('current_stage_name'), 200, { leading: false });
+
   const [pagination, setPagination] = React.useState({
-    pageSize: 20,
+    pageSize: 10,
     pageIndex: 0,
   });
   const [rowSelection, setRowSelection] = React.useState<MRT_RowSelectionState>({});
@@ -48,13 +59,6 @@ const TableClaims = (props?: PendingClaimProps) => {
 
   const { data, total_items } = claimsData || {};
 
-  React.useEffect(() => {
-    const fetchClaims = async () => await getAllClaim({
-      page: pagination.pageIndex + 1,
-      per_page: pagination.pageSize,
-    });
-    fetchClaims().then(setClaimsData);
-  }, [pagination.pageIndex, pagination.pageSize]);
 
   const columns: MRT_ColumnDef<AllClaimType>[] = [
     {
@@ -85,7 +89,61 @@ const TableClaims = (props?: PendingClaimProps) => {
       pagination,
       rowSelection
     },
-    enableTopToolbar: false,
+    enableTopToolbar: true,
+    renderTopToolbar: ({ table }) => (
+      <Form control={control}
+        className='flex gap-4 p-4'
+        onSubmit={(e) => console.log(e.data)}
+        onError={(e) => console.log(e)}
+      >
+        <NumberInput
+          name='claim_id'
+          placeholder='Claim ID'
+          hideControls 
+          leftSection={
+            <Icon
+              icon="mingcute:search-line"
+              width={20}
+              onClick={() => console.log("clicked search")}
+              className="hover:text-[#895CF3] cursor-pointer" />
+          }
+          classNames={{
+            input: '!rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white placeholder:ml-8',
+          }}
+          control={control}
+        />
+        <TextInput
+          name='actor_name'
+          placeholder='Actor'
+          leftSection={
+            <Icon
+              icon="mingcute:search-line"
+              width={20}
+              onClick={() => console.log("clicked search")}
+              className="hover:text-[#895CF3] cursor-pointer" />
+          }
+          classNames={{
+            input: '!rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white placeholder:ml-8',
+          }}
+          control={control}
+        />
+        <TextInput
+          name='current_stage_name'
+          placeholder='Stage'
+          leftSection={
+            <Icon
+              icon="mingcute:search-line"
+              width={20}
+              onClick={() => console.log("clicked search")}
+              className="hover:text-[#895CF3] cursor-pointer" />
+          }
+          classNames={{
+            input: '!rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white placeholder:ml-8',
+          }}
+          control={control}
+        />
+      </Form>
+    ),
     enableBottomToolbar: false,
     enableColumnActions: false,
     enableStickyHeader: true,
@@ -119,6 +177,23 @@ const TableClaims = (props?: PendingClaimProps) => {
       setTableData(data);
     }
   }, [data]);
+
+  React.useEffect(() => {
+    const fetchClaims = async () => await getAllClaim({
+      page: pagination.pageIndex + 1,
+      per_page: pagination.pageSize,
+      claim_id: debouncedClaimIdFilter,
+      actor_name: debouncedActorFilter,
+      stage_name: debouncedStageFilter,
+    });
+    fetchClaims().then(setClaimsData);
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    debouncedClaimIdFilter,
+    debouncedActorFilter,
+    debouncedStageFilter
+  ]);
 
   return (
     <Stack>
@@ -155,6 +230,7 @@ const TextareaHeader = ({ table, actionsButton, className }: {
         {isTable &&
           <MRT_TablePagination
             autoContrast
+            withEdges={false}
             table={table}
             color='#895CF3'
             classNames={{
