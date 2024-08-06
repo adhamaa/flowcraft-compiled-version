@@ -44,7 +44,7 @@ function SideMenus() {
             },
           },
           {
-            name: 'stage',
+            name: 'Stage',
             value: 'stage',
             disabled: true,
             onChange: async (value: any) => {
@@ -52,7 +52,7 @@ function SideMenus() {
             },
           },
           {
-            name: 'user',
+            name: 'User',
             value: 'user',
             disabled: true,
             onChange: async (value: any) => {

@@ -3,8 +3,9 @@
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import { getAllClaim } from '@/lib/service';
 import { Icon } from '@iconify-icon/react';
-import { Button, Flex, Stack } from '@mantine/core';
-import { useDebouncedValue } from '@mantine/hooks';
+import { ActionIcon, Button, Flex, Menu, MenuDropdown, MenuItem, MenuTarget, Stack } from '@mantine/core';
+import { useDebouncedValue, useMediaQuery } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
 import clsx from 'clsx';
 import { MantineReactTable, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_RowSelectionState, MRT_TablePagination, useMantineReactTable } from 'mantine-react-table';
 import * as React from 'react'
@@ -54,8 +55,14 @@ const TableClaims = (props?: PendingClaimProps) => {
     pageIndex: 0,
   });
   const [rowSelection, setRowSelection] = React.useState<MRT_RowSelectionState>({});
+  console.log('rowSelection:', rowSelection)
   const [tableData, setTableData] = React.useState<AllClaimType[]>([]);
   const [claimsData, setClaimsData] = React.useState<PendingClaimProps>();
+  const [selectedRowsData, setSelectedRowsData] = React.useState<AllClaimType[]>([]);
+  console.log('selectedRowsData:', selectedRowsData)
+
+  const [opened, setOpened] = React.useState(false);
+
 
   const { data, total_items } = claimsData || {};
 
@@ -75,6 +82,37 @@ const TableClaims = (props?: PendingClaimProps) => {
     },
   ];
 
+  const listAction = [
+    {
+      value: 'test',
+      label: 'test',
+    },
+    {
+      value: 'recovery',
+      label: 'Recovery',
+    },
+    {
+      value: 'send_message',
+      label: 'Send Message',
+    },
+    {
+      value: 'send_pending',
+      label: 'Send Pending',
+    },
+  ]
+
+  const handleSendData = () => {
+    console.log('tableData:', tableData)
+    // const selectedRowsData = Object.keys(rowSelection).map((key) => tableData[parseInt(key)]);
+    console.log('getIsSomeRowsSelected:', table.getIsSomeRowsSelected())
+    console.log('getIsAllRowsSelected:', table.getIsAllRowsSelected())
+    console.log('getIsAllPageRowsSelected:', table.getIsAllPageRowsSelected())
+    const selectedRowsData = table.getSelectedRowModel().flatRows.map((row) => row.original);
+    console.log('selectedRowsData:', selectedRowsData)
+  }
+
+  const max_h_768 = useMediaQuery('(max-height: 768px)');
+
   const table = useMantineReactTable({
     columns: React.useMemo(() => columns, [columns]),
     data: React.useMemo(() => tableData, [tableData]),
@@ -83,6 +121,8 @@ const TableClaims = (props?: PendingClaimProps) => {
     onRowSelectionChange: setRowSelection,
     enableSorting: false,
     enableRowSelection: true,
+    getRowId: (row) => row.claim_id.toString(),
+    // selectAllMode: 'all',
     manualPagination: true,
     rowCount: total_items,
     state: {
@@ -92,14 +132,14 @@ const TableClaims = (props?: PendingClaimProps) => {
     enableTopToolbar: true,
     renderTopToolbar: ({ table }) => (
       <Form control={control}
-        className='flex gap-4 p-4'
+        className='flex gap-4 p-4 px-6'
         onSubmit={(e) => console.log(e.data)}
         onError={(e) => console.log(e)}
       >
         <NumberInput
           name='claim_id'
           placeholder='Claim ID'
-          hideControls 
+          hideControls
           leftSection={
             <Icon
               icon="mingcute:search-line"
@@ -142,6 +182,83 @@ const TableClaims = (props?: PendingClaimProps) => {
           }}
           control={control}
         />
+
+        <Menu
+          opened={opened}
+          onChange={setOpened}
+          shadow="md"
+          width="target"
+          offset={0}
+          classNames={{
+            dropdown: 'rounded-none rounded-b-md border-none'
+          }}
+        >
+          {
+            <MenuTarget>
+              <Button
+                color='#895CF3'
+                ml='auto'
+                w={220}
+                type='button'
+                classNames={{
+                  root: clsx('!bg-[#895CF3] !text-white/90 !hover:bg-[#895CF3] !hover:text-white/90 !transition-all !duration-300 !ease-in-out',
+                    opened ? 'rounded-none rounded-t-md' : 'rounded-md'
+                  ),
+                }}
+              >
+                Action
+              </Button>
+            </MenuTarget>
+          }
+
+          <MenuDropdown onClick={(ctx) => { console.log({ ctx }) }}>
+            {listAction.map(({ label, value }, i) => (
+              <MenuItem
+                key={i}
+                classNames={{
+                  itemLabel: 'font-light capitalize text-center'
+                }}
+                onClick={() => {
+                  modals.open({
+                    title: label,
+                    children: (
+                      <>
+                        <p>Send message to all pending claim user of selected stage.</p>
+                        <Flex justify='center' align='center' gap={16}>
+                          <Button
+                            color='#F1F5F9'
+                            c='#0F172A'
+                            radius='md'
+                            type='button'
+                            onClick={() => modals.closeAll()}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            color='#895CF3'
+                            radius='md'
+                            type='button'
+                            onClick={() => {
+                              modals.closeAll()
+                            }}
+                          >Send</Button>
+                        </Flex>
+                      </>
+                    ),
+                    withCloseButton: false,
+                    classNames: {
+                      content: 'p-6 space-y-6 rounded-lg',
+                      title: 'text-3xl font-semibold text-[#0F172A] capitalize text-center',
+                      header: 'flex items-center justify-center',
+                    },
+                  });
+                }}
+              >
+                {label}
+              </MenuItem>
+            ))}
+          </MenuDropdown>
+        </Menu>
       </Form>
     ),
     enableBottomToolbar: false,
@@ -152,25 +269,19 @@ const TableClaims = (props?: PendingClaimProps) => {
     },
     paginationDisplayMode: 'pages',
     mantineTableContainerProps: {
-      mah: '500',
+      h: max_h_768 ? '400' : '550',
       mih: '150',
       px: '48',
     },
     mantinePaperProps: {
       classNames: {
-        root: '!border-none !shadow-none w-full bg-[#F1F5F9] overflow-auto',
+        root: '!border-none !shadow-none w-full !bg-[#F1F5F9] overflow-auto',
       },
     },
     mantineTableBodyRowProps: () => ({
       classNames: { tr: '!border-none' },
     }),
   });
-
-  const handleSendData = () => {
-    // const selectedRowsData = Object.keys(rowSelection).map((key) => tableData[parseInt(key)]);
-    const selectedRowsData = table.getSelectedRowModel().flatRows.map((row) => row.original);
-    console.log('selectedRowsData:', selectedRowsData)
-  }
 
   React.useEffect(() => {
     if (data) {
@@ -199,14 +310,16 @@ const TableClaims = (props?: PendingClaimProps) => {
     <Stack>
       <TextareaHeader
         {...{ table }}
-      // actionsButton={
-      //   <div className='flex gap-2'>
-      //     <Button
-      //       color='#895CF3'
-      //       onClick={handleSendData}
-      //     >Action</Button>
-      //   </div>
-      // }
+        actionsButton={
+          <div className='flex gap-2'>
+            <Button
+              color='#E2E8F0'
+              c='#0F172A'
+              onClick={() => console.log('Recovery')}
+              className='hover:!bg-[#E2E8F0] hover:!text-[#0F172A] transition-all duration-300 ease-in-out'
+            >Recovery</Button>
+          </div>
+        }
       />
       <MantineReactTable table={table} />
     </Stack>
@@ -221,11 +334,11 @@ const TextareaHeader = ({ table, actionsButton, className }: {
   const isTable = !!table
   return (
     <div className={clsx(
-      'relative flex bg-[#CBD5E1] rounded-t-lg mt-4 min-h-10',
+      'relative flex !bg-[#CBD5E1] rounded-t-lg mt-4 min-h-10',
       isTable && '-mb-4'
     )}>
       <Flex justify="space-between" align="center" classNames={{
-        root: clsx('py-1 px-2 w-full', isTable && '!py-0'),
+        root: clsx('!py-3 !px-4 w-full'),
       }}>
         {isTable &&
           <MRT_TablePagination
