@@ -130,7 +130,26 @@ const GeneralFormContent = ({
 
   const [statusRefList, setStatusRefList] = React.useState<StatusRef[]>([]);
 
-  const methods = useForm();
+  const methods = useForm({
+    defaultValues: {
+      cycle_active: '',
+      cycle_description: '',
+      cycle_id: '',
+      app_name: '',
+      cycle_updated: '',
+      no_of_stages: '',
+      cycle_name: '',
+    },
+    values: {
+      cycle_active: data?.cycle_active,
+      cycle_description: data?.cycle_description,
+      cycle_id: data?.cycle_id,
+      app_name: data?.app_name,
+      cycle_updated: data?.cycle_updated,
+      no_of_stages: data?.no_of_stages,
+      cycle_name: data?.cycle_name,
+    }
+  });
   const { control, handleSubmit, setValue } = methods;
 
   const onSubmit = async (formdata: any) => {
@@ -250,19 +269,6 @@ const GeneralFormContent = ({
   }
 
   React.useEffect(() => {
-    if (data) {
-      setValue('cycle_active', data.cycle_active);
-      setValue('cycle_description', data.cycle_description);
-      setValue('cycle_id', data.cycle_id);
-      setValue('app_name', data.app_name);
-      setValue('cycle_updated', data.cycle_updated);
-      setValue('no_of_stages', data.no_of_stages);
-      setValue('cycle_name', data.cycle_name);
-
-    }
-  }, [data, setValue])
-
-  React.useEffect(() => {
     async function getStatusList() {
       const statusRefListRes = await getStatusRefList();
       setStatusRefList(statusRefListRes);
@@ -285,26 +291,26 @@ const GeneralFormContent = ({
 
           <div className="container mx-auto space-y-8 py-4">
             <DiagramBar />
-            {InputList?.map((inputProps, index) =>
-              ['Status'].includes(inputProps.label) ? (
+            {InputList?.map(({ label, name, type, value, disabled }, index) => {
+              return ['Status'].includes(label) ? (
                 <InputWrapper
                   key={index}
-                  label={inputProps.label}
+                  label={label}
                   classNames={{
                     root: 'px-14 space-y-4',
                     label: '!text-sm !font-semibold',
                   }}>
-                  <LabelTooltip label={inputProps.label} />
+                  <LabelTooltip label={label} />
                   <RadioGroup
-                    name={inputProps.name}
+                    name={name as 'cycle_active' | 'cycle_description' | 'cycle_id' | 'app_name' | 'cycle_updated' | 'no_of_stages' | 'cycle_name'}
                     control={control}
-                    defaultValue={inputProps.value?.toString()}
+                    defaultValue={value?.toString()}
                   >
                     <Group>
                       {statusRefList?.map((status: StatusRef) => (
                         <Radio.Item
                           key={status.uuid}
-                          disabled={inputProps.disabled}
+                          disabled={disabled}
                           value={status.code}
                           label={<span className='capitalize'>{status.descriptions}</span>} />
                       ))}
@@ -312,21 +318,23 @@ const GeneralFormContent = ({
                   </RadioGroup>
                 </InputWrapper>
               ) : (
-                <InputWrapper key={index} label={inputProps.label} classNames={{
+                <InputWrapper key={index} label={label} classNames={{
                   root: 'px-14 space-y-4',
                   label: '!text-sm !font-semibold',
                 }}>
-                  <LabelTooltip label={inputProps.label} />
+                  <LabelTooltip label={label} />
                   <TextInput
-                    name={inputProps.name}
-                    defaultValue={inputProps.value}
+                    name={name as 'cycle_active' | 'cycle_description' | 'cycle_id' | 'app_name' | 'cycle_updated' | 'no_of_stages' | 'cycle_name'}
+                    defaultValue={value}
                     control={control}
-                    disabled={inputProps.disabled}
+                    disabled={disabled}
                     classNames={{
                       input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                     }} />
                 </InputWrapper>
-              ))}
+              )
+            })}
+
           </div>
         </form>
       </FormProvider>
@@ -334,15 +342,7 @@ const GeneralFormContent = ({
   )
 };
 
-// function to compare the status and description and return appropriate message
 function message(strings: TemplateStringsArray, ...values: any[]) {
-  // let dict = values[values.length - 1] || {};
-  // let result = [strings[0]];
-  // keys.forEach(function (key, i) {
-  //   let value = Number.isInteger(key) ? values[key] : dict[key];
-  //   result.push(value, strings[i + 1]);
-  // });
-  // return result.join('');
   const status = values[0];
   const description = values[1];
 

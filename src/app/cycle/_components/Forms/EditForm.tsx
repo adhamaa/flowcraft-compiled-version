@@ -283,7 +283,34 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
   ];
 
 
-  const methods = useForm();
+  const methods = useForm({
+    defaultValues: {
+      process_stage_name: '',
+      updated_datetime: '',
+      list_previous: '',
+      list_next_stage: '',
+      list_user: '',
+      list_pbt: '',
+      list_role: '',
+      list_requirement: '',
+      list_action: '',
+      list_entry_condition: '',
+      list_exit_condition: ''
+    },
+    values: {
+      process_stage_name: data?.process_stage_name,
+      updated_datetime: data?.updated_datetime,
+      list_previous: data?.list_previous,
+      list_next_stage: data?.list_next_stage,
+      list_user: JSON.stringify(data?.list_user, null, 2),
+      list_pbt: JSON.stringify(data?.list_pbt, null, 2),
+      list_role: JSON.stringify(data?.list_role, null, 2),
+      list_requirement: JSON.stringify(data?.list_requirement, null, 2),
+      list_action: JSON.stringify(data?.list_action, null, 2),
+      list_entry_condition: JSON.stringify(data?.list_entry_condition, null, 2),
+      list_exit_condition: JSON.stringify(data?.list_exit_condition, null, 2),
+    },
+  });
   const { handleSubmit, setValue } = methods;
   const { isEditable, toggleIsEditable } = useEditableState();
 
@@ -459,22 +486,6 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
       radius: 'md',
     })
   }
-
-  React.useEffect(() => {
-    if (data) {
-      setValue('process_stage_name', data.process_stage_name);
-      setValue('updated_datetime', data.updated_datetime);
-      setValue('list_previous', data.list_previous);
-      setValue('list_next_stage', data.list_next_stage);
-      setValue('list_user', JSON.stringify(data.list_user, null, 2));
-      setValue('list_pbt', JSON.stringify(data.list_pbt, null, 2));
-      setValue('list_role', JSON.stringify(data.list_role, null, 2));
-      setValue('list_requirement', JSON.stringify(data.list_requirement, null, 2));
-      setValue('list_action', JSON.stringify(data.list_action, null, 2));
-      setValue('list_entry_condition', JSON.stringify(data.list_entry_condition, null, 2));
-      setValue('list_exit_condition', JSON.stringify(data.list_exit_condition, null, 2));
-    }
-  }, [data, setValue])
 
   const max_h_768 = useMediaQuery('(max-height: 768px)');
 
