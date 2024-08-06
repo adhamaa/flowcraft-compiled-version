@@ -269,13 +269,14 @@ const TableClaims = (props?: PendingClaimProps) => {
     },
     paginationDisplayMode: 'pages',
     mantineTableContainerProps: {
-      h: max_h_768 ? '400' : '550',
+      h: max_h_768 ? '330' : '550',
       mih: '150',
       px: '48',
+      className: 'overflow-auto',
     },
     mantinePaperProps: {
       classNames: {
-        root: '!border-none !shadow-none w-full !bg-[#F1F5F9] overflow-auto',
+        root: '!border-none !shadow-none w-full !bg-[#F1F5F9]',
       },
     },
     mantineTableBodyRowProps: () => ({
