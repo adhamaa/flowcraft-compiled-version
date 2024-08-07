@@ -27,6 +27,8 @@ const ApplicationSection = ({
   const selected_app_param = searchParams.get('selected_app');
   const router = useRouter();
   const pathname = usePathname();
+  const isManageClaim = pathname === '/manage-claim';
+  const isCycle = pathname === '/cycle';
 
   // const listApps = useQuery({
   //   queryKey: ["applications"],
