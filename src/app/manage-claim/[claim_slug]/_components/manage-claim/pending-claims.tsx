@@ -61,6 +61,7 @@ const TableClaims = (props?: PendingClaimProps) => {
     pageIndex: 0,
   });
   const [rowSelection, setRowSelection] = React.useState<MRT_RowSelectionState>({});
+
   const [tableData, setTableData] = React.useState<AllClaimType[]>([]);
   const [claimsData, setClaimsData] = React.useState<PendingClaimProps>();
   const [selectedRowsData, setSelectedRowsData] = React.useState<AllClaimType[]>([]);
@@ -115,9 +116,9 @@ const TableClaims = (props?: PendingClaimProps) => {
     enableSorting: false,
     enableRowSelection: true,
     getRowId: (row) => row.claim_id.toString(),
-    // selectAllMode: 'all',
-    manualPagination: true,
-    rowCount: total_items,
+    selectAllMode: 'all',
+    // manualPagination: true,
+    // rowCount: total_items,
     state: {
       pagination,
       rowSelection
@@ -191,12 +192,14 @@ const TableClaims = (props?: PendingClaimProps) => {
           {
             <MenuTarget>
               <Button
+                disabled={Object.keys(rowSelection).length === 0}
                 color='#895CF3'
                 ml='auto'
                 w={220}
                 type='button'
+                variant='filled'
                 classNames={{
-                  root: clsx('!bg-[#895CF3] !text-white/90 !hover:bg-[#895CF3] !hover:text-white/90 !transition-all !duration-300 !ease-in-out',
+                  root: clsx('disabled:!bg-slate-200 disabled:border-transparent disabled:cursor-not-allowed',
                     opened ? 'rounded-none rounded-t-md' : 'rounded-md'
                   ),
                 }}
@@ -298,10 +301,7 @@ const TableClaims = (props?: PendingClaimProps) => {
   });
 
   const handleSendData = (data: any, e: any) => {
-    console.log('e:', e)
-    console.log('data:', data)
     const target_id = e.target.offsetParent.id;
-    console.log('target_id:', target_id)
     const toSendData = {
       user_id: Array.isArray(data.user_id) ? data.user_id : [data.user_id],
       claim_id: Object.keys(table.getState().rowSelection),
@@ -436,19 +436,20 @@ const TableClaims = (props?: PendingClaimProps) => {
 
   React.useEffect(() => {
     const fetchClaims = async () => await getAllClaim({
-      page: pagination.pageIndex + 1,
-      per_page: pagination.pageSize,
-      claim_id: debouncedClaimIdFilter,
-      actor_name: debouncedActorFilter,
-      stage_name: debouncedStageFilter,
+      // page: pagination.pageIndex + 1,
+      // per_page: pagination.pageSize,
+      per_page: 200,
+      // claim_id: debouncedClaimIdFilter,
+      // actor_name: debouncedActorFilter,
+      // stage_name: debouncedStageFilter,
     });
     fetchClaims().then(setClaimsData);
   }, [
-    pagination.pageIndex,
-    pagination.pageSize,
-    debouncedClaimIdFilter,
-    debouncedActorFilter,
-    debouncedStageFilter
+    // pagination.pageIndex,
+    // pagination.pageSize,
+    // debouncedClaimIdFilter,
+    // debouncedActorFilter,
+    // debouncedStageFilter
   ]);
 
   React.useEffect(() => {
