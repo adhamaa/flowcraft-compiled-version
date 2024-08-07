@@ -42,7 +42,6 @@ const TabularSection = ({ opened,
   const status = searchParams.get('status');
 
   const [activeTab, setActiveTab] = React.useState<string | null>(data_source || (isCycle ? 'database' : 'WIP'));
-  console.log('activeTab:', activeTab)
 
   const methods = useForm();
 

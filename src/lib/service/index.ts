@@ -213,7 +213,7 @@ export const getStageList = async ({
 }: {
   cycle_id: string;
   apps_label: Apps_label;
-  datasource_type: Datasource_type;
+  datasource_type?: Datasource_type;
 }) => {
   if (!cycle_id) return [];
   if (!apps_label) return [];
@@ -754,3 +754,65 @@ export const getAllClaim = async ({
   const data = await response.json();
   return data;
 };
+
+export const getUsersPending = async ({
+  cycle_id,
+  apps_label,
+}: {
+  cycle_id?: string;
+  apps_label: Apps_label;
+}) => {
+  const url = new URL(`/businessProcess/usersPending`, baseUrl);
+
+  url.searchParams.set('cycle_id', cycle_id || '');
+  url.searchParams.set('app_type', apps_label || '');
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    next: { tags: ['userspending'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch users pending.');
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const restructurePendings = async ({
+  cycle_id,
+  apps_label,
+  body
+}: {
+  cycle_id?: string;
+  apps_label?: Apps_label;
+  body: Record<string, { claim_id?: string[]; user_id: string[]; stage_uuid?: string[]; action: "recovery" | "send_pending" }>;
+}) => {
+  const url = new URL(`/businessProcess/restructurePendings`, baseUrl);
+
+  // url.searchParams.set('cycle_id', cycle_id || '');
+  // url.searchParams.set('app_type', apps_label || '');
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    body: JSON.stringify(body),
+    next: { tags: ['restructurependings'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to restructure pendings.');
+  }
+  return await response.json();
+}
