@@ -2,7 +2,7 @@
 
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
-import { Apps_label, getAllClaim, getStageList, getUsersPending, restructurePendings } from '@/lib/service';
+import { Apps_label, getAllClaim, getCycleInfo, getStageList, getUsersPending, restructurePendings } from '@/lib/service';
 import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Button, Flex, Menu, MenuDropdown, MenuItem, MenuTarget, Stack } from '@mantine/core';
 import { useDebouncedValue, useMediaQuery } from '@mantine/hooks';
@@ -35,9 +35,22 @@ type PendingClaimProps = {
 }
 
 function PendingClaim() {
+  const [cycleInfo, setCycleInfo] = React.useState<any>();
+  const searchParams = useSearchParams();
+  const cycle_id = searchParams.get('cycle_id');
+  const apps_label = searchParams.get('selected_app');
+
+  React.useEffect(() => {
+    const fetchCycleInfo = () => getCycleInfo({
+      apps_label: apps_label as Apps_label,
+      cycle_id: cycle_id as string,
+    });
+    fetchCycleInfo().then(setCycleInfo);
+  }, [])
+
   return (
-    <div className='flex flex-col w-full'>
-      <span className='flex w-full px-14 py-6 items-center border-b text-2xl font-semibold'>Cycle Name</span>
+    <div className='flex flex-col w-full overflow-auto'>
+      <span className='flex w-full px-14 py-6 items-center border-b text-2xl font-semibold'>{cycleInfo?.cycle_name}</span>
       <div className='w-full py-6 px-20'>
         <h1 className='font-semibold text-lg'>List of pending claims<LabelTooltip label='List of pending claims' /></h1>
         <TableClaims />

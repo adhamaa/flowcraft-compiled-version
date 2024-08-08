@@ -100,9 +100,9 @@ export const getCycleInfo = async ({
   cycle_id,
   datasource_type = 'database'
 }: {
-  apps_label?: Apps_label;
-  cycle_id?: string;
-  datasource_type: Datasource_type;
+  apps_label: Apps_label;
+  cycle_id: string;
+  datasource_type?: Datasource_type;
 }) => {
   // if (!apps_label) return {};
   // if (!cycle_id) return {};
