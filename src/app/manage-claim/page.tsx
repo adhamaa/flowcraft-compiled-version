@@ -26,7 +26,7 @@ async function HomePage({
   const [applicationData, cycleData] = await Promise.all([application, cycle])
 
   return (
-    <HomeContent {...{ applicationData, cycleData }} />
+    <HomeContent />
   )
 }
 
