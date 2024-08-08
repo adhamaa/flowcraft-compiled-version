@@ -9,7 +9,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MRT_Cell, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_Row, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, MantineReactTable, flexRender, useMantineReactTable } from "mantine-react-table";
 import { ActionIcon, Button, Flex, Menu, Stack, Table, Tabs, Text, Tooltip } from "@mantine/core";
 import { Icon } from "@iconify-icon/react";
-import { Apps_label, duplicateCycle, getCycleList, reloadBizProcess } from '@/lib/service';
+import { Apps_label, duplicateCycle, getCycleList, getRestructurePendingsLog, reloadBizProcess } from '@/lib/service';
 import { modals } from '@mantine/modals';
 import toast from '@/components/toast';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
@@ -21,13 +21,13 @@ import { datasource_type, DatasourceType } from '@/constant/datasource';
 const TabularSection = ({ opened,
   statusIndicator,
   isPagination,
-  cycleData,
 }: {
   opened: boolean;
   statusIndicator?: boolean;
   isPagination?: boolean;
-  cycleData: CycleData[];
 }) => {
+  const [cycleData, setCycleData] = React.useState<CycleData[]>([]);
+  const [restructurePendingsLog, setRestructurePendingsLog] = React.useState<any[]>([]);
   const { resetDiagramLocalStorage } = useWorkInProgressDiagram();
   const [tableData, setTableData] = React.useState<CycleData[]>([]);
   const { createQueryString } = useQueryString();
@@ -41,7 +41,7 @@ const TabularSection = ({ opened,
   const data_source = searchParams.get('data_source');
   const status = searchParams.get('status');
 
-  const [activeTab, setActiveTab] = React.useState<string | null>(data_source || (isCycle ? 'database' : 'WIP'));
+  const [activeTab, setActiveTab] = React.useState<string | null>(data_source || (isCycle ? 'database' : 'success'));
 
   const methods = useForm();
 
@@ -150,7 +150,7 @@ const TabularSection = ({ opened,
     }
   ]
 
-  const columns: MRT_ColumnDef<CycleData>[] = [
+  const columnsCycle: MRT_ColumnDef<CycleData>[] = [
     {
       header: 'Cycle name',
       accessorFn: (originalRow) => originalRow.cycle_name,
@@ -188,19 +188,69 @@ const TabularSection = ({ opened,
     }
   ];
 
+  const columnsPendingsLog: MRT_ColumnDef<{
+    action: string;
+    apps_name: string;
+    claim_id: number;
+    cycle_id: number;
+    cycle_name: string;
+    cycle_uuid: string;
+    last_updated_datetime: string;
+    stage_count: string;
+    user_id: string;
+    user_name: string;
+    uuid: string;
+  }>[] = [
+      {
+        header: 'Cycle id',
+        accessorFn: (originalRow) => originalRow.cycle_id,
+      },
+      {
+        header: 'Applications',
+        accessorFn: (originalRow) => originalRow.apps_name,
+      },
+      {
+        header: 'Claim id',
+        accessorFn: (originalRow) => originalRow.claim_id,
+      },
+      {
+        header: 'Stage name',
+        accessorFn: (originalRow) => 'N/A',
+      },
+      {
+        header: 'Actor',
+        accessorFn: (originalRow) => originalRow.user_name,
+      },
+      {
+        header: 'Last updated date',
+        accessorFn: (originalRow) => originalRow.last_updated_datetime,
+      },
+      {
+        header: 'Action',
+        accessorFn: (originalRow) => originalRow.action,
+        Cell: ({ cell }) => {
+          return (
+            <div className='flex gap-2 items-center'>
+              <span className={clsx('capitalize rounded-full px-2 py-1 text-sm font-semibold', statusIndicator && 'bg-green-500 text-white')}>{(cell?.getValue() as string).replace(/_/g, ' ') as string}</span>
+            </div>
+          )
+        },
+      }
+    ];
+
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10, //customize the default page size
   });
 
   const handleCellClick = (cell: MRT_Cell<CycleData>, row: MRT_Row<CycleData>) => {
-    cell.column.id !== 'mrt-row-actions' && router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''))
+    if (isCycle) cell.column.id !== 'mrt-row-actions' && router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''))
 
     resetDiagramLocalStorage();
   }
 
   const table = useMantineReactTable({
-    columns,
+    columns: isCycle ? columnsCycle : isManageClaim ? columnsPendingsLog : [] as any,
     data: React.useMemo(() => tableData, [tableData]),
     // enableRowSelection: true,
     onPaginationChange: setPagination, //hoist pagination state to your state when it changes internally
@@ -271,20 +321,34 @@ const TabularSection = ({ opened,
   });
 
   const datasourceList = [
-    { name: 'memory', disabled: false },
-    { name: 'cache', disabled: false },
-    { name: 'database', disabled: false }
+    { name: 'memory', value: "memory", disabled: false },
+    { name: 'cache', value: "cache", disabled: false },
+    { name: 'database', value: "database", disabled: false }
   ];
 
   const statusList = [
-    { name: 'WIP', disabled: false },
-    { name: 'Success', disabled: false },
-    { name: 'Failed', disabled: false }
+    { name: 'WIP', value: "wip", disabled: false },
+    { name: 'Success', value: "success", disabled: false },
+    { name: 'Failed', value: "failed", disabled: false }
   ];
 
   React.useEffect(() => {
-    setTableData(cycleData);
-  }, [cycleData]);
+    const fetchCycleData = () => getCycleList({
+      apps_label: selected_app as Apps_label,
+      datasource_type: data_source as DatasourceType,
+    });
+    fetchCycleData().then(setCycleData);
+  }, [selected_app, data_source]);
+
+  React.useEffect(() => {
+    const fetchPendingsLog = () => getRestructurePendingsLog({ status: status as "success" | "failed" | "wip" });
+    fetchPendingsLog().then(setRestructurePendingsLog);
+  }, [status]);
+
+  React.useEffect(() => {
+    if (isCycle) setTableData(cycleData);
+    if (isManageClaim) setTableData(restructurePendingsLog);
+  }, [cycleData, restructurePendingsLog, isCycle, isManageClaim]);
 
   React.useEffect(() => {
     if (selected_app && isCycle && !data_source) {
@@ -502,7 +566,7 @@ const TabularSection = ({ opened,
                       <Tabs.Tab
                         key={tab.name}
                         disabled={tab.disabled}
-                        value={tab.name}
+                        value={tab.value}
                         fz={20}
                         fw={600}>
                         <span className="capitalize ~text-base/lg">{tab.name}</span>
@@ -538,7 +602,7 @@ const TabularSection = ({ opened,
                       <Tabs.Tab
                         key={tab.name}
                         disabled={tab.disabled}
-                        value={tab.name}
+                        value={tab.value}
                         fz={20}
                         fw={600}>
                         <span className="capitalize ~text-base/lg">{tab.name}</span>

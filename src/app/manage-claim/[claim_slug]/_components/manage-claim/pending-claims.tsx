@@ -1,11 +1,13 @@
 "use client";
 
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
+import toast from '@/components/toast';
 import { Apps_label, getAllClaim, getStageList, getUsersPending, restructurePendings } from '@/lib/service';
 import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Button, Flex, Menu, MenuDropdown, MenuItem, MenuTarget, Stack } from '@mantine/core';
 import { useDebouncedValue, useMediaQuery } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { MantineReactTable, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_RowSelectionState, MRT_TablePagination, useMantineReactTable } from 'mantine-react-table';
 import { useSearchParams } from 'next/navigation';
@@ -34,9 +36,12 @@ type PendingClaimProps = {
 
 function PendingClaim() {
   return (
-    <div className='relative w-full py-4 px-20'>
-      <h1 className='font-semibold text-lg'>List of pending claims<LabelTooltip label='List of pending claims' /></h1>
-      <TableClaims />
+    <div className='flex flex-col w-full'>
+      <span className='flex w-full px-14 py-6 items-center border-b text-2xl font-semibold'>Cycle Name</span>
+      <div className='w-full py-6 px-20'>
+        <h1 className='font-semibold text-lg'>List of pending claims<LabelTooltip label='List of pending claims' /></h1>
+        <TableClaims />
+      </div >
     </div>
   )
 }
@@ -50,22 +55,22 @@ const TableClaims = (props?: PendingClaimProps) => {
   const methods = useForm({
     // defaultValues: { claim_id: '', user_id: '', stage_uuid: '', message: '', action: '', actor_name: '', current_stage_name: '' },
   });
-  const { control, watch, handleSubmit, reset, setValue } = methods;
+  const { control, watch, handleSubmit, reset } = methods;
 
   const [debouncedClaimIdFilter] = useDebouncedValue(watch('claim_id'), 200, { leading: false });
   const [debouncedActorFilter] = useDebouncedValue(watch('actor_name'), 200, { leading: false });
   const [debouncedStageFilter] = useDebouncedValue(watch('current_stage_name'), 200, { leading: false });
 
   const [pagination, setPagination] = React.useState({
-    pageSize: 10,
+    pageSize: 25,
     pageIndex: 0,
   });
   const [rowSelection, setRowSelection] = React.useState<MRT_RowSelectionState>({});
 
   const [tableData, setTableData] = React.useState<AllClaimType[]>([]);
-  const [claimsData, setClaimsData] = React.useState<PendingClaimProps>();
-  const [selectedRowsData, setSelectedRowsData] = React.useState<AllClaimType[]>([]);
-  const [action, setAction] = React.useState<string>('');
+  // const [claimsData, setClaimsData] = React.useState<PendingClaimProps>();
+  // const [selectedRowsData, setSelectedRowsData] = React.useState<AllClaimType[]>([]);
+  const [actionType, setActionType] = React.useState<"recovery" | "send_pending" | 'send_message' | 'test'>();
 
   const [opened, setOpened] = React.useState(false); // for action modal
   const [pendingUsersOptions, setPendingUsersOptions] = React.useReducer(
@@ -87,7 +92,21 @@ const TableClaims = (props?: PendingClaimProps) => {
     []
   ); // for action modal
 
-  const { data, total_items } = claimsData || {};
+  const allClaimOptions = {
+    page: pagination.pageIndex + 1,
+    per_page: pagination.pageSize,
+    claim_id: debouncedClaimIdFilter,
+    actor_name: debouncedActorFilter,
+    stage_name: debouncedStageFilter
+  };
+  const listAllClaim = useQuery({
+    queryKey: ["allclaim", allClaimOptions],
+    queryFn: () => getAllClaim(allClaimOptions),
+    placeholderData: keepPreviousData // keep previous data while loading new data
+  });
+
+  // const { data, total_items } = claimsData || {};
+  const { data, total_items } = listAllClaim.data || {};
 
 
   const columns: MRT_ColumnDef<AllClaimType>[] = [
@@ -117,8 +136,8 @@ const TableClaims = (props?: PendingClaimProps) => {
     enableRowSelection: true,
     getRowId: (row) => row.claim_id.toString(),
     selectAllMode: 'all',
-    // manualPagination: true,
-    // rowCount: total_items,
+    manualPagination: true,
+    rowCount: total_items,
     state: {
       pagination,
       rowSelection
@@ -209,7 +228,7 @@ const TableClaims = (props?: PendingClaimProps) => {
             </MenuTarget>
           }
 
-          <MenuDropdown onClick={() => reset()} >
+          <MenuDropdown onClick={() => reset()}>
             {listAction.map(({ label, description, value, input, btnCancel, btnSubmit }, i) => {
               return (
                 <MenuItem
@@ -218,7 +237,7 @@ const TableClaims = (props?: PendingClaimProps) => {
                     itemLabel: 'font-light capitalize text-center'
                   }}
                   onClick={() => {
-                    setAction(value);
+                    setActionType(value as "recovery" | "send_pending" | 'send_message' | 'test');
                     modals.open({
                       title: label,
                       size: 'sm',
@@ -226,14 +245,14 @@ const TableClaims = (props?: PendingClaimProps) => {
                         <div className='space-y-9'>
                           <p className='text-center'>{description}</p>
 
-                          {input.map((input, i) => {
-                            switch (input.type) {
+                          {input.map((item, i) => {
+                            switch (item.type) {
                               case 'select':
-                                return <CustomSelect key={i} data={input.data as { value: string; label: string; }[]} {...input} />
+                                return <CustomSelect key={i}{...item} data={item.data as { value: string; label: string; }[]} />
                               case 'multi-select':
-                                return <CustomMultiSelect key={i} data={input.data as { value: string; label: string; }[]} {...input} />
+                                return <CustomMultiSelect key={i} {...item} data={item.data as { value: string; label: string; }[]} />
                               case 'textarea':
-                                return <CustomTextarea key={i} {...input} />
+                                return <CustomTextarea key={i} {...item} />
                               default:
                                 return null;
                             }
@@ -285,7 +304,7 @@ const TableClaims = (props?: PendingClaimProps) => {
     },
     paginationDisplayMode: 'pages',
     mantineTableContainerProps: {
-      h: max_h_768 ? '330' : '550',
+      h: max_h_768 ? '300' : '450',
       mih: '150',
       px: '48',
       className: 'overflow-auto',
@@ -302,30 +321,74 @@ const TableClaims = (props?: PendingClaimProps) => {
 
   const handleSendData = (data: any, e: any) => {
     const target_id = e.target.offsetParent.id;
+    const isSendPending = target_id || actionType === 'send_pending';
+    const isRecovery = target_id || actionType === 'recovery';
+    const isSendMessage = target_id || actionType === 'send_message';
+    const isTest = target_id || actionType === 'test';
     const toSendData = {
       user_id: Array.isArray(data.user_id) ? data.user_id : [data.user_id],
       claim_id: Object.keys(table.getState().rowSelection),
       stage_uuid: data.stage_uuid,
       message: data.message,
-      action: action,
+      action: target_id || actionType,
     }
-    console.log('toSendData:', toSendData)
+
+    const { user_id, claim_id, stage_uuid, message, action } = toSendData;
+
+    const sendPendingData = {
+      user_id,
+      claim_id,
+      action,
+    };
+    const sendRecoveryByStageData = {
+      user_id,
+      claim_id,
+      stage_uuid,
+      action,
+    };
+    const sendRecoveryAllData = {
+      user_id,
+      action,
+    };
+    const sendMessageData = {
+      user_id,
+      claim_id,
+      message,
+    };
+    const sendTestData = {
+      user_id,
+      claim_id,
+    };
+
 
     try {
-      // restructurePendings(toSendData);
-    } catch (error) {
-
+      if (isSendPending) {
+        // sendPending(sendPendingData);
+        console.log('sendPendingData:', sendPendingData)
+      } else if (isRecovery) {
+        if (stage_uuid) {
+          // sendRecoveryByStage(sendRecoveryByStageData);
+          console.log('sendRecoveryByStageData:', sendRecoveryByStageData)
+        } else {
+          // sendRecoveryAll(sendRecoveryAllData);
+          console.log('sendRecoveryAllData:', sendRecoveryAllData)
+        }
+      } else if (isSendMessage) {
+        // sendMessage(sendMessageData);
+        console.log('sendMessageData:', sendMessageData)
+      } else if (isTest) {
+        // test(sendTestData);
+        console.log('sendTestData:', sendTestData)
+      } else {
+        console.log('No action type selected')
+      }
+    } catch (error: any) {
+      console.error('error:', error);
+      toast.error(error.message);
     }
-
-
+    // reset(); // reset form doesn't work don't know why
     table.resetRowSelection();
     modals.closeAll();
-    // console.log('tableData:', tableData)
-    // // const selectedRowsData = Object.keys(rowSelection).map((key) => tableData[parseInt(key)]);
-    // console.log('getIsSomeRowsSelected:', table.getIsSomeRowsSelected())
-    // console.log('getIsAllRowsSelected:', table.getIsAllRowsSelected())
-    // console.log('getIsAllPageRowsSelected:', table.getIsAllPageRowsSelected())
-    // console.log('selectedRowsData:', selectedRowsData)
   }
 
   const listAction = [
@@ -426,7 +489,7 @@ const TableClaims = (props?: PendingClaimProps) => {
         onClick: handleSubmit(handleSendData),
       },
     },
-  ]
+  ];
 
   React.useEffect(() => {
     if (data) {
@@ -434,23 +497,23 @@ const TableClaims = (props?: PendingClaimProps) => {
     }
   }, [data]);
 
-  React.useEffect(() => {
-    const fetchClaims = async () => await getAllClaim({
-      // page: pagination.pageIndex + 1,
-      // per_page: pagination.pageSize,
-      per_page: 200,
-      // claim_id: debouncedClaimIdFilter,
-      // actor_name: debouncedActorFilter,
-      // stage_name: debouncedStageFilter,
-    });
-    fetchClaims().then(setClaimsData);
-  }, [
-    // pagination.pageIndex,
-    // pagination.pageSize,
-    // debouncedClaimIdFilter,
-    // debouncedActorFilter,
-    // debouncedStageFilter
-  ]);
+  // React.useEffect(() => {
+  //   const fetchClaims = async () => await getAllClaim({
+  //     per_page: 200,
+  //     // page: pagination.pageIndex + 1,
+  //     // per_page: pagination.pageSize,
+  //     // claim_id: debouncedClaimIdFilter,
+  //     // actor_name: debouncedActorFilter,
+  //     // stage_name: debouncedStageFilter,
+  //   });
+  //   fetchClaims().then(setClaimsData);
+  // }, [
+  //   // pagination.pageIndex,
+  //   // pagination.pageSize,
+  //   // debouncedClaimIdFilter,
+  //   // debouncedActorFilter,
+  //   // debouncedStageFilter
+  // ]);
 
   React.useEffect(() => {
     const fetchPendingUsers = async () => await getUsersPending({
@@ -468,6 +531,8 @@ const TableClaims = (props?: PendingClaimProps) => {
     fetchStageList().then(setStageListOptions);
   }, [selected_app, cycle_id]);
 
+  React
+
   return (
     <Stack>
       <TextareaHeader
@@ -477,14 +542,85 @@ const TableClaims = (props?: PendingClaimProps) => {
             <Button
               color='#E2E8F0'
               c='#0F172A'
-              onClick={() => console.log('Recovery')}
+              onClick={() => {
+                setActionType('recovery');
+                reset();
+                [{
+                  value: 'recovery',
+                  label: 'Recovery',
+                  description: 'To test and send to specific user to get their respective pending by business prosess',
+                  input: [{
+                    type: 'multi-select',
+                    name: 'user_id',
+                    label: 'Choose User Id',
+                    placeholder: 'Selected User ID',
+                    data: pendingUsersOptions,
+                    control: control,
+                  }],
+                  btnCancel: {
+                    label: 'Cancel',
+                    onClick: () => modals.closeAll(),
+                  },
+                  btnSubmit: {
+                    label: 'Recover',
+                    onClick: handleSubmit(handleSendData),
+                  },
+                }].map(({ label, description, value, input, btnCancel, btnSubmit }, i) => modals.open({
+                  title: label,
+                  size: 'sm',
+                  children: (
+                    <div className='space-y-9'>
+                      <p className='text-center'>{description}</p>
+
+                      {input.map((item, i) => {
+                        switch (item.type) {
+                          case 'select':
+                            return <CustomSelect key={i}{...item} data={item.data as { value: string; label: string; }[]} />
+                          case 'multi-select':
+                            return <CustomMultiSelect key={i} {...item} data={item.data as { value: string; label: string; }[]} />
+                          case 'textarea':
+                            return <CustomTextarea key={i} {...item} />
+                          default:
+                            return null;
+                        }
+                      })}
+
+                      <Flex justify='center' align='center' gap={16}>
+                        <Button
+                          id={value}
+                          color='#F1F5F9'
+                          c='#0F172A'
+                          radius='md'
+                          type='button'
+                          onClick={btnCancel.onClick}
+                        >
+                          {btnCancel.label}
+                        </Button>
+                        <Button
+                          id={value}
+                          color='#895CF3'
+                          radius='md'
+                          type='button'
+                          onClick={btnSubmit.onClick}
+                        >{btnSubmit.label}</Button>
+                      </Flex>
+                    </div>
+                  ),
+                  withCloseButton: false,
+                  classNames: {
+                    content: 'p-6 space-y-6 rounded-lg',
+                    title: 'text-3xl font-semibold text-[#0F172A] capitalize text-center',
+                    header: 'flex items-center justify-center',
+                  },
+                }))
+              }}
               className='hover:!bg-[#E2E8F0] hover:!text-[#0F172A] transition-all duration-300 ease-in-out'
             >Recovery</Button>
           </div>
         }
       />
-      <MantineReactTable table={table} />
-    </Stack>
+      < MantineReactTable table={table} />
+    </Stack >
   )
 };
 

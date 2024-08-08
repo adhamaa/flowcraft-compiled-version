@@ -815,4 +815,32 @@ export const restructurePendings = async ({
     throw new Error('Failed to restructure pendings.');
   }
   return await response.json();
-}
+};
+
+export const getRestructurePendingsLog = async ({
+  status = 'success',
+}: {
+  status?: "success" | "wip" | "failed";
+
+}) => {
+  const url = new URL(`/businessProcess/restructurePendingLogs`, baseUrl);
+
+  url.searchParams.set('status', status);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    next: { tags: ['restructurependingslog'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to fetch restructure pendings log.');
+  }
+  const data = await response.json();
+  return data.data;
+};
