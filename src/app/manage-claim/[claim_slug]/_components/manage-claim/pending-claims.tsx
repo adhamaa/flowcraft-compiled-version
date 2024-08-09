@@ -2,7 +2,7 @@
 
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
-import { Apps_label, getAllClaim, getCycleInfo, getStageList, getUsersPending, restructurePendings } from '@/lib/service';
+import { Apps_label, getAllClaim, getCycleInfo, getStageList, getUsersPending, restructurePendings, sendMessagePending, testPending } from '@/lib/service';
 import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Button, Flex, Menu, MenuDropdown, MenuItem, MenuTarget, Stack } from '@mantine/core';
 import { useDebouncedValue, useMediaQuery } from '@mantine/hooks';
@@ -332,7 +332,7 @@ const TableClaims = (props?: PendingClaimProps) => {
     }),
   });
 
-  const handleSendData = (data: any, e: any) => {
+  const handleSendData = async (data: any, e: any) => {
     const target_id = e.target.offsetParent.id;
     const isSendPending = target_id || actionType === 'send_pending';
     const isRecovery = target_id || actionType === 'recovery';
@@ -376,22 +376,22 @@ const TableClaims = (props?: PendingClaimProps) => {
 
     try {
       if (isSendPending) {
-        // sendPending(sendPendingData);
-        console.log('sendPendingData:', sendPendingData)
+        const res = await restructurePendings({ body: sendPendingData });
+        toast.success(res.message);
       } else if (isRecovery) {
         if (stage_uuid) {
-          // sendRecoveryByStage(sendRecoveryByStageData);
-          console.log('sendRecoveryByStageData:', sendRecoveryByStageData)
+          const res = await restructurePendings({ body: sendRecoveryByStageData });
+          toast.success(res.message);
         } else {
-          // sendRecoveryAll(sendRecoveryAllData);
-          console.log('sendRecoveryAllData:', sendRecoveryAllData)
+          const res = await restructurePendings({ body: sendRecoveryAllData });
+          toast.success(res.message);
         }
       } else if (isSendMessage) {
-        // sendMessage(sendMessageData);
-        console.log('sendMessageData:', sendMessageData)
+        const res = await sendMessagePending({ body: sendMessageData });
+        toast.success(res.message);
       } else if (isTest) {
-        // test(sendTestData);
-        console.log('sendTestData:', sendTestData)
+        const res = await testPending({ body: sendTestData });
+        toast.success(res.message);
       } else {
         console.log('No action type selected')
       }

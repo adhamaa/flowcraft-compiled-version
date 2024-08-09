@@ -785,38 +785,6 @@ export const getUsersPending = async ({
   return data;
 };
 
-export const restructurePendings = async ({
-  cycle_id,
-  apps_label,
-  body
-}: {
-  cycle_id?: string;
-  apps_label?: Apps_label;
-  body: Record<string, { claim_id?: string[]; user_id: string[]; stage_uuid?: string[]; action: "recovery" | "send_pending" }>;
-}) => {
-  const url = new URL(`/businessProcess/restructurePendings`, baseUrl);
-
-  // url.searchParams.set('cycle_id', cycle_id || '');
-  // url.searchParams.set('app_type', apps_label || '');
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
-    },
-    body: JSON.stringify(body),
-    next: { tags: ['restructurependings'] }
-  });
-  if (response.status === 404) {
-    return [];
-  }
-  if (!response.ok) {
-    throw new Error('Failed to restructure pendings.');
-  }
-  return await response.json();
-};
-
 export const getRestructurePendingsLog = async ({
   status = 'success',
 }: {
@@ -843,4 +811,79 @@ export const getRestructurePendingsLog = async ({
   }
   const data = await response.json();
   return data.data;
+};
+
+export const restructurePendings = async ({
+  body
+}: {
+  body: { claim_id?: string[]; user_id: string[]; stage_uuid?: string[]; action: "recovery" | "send_pending" };
+}) => {
+  const url = new URL(`/businessProcess/restructurePendings`, baseUrl);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    body: JSON.stringify(body),
+    next: { tags: ['restructurependings'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to restructure pendings.');
+  }
+  return await response.json();
+};
+
+export const testPending = async ({
+  body
+}: {
+  body: { claim_id: string[]; user_id: string[]; };
+}) => {
+  const url = new URL(`/businessProcess/testPending`, baseUrl);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    body: JSON.stringify(body),
+    next: { tags: ['testpending'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to test pending.');
+  }
+  return await response.json();
+};
+
+export const sendMessagePending = async ({
+  body
+}: {
+  body: { claim_id: string[]; user_id: string[]; message: string; };
+}) => {
+  const url = new URL(`/businessProcess/sendMessagePending`, baseUrl);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    body: JSON.stringify(body),
+    next: { tags: ['sendmessagepending'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to send message pending.');
+  }
+  return await response.json();
 };
