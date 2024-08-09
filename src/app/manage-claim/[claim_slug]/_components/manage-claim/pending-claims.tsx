@@ -34,6 +34,8 @@ type PendingClaimProps = {
   error_message?: string | null;
 }
 
+type ActionType = 'recovery' | 'send_pending' | 'send_message' | 'test';
+
 function PendingClaim() {
   const [cycleInfo, setCycleInfo] = React.useState<any>();
   const searchParams = useSearchParams();
@@ -83,7 +85,7 @@ const TableClaims = (props?: PendingClaimProps) => {
   const [tableData, setTableData] = React.useState<AllClaimType[]>([]);
   // const [claimsData, setClaimsData] = React.useState<PendingClaimProps>();
   // const [selectedRowsData, setSelectedRowsData] = React.useState<AllClaimType[]>([]);
-  const [actionType, setActionType] = React.useState<"recovery" | "send_pending" | 'send_message' | 'test'>();
+  const [actionType, setActionType] = React.useState<ActionType>();
 
   const [opened, setOpened] = React.useState(false); // for action modal
   const [pendingUsersOptions, setPendingUsersOptions] = React.useReducer(
@@ -332,27 +334,55 @@ const TableClaims = (props?: PendingClaimProps) => {
     }),
   });
 
-  const handleSendData = async (data: any, e: any) => {
-    const target_id = e.target.offsetParent.id;
-    const isSendPending = target_id || actionType === 'send_pending';
-    const isRecovery = target_id || actionType === 'recovery';
-    const isSendMessage = target_id || actionType === 'send_message';
-    const isTest = target_id || actionType === 'test';
-    const toSendData = {
+  const convertData = (data: any, actionType: ActionType) => {
+    return {
       user_id: Array.isArray(data.user_id) ? data.user_id : [data.user_id],
       claim_id: Object.keys(table.getState().rowSelection),
       stage_uuid: data.stage_uuid,
       message: data.message,
-      action: target_id || actionType,
+      action: actionType,
+    };
+  }
+
+  const handleTest = async (data: any, e: any) => {
+    const { user_id, claim_id } = convertData(data, actionType!);
+    const sendTestData = {
+      user_id,
+      claim_id,
+    };
+    try {
+      const res = await testPending({ body: sendTestData });
+      toast.success(res.message);
+    } catch (error: any) {
+      console.error('error:', error);
+      toast.error(error.message);
     }
+    reset(); // reset form doesn't work don't know why
+    table.resetRowSelection();
+    modals.closeAll();
+  };
 
-    const { user_id, claim_id, stage_uuid, message, action } = toSendData;
-
+  const handleSendPending = async (data: any, e: any) => {
+    const { user_id, claim_id, action } = convertData(data, actionType!);
     const sendPendingData = {
       user_id,
       claim_id,
       action,
     };
+    try {
+      const res = await restructurePendings({ body: sendPendingData });
+      toast.success(res.message);
+    } catch (error: any) {
+      console.error('error:', error);
+      toast.error(error.message);
+    }
+    reset(); // reset form doesn't work don't know why
+    table.resetRowSelection();
+    modals.closeAll();
+  };
+
+  const handleRecovery = async (data: any, e: any) => {
+    const { user_id, claim_id, stage_uuid, action } = convertData(data, actionType!);
     const sendRecoveryByStageData = {
       user_id,
       claim_id,
@@ -363,46 +393,41 @@ const TableClaims = (props?: PendingClaimProps) => {
       user_id,
       action,
     };
-    const sendMessageData = {
-      user_id,
-      claim_id,
-      message,
-    };
-    const sendTestData = {
-      user_id,
-      claim_id,
-    };
-
-
     try {
-      if (isSendPending) {
-        const res = await restructurePendings({ body: sendPendingData });
-        toast.success(res.message);
-      } else if (isRecovery) {
-        if (stage_uuid) {
-          const res = await restructurePendings({ body: sendRecoveryByStageData });
-          toast.success(res.message);
-        } else {
-          const res = await restructurePendings({ body: sendRecoveryAllData });
-          toast.success(res.message);
-        }
-      } else if (isSendMessage) {
-        const res = await sendMessagePending({ body: sendMessageData });
-        toast.success(res.message);
-      } else if (isTest) {
-        const res = await testPending({ body: sendTestData });
+      if (stage_uuid) {
+        const res = await restructurePendings({ body: sendRecoveryByStageData });
         toast.success(res.message);
       } else {
-        console.log('No action type selected')
+        const res = await restructurePendings({ body: sendRecoveryAllData });
+        toast.success(res.message);
       }
     } catch (error: any) {
       console.error('error:', error);
       toast.error(error.message);
     }
-    // reset(); // reset form doesn't work don't know why
+    reset(); // reset form doesn't work don't know why
     table.resetRowSelection();
     modals.closeAll();
-  }
+  };
+
+  const handleSendMessage = async (data: any, e: any) => {
+    const { user_id, claim_id, message } = convertData(data, actionType!);
+    const sendMessageData = {
+      user_id,
+      claim_id,
+      message,
+    };
+    try {
+      const res = await sendMessagePending({ body: sendMessageData });
+      toast.success(res.message);
+    } catch (error: any) {
+      console.error('error:', error);
+      toast.error(error.message);
+    }
+    reset(); // reset form doesn't work don't know why
+    table.resetRowSelection();
+    modals.closeAll();
+  };
 
   const listAction = [
     {
@@ -423,7 +448,7 @@ const TableClaims = (props?: PendingClaimProps) => {
       },
       btnSubmit: {
         label: 'test',
-        onClick: handleSubmit(handleSendData),
+        onClick: handleSubmit(handleTest),
       },
     },
     {
@@ -451,7 +476,7 @@ const TableClaims = (props?: PendingClaimProps) => {
       },
       btnSubmit: {
         label: 'Recover',
-        onClick: handleSubmit(handleSendData),
+        onClick: handleSubmit(handleRecovery),
       },
     },
     {
@@ -478,7 +503,7 @@ const TableClaims = (props?: PendingClaimProps) => {
       },
       btnSubmit: {
         label: 'Send',
-        onClick: handleSubmit(handleSendData),
+        onClick: handleSubmit(handleSendMessage),
       },
     },
     {
@@ -499,7 +524,7 @@ const TableClaims = (props?: PendingClaimProps) => {
       },
       btnSubmit: {
         label: 'Send',
-        onClick: handleSubmit(handleSendData),
+        onClick: handleSubmit(handleSendPending),
       },
     },
   ];
@@ -576,7 +601,7 @@ const TableClaims = (props?: PendingClaimProps) => {
                   },
                   btnSubmit: {
                     label: 'Recover',
-                    onClick: handleSubmit(handleSendData),
+                    onClick: handleSubmit(handleRecovery),
                   },
                 }].map(({ label, description, value, input, btnCancel, btnSubmit }, i) => modals.open({
                   title: label,

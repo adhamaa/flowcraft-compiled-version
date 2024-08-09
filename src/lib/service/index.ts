@@ -816,7 +816,7 @@ export const getRestructurePendingsLog = async ({
 export const restructurePendings = async ({
   body
 }: {
-  body: { claim_id?: string[]; user_id: string[]; stage_uuid?: string[]; action: "recovery" | "send_pending" };
+  body: { claim_id?: string[]; user_id: string[]; stage_uuid?: string[]; action: "recovery" | "send_pending" | "send_message" | "test" };
 }) => {
   const url = new URL(`/businessProcess/restructurePendings`, baseUrl);
 
@@ -868,7 +868,7 @@ export const sendMessagePending = async ({
 }: {
   body: { claim_id: string[]; user_id: string[]; message: string; };
 }) => {
-  const url = new URL(`/businessProcess/sendMessagePending`, baseUrl);
+  const url = new URL(`/businessProcess/sendMessage`, baseUrl);
 
   const response = await fetch(url, {
     method: 'POST',
