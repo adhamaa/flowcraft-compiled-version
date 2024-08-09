@@ -11,8 +11,6 @@ import clsx from 'clsx';
 import TitleSection from './TitleSection';
 import ApplicationSection from './ApplicationSection';
 import TabularSection from './TabularSection';
-import { Popover, PopoverDropdown, PopoverTarget } from '@mantine/core';
-import { Icon } from '@iconify-icon/react';
 
 export type ApplicationData = {
   apps_label: string;
@@ -96,11 +94,7 @@ export type StageInfoData = {
 
 
 export default function HomeContent({
-  applicationData,
-  cycleData
 }: {
-  applicationData: ApplicationData[];
-  cycleData: CycleData[]
 }) {
   const [opened, { toggle }] = useDisclosure(true);
 
@@ -109,8 +103,8 @@ export default function HomeContent({
       className={clsx('w-full'
       )}>
       <TitleSection title={['Business Process', 'Claim Management']} multiple />
-      <ApplicationSection {...{ opened, toggle, applicationData, cycleData }} />
-      <TabularSection isPagination {...{ opened, cycleData }} />
+      <ApplicationSection {...{ opened, toggle }} />
+      <TabularSection isPagination {...{ opened }} />
     </div>
   );
 }

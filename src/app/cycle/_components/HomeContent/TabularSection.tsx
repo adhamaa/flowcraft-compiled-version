@@ -9,25 +9,28 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MRT_Cell, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_Row, MRT_TableBodyCellValue, MRT_TablePagination, MRT_ToolbarAlertBanner, MantineReactTable, flexRender, useMantineReactTable } from "mantine-react-table";
 import { ActionIcon, Button, Flex, Menu, Stack, Table, Tabs, Text, Tooltip } from "@mantine/core";
 import { Icon } from "@iconify-icon/react";
-import { Apps_label, duplicateCycle, reloadBizProcess } from '@/lib/service';
+import { Apps_label, duplicateCycle, getCycleList, getRestructurePendingsLog, reloadBizProcess } from '@/lib/service';
 import { modals } from '@mantine/modals';
 import toast from '@/components/toast';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import useQueryString from '@/hooks/useQueryString';
+import { Select } from 'react-hook-form-mantine';
+import { useForm } from 'react-hook-form';
+import { datasource_type, DatasourceType } from '@/constant/datasource';
 
 const TabularSection = ({ opened,
   statusIndicator,
   isPagination,
-  cycleData,
 }: {
   opened: boolean;
   statusIndicator?: boolean;
   isPagination?: boolean;
-  cycleData: CycleData[];
 }) => {
+  const [cycleData, setCycleData] = React.useState<CycleData[]>([]);
+  const [restructurePendingsLog, setRestructurePendingsLog] = React.useState<any[]>([]);
   const { resetDiagramLocalStorage } = useWorkInProgressDiagram();
   const [tableData, setTableData] = React.useState<CycleData[]>([]);
-  const { createQueryString, } = useQueryString();
+  const { createQueryString } = useQueryString();
   const router = useRouter();
   const pathname = usePathname();
   const isManageClaim = pathname === '/manage-claim';
@@ -36,8 +39,11 @@ const TabularSection = ({ opened,
   const searchParams = useSearchParams();
   const selected_app = searchParams.get('selected_app');
   const data_source = searchParams.get('data_source');
+  const status = searchParams.get('status');
 
-  const [activeTab, setActiveTab] = React.useState<string | null>(data_source || 'database')
+  const [activeTab, setActiveTab] = React.useState<string | null>(data_source || (isCycle ? 'database' : 'success'));
+
+  const methods = useForm();
 
   const tripleDotMenu = [
     {
@@ -144,7 +150,7 @@ const TabularSection = ({ opened,
     }
   ]
 
-  const columns: MRT_ColumnDef<CycleData>[] = [
+  const columnsCycle: MRT_ColumnDef<CycleData>[] = [
     {
       header: 'Cycle name',
       accessorFn: (originalRow) => originalRow.cycle_name,
@@ -182,19 +188,69 @@ const TabularSection = ({ opened,
     }
   ];
 
+  const columnsPendingsLog: MRT_ColumnDef<{
+    action: string;
+    apps_name: string;
+    claim_id: number;
+    cycle_id: number;
+    cycle_name: string;
+    cycle_uuid: string;
+    last_updated_datetime: string;
+    stage_count: string;
+    user_id: string;
+    user_name: string;
+    uuid: string;
+  }>[] = [
+      {
+        header: 'Cycle id',
+        accessorFn: (originalRow) => originalRow.cycle_id,
+      },
+      {
+        header: 'Applications',
+        accessorFn: (originalRow) => originalRow.apps_name,
+      },
+      {
+        header: 'Claim id',
+        accessorFn: (originalRow) => originalRow.claim_id,
+      },
+      {
+        header: 'Stage name',
+        accessorFn: (originalRow) => 'N/A',
+      },
+      {
+        header: 'Actor',
+        accessorFn: (originalRow) => originalRow.user_name,
+      },
+      {
+        header: 'Last updated date',
+        accessorFn: (originalRow) => originalRow.last_updated_datetime,
+      },
+      {
+        header: 'Action',
+        accessorFn: (originalRow) => originalRow.action,
+        Cell: ({ cell }) => {
+          return (
+            <div className='flex gap-2 items-center'>
+              <span className={clsx('capitalize rounded-full px-2 py-1 text-sm font-semibold', statusIndicator && 'bg-green-500 text-white')}>{(cell?.getValue() as string).replace(/_/g, ' ') as string}</span>
+            </div>
+          )
+        },
+      }
+    ];
+
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10, //customize the default page size
   });
 
   const handleCellClick = (cell: MRT_Cell<CycleData>, row: MRT_Row<CycleData>) => {
-    cell.column.id !== 'mrt-row-actions' && router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''))
+    if (isCycle) cell.column.id !== 'mrt-row-actions' && router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''))
 
     resetDiagramLocalStorage();
   }
 
   const table = useMantineReactTable({
-    columns,
+    columns: isCycle ? columnsCycle : isManageClaim ? columnsPendingsLog : [] as any,
     data: React.useMemo(() => tableData, [tableData]),
     // enableRowSelection: true,
     onPaginationChange: setPagination, //hoist pagination state to your state when it changes internally
@@ -265,18 +321,44 @@ const TabularSection = ({ opened,
   });
 
   const datasourceList = [
-    { name: 'memory', disabled: false },
-    { name: 'cache', disabled: false },
-    { name: 'database', disabled: false }
+    { name: 'memory', value: "memory", disabled: false },
+    { name: 'cache', value: "cache", disabled: false },
+    { name: 'database', value: "database", disabled: false }
+  ];
+
+  const statusList = [
+    { name: 'WIP', value: "wip", disabled: false },
+    { name: 'Success', value: "success", disabled: false },
+    { name: 'Failed', value: "failed", disabled: false }
   ];
 
   React.useEffect(() => {
-    setTableData(cycleData);
-  }, [cycleData]);
+    const fetchCycleData = () => getCycleList({
+      apps_label: selected_app as Apps_label,
+      datasource_type: data_source as DatasourceType,
+    });
+    fetchCycleData().then(setCycleData);
+  }, [selected_app, data_source]);
 
   React.useEffect(() => {
-    if (selected_app && !data_source) {
+    const fetchPendingsLog = () => getRestructurePendingsLog({ status: status as "success" | "failed" | "wip" });
+    fetchPendingsLog().then(setRestructurePendingsLog);
+  }, [status]);
+
+  React.useEffect(() => {
+    if (isCycle) setTableData(cycleData);
+    if (isManageClaim) setTableData(restructurePendingsLog);
+  }, [cycleData, restructurePendingsLog, isCycle, isManageClaim]);
+
+  React.useEffect(() => {
+    if (selected_app && isCycle && !data_source) {
       router.push(pathname + '?' + createQueryString('data_source', activeTab as string))
+    }
+  }, [activeTab, createQueryString, data_source, pathname, router, selected_app])
+
+  React.useEffect(() => {
+    if (selected_app && isManageClaim && !status) {
+      router.push(pathname + '?' + createQueryString('status', activeTab as string))
     }
   }, [activeTab, createQueryString, data_source, pathname, router, selected_app])
 
@@ -284,7 +366,7 @@ const TabularSection = ({ opened,
     {
       tooltip: "Reload Business Process (All)",
       icon: "heroicons-outline:refresh",
-      disabled: false,
+      disabled: isCycle ? false : true,
       onClick: async () => {
         modals.open({
           title: 'Confirm update',
@@ -335,25 +417,33 @@ const TabularSection = ({ opened,
     }])
   ];
 
+  const [manageClaimOptions, setManageClaimOptions] = React.useReducer((state: { value: string; label: string; }[], action: { cycle_id: string; cycle_name: string; }[]) => {
+    state = action.reduce((acc: { value: string; label: string; }[], { cycle_id, cycle_name }: { cycle_id: string; cycle_name: string; }) => {
+      acc.push({ value: cycle_id, label: cycle_name })
+      return acc;
+    }, []);
+    return state;
+  }, []);
+
   const buttons = [
-    {
-      label: 'Manage Claim',
-      type: 'button' as React.ButtonHTMLAttributes<HTMLButtonElement>["type"],
-      disabled: false,
-      canShow: isManageClaim,
-      onClick: () => router.push('/manage-claim/pending-claim'),
-      variant: "filled",
-      color: "#F1F5F9",
-      c: "#0F172A",
-      radius: "md",
-      size: "sm",
-      fz: 14,
-      mr: "auto",
-      classNames: {
-        root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
-      },
-      icon: "",
-    },
+    // {
+    //   label: 'Manage Claim',
+    //   type: 'button' as React.ButtonHTMLAttributes<HTMLButtonElement>["type"],
+    //   disabled: false,
+    //   canShow: isManageClaim,
+    //   onClick: () => router.push('/manage-claim/pending-claim'),
+    //   variant: "filled",
+    //   color: "#F1F5F9",
+    //   c: "#0F172A",
+    //   radius: "md",
+    //   size: "sm",
+    //   fz: 14,
+    //   mr: "auto",
+    //   classNames: {
+    //     root: 'disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+    //   },
+    //   icon: "",
+    // },
     {
       label: 'Add Cycle',
       type: 'button' as React.ButtonHTMLAttributes<HTMLButtonElement>["type"],
@@ -379,7 +469,7 @@ const TabularSection = ({ opened,
       {tableData.length ? (
         <>
           <Stack className='w-full py-20'>
-            <Flex justify="end" align="center" classNames={{
+            <Flex justify="start" align="center" classNames={{
               root: 'px-20',
             }}>
 
@@ -387,7 +477,37 @@ const TabularSection = ({ opened,
                 <Button key={label + i} leftSection={icon} {...button} >{label}</Button>
               ))}
 
-              {isCycle && <>
+              {isManageClaim && <>
+                <Select
+                  name='cycle_id'
+                  // label='Choose Cycle Name'
+                  placeholder='Cycle Name'
+                  checkIconPosition='left'
+                  rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
+                  data={manageClaimOptions}
+                  disabled={false}
+                  allowDeselect
+                  nothingFoundMessage="No stage found"
+                  classNames={{
+                    root: 'space-y-2 w-96 mr-auto',
+                    input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+                    label: 'text-sm font-semibold text-[#475569] capitalize mb',
+                  }}
+                  onClick={() => getCycleList({
+                    apps_label: selected_app as Apps_label,
+                    datasource_type: datasource_type.memory as DatasourceType,
+                  }).then(setManageClaimOptions)}
+                  onChange={(value) => router.push(pathname + '/pending-claim' + '?' + createQueryString('cycle_id', value as string))}
+                  control={methods.control}
+                />
+                <style jsx global>{`
+                  .mantine-Select-option > svg {
+                       color: #895CF3;
+                       opacity: 1;
+                         }
+                  `}</style>
+              </>}
+              {<>
                 <MRT_GlobalFilterTextInput
                   table={table}
                   placeholder='Search Cycle'
@@ -399,7 +519,7 @@ const TabularSection = ({ opened,
                       className="hover:text-[#895CF3] cursor-pointer" />
                   }
                   classNames={{
-                    input: '!rounded-lg border border-gray-300 w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#F1F4F5] focus:!bg-white placeholder:ml-8',
+                    input: '!rounded-lg border !border-[--mantine-color-default-border] w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#FFF] focus:!bg-white placeholder:ml-8',
                   }} />
                 {isPagination && <MRT_TablePagination table={table} color='#895CF3' />}
                 <div className='flex ml-2 gap-4'>
@@ -424,7 +544,7 @@ const TabularSection = ({ opened,
               </>}
             </Flex>
 
-            {isCycle ? <>
+            {isCycle && <>
               <Tabs
                 color='#895CF3'
                 variant='default'
@@ -446,7 +566,7 @@ const TabularSection = ({ opened,
                       <Tabs.Tab
                         key={tab.name}
                         disabled={tab.disabled}
-                        value={tab.name}
+                        value={tab.value}
                         fz={20}
                         fw={600}>
                         <span className="capitalize ~text-base/lg">{tab.name}</span>
@@ -459,7 +579,43 @@ const TabularSection = ({ opened,
                 <MantineReactTable table={table} />
               </div>
               <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
-            </> : <div className='h-screen'></div>}
+            </>}
+            {isManageClaim && <>
+              <Tabs
+                color='#895CF3'
+                variant='default'
+                // defaultValue="database"
+                value={activeTab as string}
+                onChange={(value) => {
+                  router.push(pathname + '?' + createQueryString('status', value as string))
+                  setActiveTab(value)
+                }}
+                classNames={{
+                  root: "m-auto",
+                  tab: "!py-[1.6rem] !border-white data-[active=true]:text-[#895CF3] data-[active=true]:!border-[#895CF3] hover:bg-transparent",
+                  list: 'before:!content-none',
+                }}
+              >
+                <Tabs.List>
+                  {statusList
+                    .map((tab) => (
+                      <Tabs.Tab
+                        key={tab.name}
+                        disabled={tab.disabled}
+                        value={tab.value}
+                        fz={20}
+                        fw={600}>
+                        <span className="capitalize ~text-base/lg">{tab.name}</span>
+                      </Tabs.Tab>
+                    ))}
+                </Tabs.List>
+              </Tabs>
+              <div className="relative w-screen">
+                <div className='absolute top-12 border w-full border-black/5 z-50' />
+                <MantineReactTable table={table} />
+              </div>
+              <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
+            </>}
           </Stack>
         </>
       ) : (
@@ -467,7 +623,8 @@ const TabularSection = ({ opened,
           <Image src='/process-pana.svg' width={opened ? 400 : 600} height={opened ? 500 : 700} className={clsx('object-cover',
             // 'transition-all duration-300 ease-in-out'
           )} alt='process illustration' />
-          <span>Explore business process cycles by clicking on the application</span>
+          {isCycle && <span>Explore business process cycles by clicking on the application</span>}
+          {isManageClaim && <span>Manage your claims by clicking on the application </span>}
         </div>
       )}
     </section >

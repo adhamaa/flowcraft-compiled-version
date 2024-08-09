@@ -4,29 +4,29 @@ import { Icon } from '@iconify-icon/react';
 import { Button, Collapse, Tooltip, UnstyledButton } from '@mantine/core';
 import clsx from 'clsx';
 import * as React from 'react'
-import { ApplicationData, CycleData } from '.';
+import { ApplicationData } from '.';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import useQueryString from '@/hooks/useQueryString';
+import { getApplicationList } from '@/lib/service';
 
 const ApplicationSection = ({
   opened,
   toggle,
-  applicationData,
-  cycleData,
 }: {
   opened: boolean;
   toggle: () => void;
-  applicationData: ApplicationData[];
-  cycleData: CycleData[];
 }) => {
+  const [applicationData, setApplicationData] = React.useState<ApplicationData[]>([]);
   const { selectedApp, setSelectedApp } = useGlobalState();
   const { createQueryString } = useQueryString();
   const searchParams = useSearchParams();
   const selected_app_param = searchParams.get('selected_app');
   const router = useRouter();
   const pathname = usePathname();
+  const isManageClaim = pathname === '/manage-claim';
+  const isCycle = pathname === '/cycle';
 
   // const listApps = useQuery({
   //   queryKey: ["applications"],
@@ -40,7 +40,10 @@ const ApplicationSection = ({
   // }).data.result;
   // console.log('listApps:', listApps)
 
-
+  React.useEffect(() => {
+    const fetchApplications = () => getApplicationList();
+    fetchApplications().then(setApplicationData);
+  }, []);
 
   return (
     <section className={clsx('px-20 py-1 bg-[#F1F5F9]',
