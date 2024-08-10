@@ -1,0 +1,20 @@
+meta {
+  name: application list
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/:path/listAppsBizProcess
+  body: none
+  auth: basic
+}
+
+params:path {
+  path: businessProcess
+}
+
+auth:basic {
+  username: {{username}}
+  password: {{password}}
+}

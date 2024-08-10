@@ -1,0 +1,25 @@
+meta {
+  name: cycle list | cycle info
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/:path/listCycleProcess?apps_label=SP&cycle_id=2
+  body: none
+  auth: basic
+}
+
+params:query {
+  apps_label: SP
+  cycle_id: 2
+}
+
+params:path {
+  path: businessProcessTmp
+}
+
+auth:basic {
+  username: {{username}}
+  password: {{password}}
+}
