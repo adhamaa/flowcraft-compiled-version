@@ -38,7 +38,7 @@ function SideMenus() {
           {
             name: 'Security',
             value: 'security',
-            disabled: false,
+            disabled: true,
             onChange: async (value: any) => {
               router.push(`/manage-account/${value}/` + '?' + remainQueryString());
             },
@@ -46,7 +46,7 @@ function SideMenus() {
           {
             name: 'Activities',
             value: 'activities',
-            disabled: false,
+            disabled: true,
             onChange: async (value: any) => {
               router.push(`/manage-account/${value}/` + '?' + remainQueryString());
             },
@@ -65,9 +65,10 @@ function SideMenus() {
             orientation="vertical"
             classNames={{
               root: 'h-full',
-              tab: 'w-40 !border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[var(--fc-brand-700)] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+              tab: 'w-28 !border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[var(--fc-brand-700)] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
               tabLabel: '~text-md/lg',
               list: 'flex-nowrap',
+              panel: 'w-full',
             }}
             onChange={menu?.onChange}
           >

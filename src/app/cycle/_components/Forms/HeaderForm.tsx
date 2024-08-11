@@ -14,7 +14,7 @@ export type CustomButtonProps = ButtonProps & {
 }
 
 const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
-  type: 'stages' | 'general';
+  type: 'stages' | 'general' | 'profile';
   toggleExpand: () => void;
   toggleEdit?: () => void;
   isEdit?: boolean;
@@ -163,6 +163,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
         <>
           {type === 'general' && <h1 className="text-2xl font-semibold">General Information</h1>}
           {type === 'stages' && <h1 className="text-2xl font-semibold">Stage Information</h1>}
+          {type === 'profile' && <h1 className="text-2xl font-semibold">Profile Details</h1>}
         </>
       )}
     </div>
