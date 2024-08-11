@@ -71,7 +71,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       onClick: toggleEdit as () => void,
 
       variant: "filled",
-      color: "#895CF3",
+      color: "var(--fc-brand-700)",
       radius: "md",
       size: "sm",
       fz: 14,
@@ -106,7 +106,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       onClick: () => { },
 
       variant: "filled",
-      color: "#895CF3",
+      color: "var(--fc-brand-700)",
       radius: "md",
       size: "sm",
       fz: 14,

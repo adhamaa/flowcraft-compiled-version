@@ -84,7 +84,7 @@ const TabularSection = ({ opened,
                         }).finally(() => {
                           modals.closeAll()
                         });
-                    }} color='#895CF3' radius='md'>
+                    }} color='var(--fc-brand-700)' radius='md'>
                       Yes
                     </Button>
                   </Flex>
@@ -130,7 +130,7 @@ const TabularSection = ({ opened,
                       } finally {
                         modals.closeAll();
                       }
-                    }} color='#895CF3' radius='md'>
+                    }} color='var(--fc-brand-700)' radius='md'>
                       Yes
                     </Button>
                   </Flex>
@@ -274,7 +274,7 @@ const TabularSection = ({ opened,
     },
     renderRowActions: ({ row }) => (
       <Menu classNames={{
-        item: 'hover:bg-[#FBFAFC] hover:text-[#895CF3] hover:!border-r-2 border-[#895CF3] ring-0',
+        item: 'hover:bg-[#FBFAFC] hover:text-[var(--fc-brand-700)] hover:!border-r-2 border-[var(--fc-brand-700)] ring-0',
         dropdown: '!p-0 ring-0',
       }}>
         <Menu.Target>
@@ -391,7 +391,7 @@ const TabularSection = ({ opened,
                     } finally {
                       modals.closeAll();
                     }
-                  }} color='#895CF3' radius='md'>
+                  }} color='var(--fc-brand-700)' radius='md'>
                   Yes
                 </Button>
               </Flex>
@@ -490,7 +490,7 @@ const TabularSection = ({ opened,
                   nothingFoundMessage="No stage found"
                   classNames={{
                     root: 'space-y-2 w-96 mr-auto',
-                    input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+                    input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                     label: 'text-sm font-semibold text-[#475569] capitalize mb',
                   }}
                   onClick={() => getCycleList({
@@ -502,7 +502,7 @@ const TabularSection = ({ opened,
                 />
                 <style jsx global>{`
                   .mantine-Select-option > svg {
-                       color: #895CF3;
+                       color: var(--fc-brand-700);
                        opacity: 1;
                          }
                   `}</style>
@@ -516,12 +516,12 @@ const TabularSection = ({ opened,
                       icon="mingcute:search-line"
                       width={20}
                       onClick={() => console.log("clicked search")}
-                      className="hover:text-[#895CF3] cursor-pointer" />
+                      className="hover:text-[var(--fc-brand-700)] cursor-pointer" />
                   }
                   classNames={{
-                    input: '!rounded-lg border !border-[--mantine-color-default-border] w-96 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#FFF] focus:!bg-white placeholder:ml-8',
+                    input: '!rounded-lg border !border-[--mantine-color-default-border] w-96 focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#FFF] focus:!bg-white placeholder:ml-8',
                   }} />
-                {isPagination && <MRT_TablePagination table={table} color='#895CF3' />}
+                {isPagination && <MRT_TablePagination table={table} color='var(--fc-brand-700)' />}
                 <div className='flex ml-2 gap-4'>
                   {
                     actionIcons.map((icon, i) => (
@@ -546,7 +546,7 @@ const TabularSection = ({ opened,
 
             {isCycle && <>
               <Tabs
-                color='#895CF3'
+                color='var(--fc-brand-700)'
                 variant='default'
                 // defaultValue="database"
                 value={activeTab as string}
@@ -556,7 +556,7 @@ const TabularSection = ({ opened,
                 }}
                 classNames={{
                   root: "m-auto",
-                  tab: "!py-[1.6rem] !border-white data-[active=true]:text-[#895CF3] data-[active=true]:!border-[#895CF3] hover:bg-transparent",
+                  tab: "!py-[1.6rem] !border-white data-[active=true]:text-[var(--fc-brand-700)] data-[active=true]:!border-[var(--fc-brand-700)] hover:bg-transparent",
                   list: 'before:!content-none',
                 }}
               >
@@ -582,7 +582,7 @@ const TabularSection = ({ opened,
             </>}
             {isManageClaim && <>
               <Tabs
-                color='#895CF3'
+                color='var(--fc-brand-700)'
                 variant='default'
                 // defaultValue="database"
                 value={activeTab as string}
@@ -592,7 +592,7 @@ const TabularSection = ({ opened,
                 }}
                 classNames={{
                   root: "m-auto",
-                  tab: "!py-[1.6rem] !border-white data-[active=true]:text-[#895CF3] data-[active=true]:!border-[#895CF3] hover:bg-transparent",
+                  tab: "!py-[1.6rem] !border-white data-[active=true]:text-[var(--fc-brand-700)] data-[active=true]:!border-[var(--fc-brand-700)] hover:bg-transparent",
                   list: 'before:!content-none',
                 }}
               >

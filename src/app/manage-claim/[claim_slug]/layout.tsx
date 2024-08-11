@@ -4,8 +4,8 @@ import SideMenus from "./_components/SideMenus/menus";
 
 
 export const metadata: Metadata = {
-  title: "Cycle Info",
-  description: "Cycle General Information",
+  title: "Manage claim",
+  description: "Claim management",
 };
 
 export default async function Layout({

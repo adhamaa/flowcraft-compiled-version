@@ -7,7 +7,7 @@ const FooterButton = ({ isRestructure, isCollapse, isSideMenuCollapse, onClick, 
       <Button
         disabled={disabled}
         variant='transparent'
-        color='#895CF3'
+        color='var(--fc-brand-700)'
         fz={16}
         {...(isRestructure && {
           leftSection:
@@ -21,7 +21,7 @@ const FooterButton = ({ isRestructure, isCollapse, isSideMenuCollapse, onClick, 
           icon="tabler:chevron-down"
           width="3rem"
           rotate={isSideMenuCollapse ? 15 : 45}
-          className='text-[#895CF3]' />}
+          className='text-[var(--fc-brand-700)]' />}
       </Button>
     </div >
   );

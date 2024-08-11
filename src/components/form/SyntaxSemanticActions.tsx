@@ -22,7 +22,7 @@ const SyntaxSemanticActions = ({
         id={name}
         data-cycle_id={cycle_id}
         data-stage_uuid={stage_uuid}
-        color='#895CF3'
+        color='var(--fc-brand-700)'
         radius='md' className="!font-normal"
         onClick={onSyntaxSubmit as never}
       >Verify syntax</Button>
@@ -30,7 +30,7 @@ const SyntaxSemanticActions = ({
         id={name}
         data-cycle_id={cycle_id}
         data-stage_uuid={stage_uuid}
-        color='#895CF3'
+        color='var(--fc-brand-700)'
         radius='md' className="!font-normal"
         onClick={onSemanticSubmit as never}
       >Evaluate semantics

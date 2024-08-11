@@ -46,9 +46,9 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
   ]
 
   return excludePaths && (
-    <header className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-8 gap-4 w-screen h-[66px] sticky top-0 bg-white z-10', className)}>
+    <header className={clsx('flex border-b-2 border-[var(--fc-border-gray)] items-center col-span-full p-8 gap-4 w-screen h-[66px] sticky top-0 bg-white z-10', className)}>
       <h1
-        className="text-2xl font-bold cursor-pointer transition-all duration-300 ease-in-out hover:text-[#895CF3] dark:hover:text-[#895CF3]"
+        className="text-2xl font-bold cursor-pointer transition-all duration-300 ease-in-out hover:text-[var(--fc-brand-700)] dark:hover:text-[var(--fc-brand-700)]"
         onClick={() => {
           setSelectedApp('');
           router.push("/")
@@ -57,7 +57,7 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
       <Tabs
         classNames={{
           root: "mr-auto",
-          tab: "!py-[1.6rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:text-[#895CF3] data-[active=true]:border-[#895CF3] data-[active=true]:dark:border-[#895CF3] data-[active=true]:font-semibold",
+          tab: "!py-[1.6rem] hover:bg-transparent border-b-2 dark:border-white hover:dark:border-white data-[active=true]:border-[var(--fc-brand-700)] data-[active=true]:dark:border-[var(--fc-brand-700)] data-[active=true]:text-[var(--fc-brand-700)] data-[active=true]:border-[var(--fc-brand-700)] data-[active=true]:dark:border-[var(--fc-brand-700)] data-[active=true]:font-semibold",
         }}
         value={!cycle_id ? activeTab as string : "none"}
         onChange={setActiveTab}
@@ -108,8 +108,8 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
           // target="_blank"
           onClick={() => console.log("clicked")}
           underline="hover"
-          c="#895CF3"
-          className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[#895CF3] dark:hover:text-[#895CF3] transition-all duration-300 ease-in-out"
+          c="var(--fc-brand-700)"
+          className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[var(--fc-brand-700)] dark:hover:text-[var(--fc-brand-700)] transition-all duration-300 ease-in-out"
         >
           How To Use?
         </Anchor>
@@ -125,15 +125,15 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
               // disabled
               // href="#"
               // target="_blank"
-              onClick={() => router.push("/profile")}
+              onClick={() => router.push("/manage-account")}
               underline="hover"
-              c="#895CF3"
-              className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[#895CF3] dark:hover:text-[#895CF3] transition-all duration-300 ease-in-out"
+              c="var(--fc-brand-700)"
+              className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[var(--fc-brand-700)] dark:hover:text-[var(--fc-brand-700)] transition-all duration-300 ease-in-out"
             >
               {profileImg ?
                 <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} src={session?.user?.image} alt="it's me" />
                 :
-                <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} color="#895CF3" radius="xl">AA</Avatar>
+                <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} color="var(--fc-brand-700)" radius="xl">AA</Avatar>
               }
             </Anchor>
           </Menu.Target>

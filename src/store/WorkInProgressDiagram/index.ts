@@ -235,7 +235,7 @@ const useDiagramStore = create<RFState>()(
           },
           withCloseButton: false,
           confirmProps: {
-            color: '#895CF3',
+            color: 'var(--fc-brand-700)',
           },
           cancelProps: {
             color: '#0F172A',
@@ -353,7 +353,7 @@ const useDiagramStore = create<RFState>()(
           },
           withCloseButton: false,
           confirmProps: {
-            color: '#895CF3',
+            color: 'var(--fc-brand-700)',
           },
           cancelProps: {
             color: '#0F172A',
@@ -477,7 +477,7 @@ const useDiagramStore = create<RFState>()(
             },
             withCloseButton: false,
             confirmProps: {
-              color: '#895CF3',
+              color: 'var(--fc-brand-700)',
             },
             cancelProps: {
               color: '#0F172A',

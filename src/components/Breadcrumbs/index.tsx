@@ -22,7 +22,7 @@ function Breadcrumbs({ items, className, route }: {
   const breadcrumbs = useBreadcrumbs({ route }).breadcrumbs;
   items = items ? items : breadcrumbs;
   return excludePaths && (
-    <div className={clsx('flex border-b-2 border-[#EBEAEA] items-center col-span-full p-6 gap-4 w-screen h-max', className)}>
+    <div className={clsx('flex border-b-2 border-[var(--fc-border-gray)] items-center col-span-full p-6 gap-4 w-screen h-max', className)}>
       <MantineBreadcrumbs
         separator={
           <Icon icon="tabler:chevron-right" width="1.2rem" />

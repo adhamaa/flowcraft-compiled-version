@@ -173,10 +173,10 @@ const TableClaims = (props?: PendingClaimProps) => {
               icon="mingcute:search-line"
               width={20}
               onClick={() => console.log("clicked search")}
-              className="hover:text-[#895CF3] cursor-pointer" />
+              className="hover:text-[var(--fc-brand-700)] cursor-pointer" />
           }
           classNames={{
-            input: '!rounded-lg border border-[--mantine-color-default-border] focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#FFF] focus:!bg-white placeholder:ml-8',
+            input: '!rounded-lg border border-[--mantine-color-default-border] focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#FFF] focus:!bg-white placeholder:ml-8',
           }}
           control={control}
         />
@@ -189,10 +189,10 @@ const TableClaims = (props?: PendingClaimProps) => {
               icon="mingcute:search-line"
               width={20}
               onClick={() => console.log("clicked search")}
-              className="hover:text-[#895CF3] cursor-pointer" />
+              className="hover:text-[var(--fc-brand-700)] cursor-pointer" />
           }
           classNames={{
-            input: '!rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#FFF] focus:!bg-white placeholder:ml-8',
+            input: '!rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#FFF] focus:!bg-white placeholder:ml-8',
           }}
           control={control}
         />
@@ -205,10 +205,10 @@ const TableClaims = (props?: PendingClaimProps) => {
               icon="mingcute:search-line"
               width={20}
               onClick={() => console.log("clicked search")}
-              className="hover:text-[#895CF3] cursor-pointer" />
+              className="hover:text-[var(--fc-brand-700)] cursor-pointer" />
           }
           classNames={{
-            input: '!rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#FFF] focus:!bg-white placeholder:ml-8',
+            input: '!rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out !bg-[#FFF] focus:!bg-white placeholder:ml-8',
           }}
           control={control}
         />
@@ -227,13 +227,13 @@ const TableClaims = (props?: PendingClaimProps) => {
             <MenuTarget>
               <Button
                 disabled={Object.keys(rowSelection).length === 0}
-                color='#895CF3'
+                color='var(--fc-brand-700)'
                 ml='auto'
                 w={220}
                 type='button'
                 variant='filled'
                 classNames={{
-                  root: clsx('disabled:!bg-slate-200 disabled:border-transparent disabled:cursor-not-allowed',
+                  root: clsx('disabled:!bg-fc-neutral-200 disabled:border-transparent disabled:cursor-not-allowed',
                     opened ? 'rounded-none rounded-t-md' : 'rounded-md'
                   ),
                 }}
@@ -286,7 +286,7 @@ const TableClaims = (props?: PendingClaimProps) => {
                             </Button>
                             <Button
                               id={value}
-                              color='#895CF3'
+                              color='var(--fc-brand-700)'
                               radius='md'
                               type='button'
                               onClick={btnSubmit.onClick}
@@ -636,7 +636,7 @@ const TableClaims = (props?: PendingClaimProps) => {
                         </Button>
                         <Button
                           id={value}
-                          color='#895CF3'
+                          color='var(--fc-brand-700)'
                           radius='md'
                           type='button'
                           onClick={btnSubmit.onClick}
@@ -681,10 +681,10 @@ const TextareaHeader = ({ table, actionsButton, className }: {
             autoContrast
             withEdges={false}
             table={table}
-            color='#895CF3'
+            color='var(--fc-brand-700)'
             classNames={{
               root: '',
-              control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[#895CF3] !hover:text-white/90 !hover:!border-[#895CF3] !transition-all !duration-300 !ease-in-out data-[active=true]:!bg-[#895CF3] data-[active=true]:!text-white/90 data-[active=true]:!border-[#895CF3]',
+              control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[var(--fc-brand-700)] !hover:text-white/90 !hover:!border-[var(--fc-brand-700)] !transition-all !duration-300 !ease-in-out data-[active=true]:!bg-[var(--fc-brand-700)] data-[active=true]:!text-white/90 data-[active=true]:!border-[var(--fc-brand-700)]',
             }}
           />}
         {actionsButton}
@@ -700,7 +700,7 @@ const commonInputStyles = {
 
 const selectInputStyles = {
   root: commonInputStyles.root,
-  input: '!rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black py-[21.5px] pr-[21.5px]',
+  input: '!rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black py-[21.5px] pr-[21.5px]',
   label: commonInputStyles.label,
 };
 
@@ -708,19 +708,19 @@ const selectInputStyles = {
 
 const multiSelectInputStyles = {
   root: commonInputStyles.root,
-  input: '!rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black py-2.5 pr-2.5',
+  input: '!rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black py-2.5 pr-2.5',
   label: commonInputStyles.label,
 };
 
 const textareaInputStyles = {
   root: commonInputStyles.root,
-  input: '!rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black py-2.5 pr-2.5 h-40',
+  input: '!rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black py-2.5 pr-2.5 h-40',
   label: commonInputStyles.label,
 };
 
 const svgStyles = `
   .mantine-Select-option > svg {
-    color: #895CF3;
+    color: var(--fc-brand-700);
     opacity: 1;
   }
 `;
@@ -732,7 +732,7 @@ const commonStyles = `
   .mantine-Textarea-input:focus,
   .mantine-Textarea-input:focus-visible,
   .mantine-Textarea-input:focus-within {
-    outline: 2px solid #895CF3;
+    outline: 2px solid var(--fc-brand-700);
     border-color: transparent;
     transition: all 0.1s ease;
   }

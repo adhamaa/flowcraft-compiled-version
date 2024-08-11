@@ -72,7 +72,7 @@ function SideMenus() {
         orientation="vertical"
         classNames={{
           root: 'h-full',
-          tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+          tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[var(--fc-brand-700)] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
           tabLabel: '~text-md/lg',
           list: 'flex-nowrap',
         }}>
@@ -104,7 +104,7 @@ function SideMenus() {
                   root: clsx(
                     'h-full',
                   ),
-                  tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                  tab: '!border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[var(--fc-brand-700)] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
                   tabLabel: '~text-md/lg',
                   list: 'flex-nowrap w-40',
                 }}
@@ -136,7 +136,7 @@ function SideMenus() {
                             orientation="vertical"
                             classNames={{
                               root: 'h-full',
-                              tab: 'w-40 !border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[#895CF3] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
+                              tab: 'w-40 !border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[var(--fc-brand-700)] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
                               tabLabel: '~text-md/lg',
                               list: 'flex-nowrap',
                             }}

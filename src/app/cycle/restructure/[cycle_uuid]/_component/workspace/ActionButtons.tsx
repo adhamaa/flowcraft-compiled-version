@@ -54,7 +54,7 @@ const ActionButtons = () => {
       disabled: !isEditable,
       canShow: true,
       onClick: handleSubmit(onApplySubmit),
-      color: '#895CF3',
+      color: 'var(--fc-brand-700)',
       icon: { name: "heroicons-outline:check-circle", width: '1.5rem' },
     },
     // {
@@ -63,7 +63,7 @@ const ActionButtons = () => {
     //   disabled: !isEditable,
     //   canShow: true,
     //   onClick: onDraft,
-    //   color: '#895CF3',
+    //   color: 'var(--fc-brand-700)',
     //   icon: { name: "heroicons-outline:folder", width: '1.5rem' },
     // },
     {
@@ -79,7 +79,7 @@ const ActionButtons = () => {
           }
         });
       },
-      color: '#895CF3',
+      color: 'var(--fc-brand-700)',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
     // {

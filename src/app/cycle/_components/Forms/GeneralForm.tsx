@@ -253,7 +253,7 @@ const GeneralFormContent = ({
                   toggleEdit();
                 }
               }
-            } color='#895CF3' radius='md'>
+            } color='var(--fc-brand-700)' radius='md'>
               Yes
             </Button>
           </Flex>
@@ -329,7 +329,7 @@ const GeneralFormContent = ({
                     control={control}
                     disabled={disabled}
                     classNames={{
-                      input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+                      input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                     }} />
                 </InputWrapper>
               )
@@ -369,7 +369,7 @@ function DiagramBar() {
       <ActionIcon
         disabled
         variant="filled"
-        color="#895CF3" size="lg"
+        color="var(--fc-brand-700)" size="lg"
         radius="md" aria-label="Settings" mr="auto"
         onClick={() => router.refresh()}
       >
