@@ -238,7 +238,7 @@ const useDiagramStore = create<RFState>()(
             color: 'var(--fc-brand-700)',
           },
           cancelProps: {
-            color: '#0F172A',
+            color: 'var(--fc-neutral-900)',
             variant: 'light',
           },
           groupProps: {
@@ -356,7 +356,7 @@ const useDiagramStore = create<RFState>()(
             color: 'var(--fc-brand-700)',
           },
           cancelProps: {
-            color: '#0F172A',
+            color: 'var(--fc-neutral-900)',
             variant: 'light',
           },
           groupProps: {
@@ -480,7 +480,7 @@ const useDiagramStore = create<RFState>()(
               color: 'var(--fc-brand-700)',
             },
             cancelProps: {
-              color: '#0F172A',
+              color: 'var(--fc-neutral-900)',
               variant: 'light',
             },
             groupProps: {

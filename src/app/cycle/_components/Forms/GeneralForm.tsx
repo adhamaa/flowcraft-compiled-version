@@ -161,7 +161,7 @@ const GeneralFormContent = ({
         <>
           <Text size="sm">Are you sure you want to update <strong>Cycle status & description</strong>?</Text>
           <Flex gap={16} justify={'end'} mt="md">
-            <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+            <Button onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
               Cancel
             </Button>
             <Button onClick={
@@ -280,16 +280,16 @@ const GeneralFormContent = ({
   const max_h_768 = useMediaQuery('(max-height: 768px)');
 
   return (
-    <ScrollAreaAutosize >
-      <FormProvider {...methods}>
-        <form
-          className={clsx('space-y-4 h-[calc(100vh-146.5px)]')}
-          onSubmit={handleSubmit(onSubmit)}
-          onError={(e) => console.log(e)}
-        >
-          <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
+    <FormProvider {...methods}>
+      <form
+        className={clsx('space-y-4 w-full')}
+        onSubmit={handleSubmit(onSubmit)}
+        onError={(e) => console.log(e)}
+      >
+        <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
 
-          <div className="container mx-auto space-y-8 py-4">
+        <ScrollAreaAutosize className='h-[calc(100vh-231.5px)]'>
+          <div className="container mx-auto space-y-8 pt-4 pb-10">
             <DiagramBar />
             {InputList?.map(({ label, name, type, value, disabled }, index) => {
               return ['Status'].includes(label) ? (
@@ -336,9 +336,9 @@ const GeneralFormContent = ({
             })}
 
           </div>
-        </form>
-      </FormProvider>
-    </ScrollAreaAutosize >
+        </ScrollAreaAutosize >
+      </form>
+    </FormProvider>
   )
 };
 

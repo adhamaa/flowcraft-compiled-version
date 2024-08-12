@@ -19,7 +19,7 @@ export default async function Layout({
   return (
     <div className="w-full h-[calc(100vh-146.5px)] overflow-hidden">
       <TitleSection title='Manage Account' className='h-max w-full border-b-2 border-[var(--fc-border-gray)]' />
-      <div className='flex w-full h-full'>
+      <div className='flex w-full h-full font-notoSans'>
         <SideMenus />
         {children}
       </div>

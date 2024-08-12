@@ -834,8 +834,8 @@ const Diagram = ({ disabled }: {
       <Button
         disabled={disabled}
         variant='filled'
-        color='#F1F5F9'
-        c='#0F172A'
+        color='var(--fc-neutral-100)'
+        c='var(--fc-neutral-900)'
         radius='md'
         size="sm"
         fz={14}

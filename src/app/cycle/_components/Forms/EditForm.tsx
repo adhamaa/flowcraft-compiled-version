@@ -335,8 +335,8 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
           <Flex gap={16} justify={'end'} mt="md">
             <Button
               onClick={() => modals.closeAll()}
-              color='#F1F5F9'
-              c='#0F172A'
+              color='var(--fc-neutral-100)'
+              c='var(--fc-neutral-900)'
               radius='md'>
               Cancel
             </Button>

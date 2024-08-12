@@ -28,7 +28,7 @@ const SaveActions = ({ name, copyValue, hidden, onCancel, type }: {
               type='submit'
               // disabled
               variant="transparent"
-              bg="#F1F5F9"
+              bg="var(--fc-neutral-100)"
               color='black'
               size="lg"
               radius="md"
@@ -45,7 +45,7 @@ const SaveActions = ({ name, copyValue, hidden, onCancel, type }: {
               id={name}
               // disabled
               variant="transparent"
-              bg="#F1F5F9"
+              bg="var(--fc-neutral-100)"
               color='black'
               size="lg"
               radius="md"
@@ -70,7 +70,7 @@ const SaveActions = ({ name, copyValue, hidden, onCancel, type }: {
                   // disabled
                   color='black'
                   variant="transparent"
-                  bg={copied ? "#c5aff9" : '#F1F5F9'}
+                  bg={copied ? "#c5aff9" : 'var(--fc-neutral-100)'}
                   size="lg"
                   radius="md"
                   onClick={copy}

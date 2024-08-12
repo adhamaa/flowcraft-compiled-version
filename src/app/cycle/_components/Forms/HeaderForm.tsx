@@ -22,7 +22,10 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
 }) => {
   const searchParams = useSearchParams();
   const datasource_type = searchParams.get('data_source') as DatasourceType;
-  const canDisplay = datasource_type === 'database';
+  const isDatabase = datasource_type === 'database';
+  const isProfile = type === 'profile';
+  const isStages = type === 'stages';
+  const isGeneral = type === 'general';
 
   if (!type) throw new Error('type is required');
 
@@ -30,13 +33,13 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
     {
       label: 'Duplicate',
       type: 'button',
-      disabled: type === 'stages' && !isEdit,
-      canShow: canDisplay && type === 'stages' && !isEdit,
+      disabled: isStages && !isEdit,
+      canShow: isDatabase && isStages && !isEdit,
       onClick: () => { },
 
       variant: "filled",
-      color: "#F1F5F9",
-      c: "#0F172A",
+      color: "var(--fc-neutral-100)",
+      c: "var(--fc-neutral-900)",
       radius: "md",
       size: "sm",
       fz: 14,
@@ -49,12 +52,12 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Delete',
       type: 'button',
       disabled: true,
-      canShow: canDisplay && !isEdit,
+      canShow: isDatabase && !isEdit,
       onClick: () => { },
 
       variant: "filled",
-      color: "#F1F5F9",
-      c: "#0F172A",
+      color: "var(--fc-neutral-100)",
+      c: "var(--fc-neutral-900)",
       radius: "md",
       size: "sm",
       fz: 14,
@@ -67,11 +70,12 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Edit',
       type: 'button',
       disabled: false,
-      canShow: canDisplay && !isEdit,
+      canShow: (isDatabase || isProfile) && !isEdit,
       onClick: toggleEdit as () => void,
 
       variant: "filled",
-      color: "var(--fc-brand-700)",
+      color: isProfile ? "var(--fc-neutral-100)" : "var(--fc-brand-700)",
+      c: isProfile ? "var(--fc-neutral-900)" : "default",
       radius: "md",
       size: "sm",
       fz: 14,
@@ -84,12 +88,12 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Close',
       type: 'button',
       disabled: false,
-      canShow: (canDisplay && type === 'stages' && isEdit) as boolean,
+      canShow: (isDatabase && isStages && isEdit) as boolean,
       onClick: toggleEdit as () => void,
 
       variant: "white",
-      color: "#F1F5F9",
-      c: "#0F172A",
+      color: "var(--fc-neutral-100)",
+      c: "var(--fc-neutral-900)",
       radius: "md",
       size: "sm",
       fz: 14,
@@ -102,8 +106,8 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Save',
       type: 'submit',
       disabled: false,
-      canShow: (canDisplay && type === 'general' && isEdit) as boolean,
-      onClick: () => { },
+      canShow: (((isDatabase && isGeneral) || isProfile) && isEdit) as boolean,
+      onClick: () => { }, // trigger from useform submit
 
       variant: "filled",
       color: "var(--fc-brand-700)",
@@ -119,12 +123,12 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Cancel',
       type: 'button',
       disabled: false,
-      canShow: (canDisplay && type === 'general' && isEdit) as boolean,
+      canShow: (((isDatabase && isGeneral) || isProfile) && isEdit) as boolean,
       onClick: toggleEdit as () => void,
 
       variant: "white",
-      color: "#F1F5F9",
-      c: "#0F172A",
+      color: "var(--fc-neutral-100)",
+      c: "var(--fc-neutral-900)",
       radius: "md",
       size: "sm",
       fz: 14,
@@ -138,11 +142,12 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
   return (
     <div className={clsx(
       'flex px-14 py-6 items-center border-b',
-      canDisplay && type === 'general' && 'justify-end'
+      isDatabase && isGeneral && 'justify-end'
     )}>
-      {canDisplay && (
+      {isProfile && <h1 className="text-2xl font-semibold mr-auto">Profile Details</h1>}
+      {(isDatabase || isProfile) && (
         <>
-          {type === 'general' ? (
+          {isGeneral || isProfile ? (
             <div className="flex gap-4">
               {buttons.map(({ label, canShow, icon, ...btn }, index) => canShow && (
                 <Button
@@ -159,11 +164,10 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
           )}
         </>
       )}
-      {!canDisplay && (
+      {!isDatabase && (
         <>
-          {type === 'general' && <h1 className="text-2xl font-semibold">General Information</h1>}
-          {type === 'stages' && <h1 className="text-2xl font-semibold">Stage Information</h1>}
-          {type === 'profile' && <h1 className="text-2xl font-semibold">Profile Details</h1>}
+          {isGeneral && <h1 className="text-2xl font-semibold">General Information</h1>}
+          {isStages && <h1 className="text-2xl font-semibold">Stage Information</h1>}
         </>
       )}
     </div>

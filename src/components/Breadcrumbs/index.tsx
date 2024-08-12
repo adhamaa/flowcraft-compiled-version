@@ -35,7 +35,7 @@ function Breadcrumbs({ items, className, route }: {
             key={index}
             href={item.href}
 
-            c="#0F172A"
+            c="var(--fc-neutral-900)"
             size='lg'
           >
             {item.icon ? <Icon icon={item.icon as string}></Icon> : item.title}

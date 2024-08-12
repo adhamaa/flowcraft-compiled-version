@@ -45,7 +45,7 @@ const ActionButtons = () => {
       disabled: false,
       canShow: true,
       onClick: () => onReset(reset),
-      color: '#F1F5F9',
+      color: 'var(--fc-neutral-100)',
       icon: { name: "heroicons-outline:x-circle", width: '1.5rem' },
     },
     {
@@ -88,7 +88,7 @@ const ActionButtons = () => {
     //   disabled: false,
     //   canShow: true,
     //   onClick: () => window.location.reload(),
-    //   color: '#F1F5F9',
+    //   color: 'var(--fc-neutral-100)',
     //   icon: { name: "heroicons:refresh", width: '1.5rem' },
     // }
   ] satisfies CustomButtonProps[];

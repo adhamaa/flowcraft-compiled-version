@@ -8,3 +8,7 @@
 @import "tailwindcss/utilities";
 
 @import "./color.css";
+
+html {
+  font-family: var(--font-inter);
+}

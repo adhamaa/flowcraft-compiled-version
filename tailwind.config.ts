@@ -73,6 +73,10 @@ const config: Config = {
           },
         },
       },
+      fontFamily: {
+        inter: ["var(--font-inter)", "sans-serif"],
+        notoSans: ["var(--font-noto-sans)", "sans-serif"],
+      },
     },
     plugins: [fluidCorePlugins],
     corePlugins: {

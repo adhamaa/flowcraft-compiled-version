@@ -67,7 +67,7 @@ const TabularSection = ({ opened,
                 <>
                   <Text size="sm">Are you sure you want to duplicate <strong>{app_name} - cycle id: {cycle_id}</strong>?</Text>
                   <Flex gap={16} justify={'end'} mt="md">
-                    <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+                    <Button onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
                       Cancel
                     </Button>
                     <Button onClick={async () => {
@@ -114,7 +114,7 @@ const TabularSection = ({ opened,
                 <>
                   <Text size="sm">Are you sure you want to Reload <strong>{app_name} - cycle id: {cycle_id}</strong>?</Text>
                   <Flex gap={16} justify={'end'} mt="md">
-                    <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+                    <Button onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
                       Cancel
                     </Button>
                     <Button onClick={async () => {
@@ -376,8 +376,8 @@ const TabularSection = ({ opened,
               <Flex gap={16} justify={'end'} mt="md">
                 <Button
                   onClick={() => modals.closeAll()}
-                  color='#F1F5F9'
-                  c='#0F172A'
+                  color='var(--fc-neutral-100)'
+                  c='var(--fc-neutral-900)'
                   radius='md'>
                   Cancel
                 </Button>
@@ -433,8 +433,8 @@ const TabularSection = ({ opened,
     //   canShow: isManageClaim,
     //   onClick: () => router.push('/manage-claim/pending-claim'),
     //   variant: "filled",
-    //   color: "#F1F5F9",
-    //   c: "#0F172A",
+    //   color: "var(--fc-neutral-100)",
+    //   c: "var(--fc-neutral-900)",
     //   radius: "md",
     //   size: "sm",
     //   fz: 14,
@@ -451,8 +451,8 @@ const TabularSection = ({ opened,
       canShow: isCycle,
       onClick: () => router.push('#'),
       variant: "filled",
-      color: "#F1F5F9",
-      c: "#0F172A",
+      color: "var(--fc-neutral-100)",
+      c: "var(--fc-neutral-900)",
       radius: "md",
       size: "sm",
       fz: 14,
@@ -530,7 +530,7 @@ const TabularSection = ({ opened,
                           disabled={icon?.disabled}
                           onClick={icon.onClick}
                           variant="transparent"
-                          bg="#F1F5F9"
+                          bg="var(--fc-neutral-100)"
                           color='black'
                           size="lg"
                           radius="md"

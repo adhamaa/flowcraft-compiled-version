@@ -716,6 +716,7 @@ export const restructureBizProcess = async ({
   }
 };
 
+// ----------------- Claim management ----------------- //
 export const getAllClaim = async ({
   claim_id,
   per_page,
@@ -885,5 +886,50 @@ export const sendMessagePending = async ({
   if (!response.ok) {
     throw new Error('Failed to send message pending.');
   }
+  return await response.json();
+};
+
+export const getUserDetails = async ({ email }: { email: string }) => {
+  const url = new URL(`/businessProcess/user`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    next: { tags: ['userdetails'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to get user details.');
+  }
+  const data = await response.json();
+  const [user] = data.data;
+  return user;
+};
+
+export const updateUserDetails = async ({ email, body }: { email: string; body: Record<string, any> }) => {
+  const url = new URL(`/businessProcess/userUpdate`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    body: JSON.stringify(body)
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to update user details.');
+  }
+  clientRevalidateTag('userdetails');
   return await response.json();
 };

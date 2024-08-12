@@ -276,8 +276,8 @@ const TableClaims = (props?: PendingClaimProps) => {
                           <Flex justify='center' align='center' gap={16}>
                             <Button
                               id={value}
-                              color='#F1F5F9'
-                              c='#0F172A'
+                              color='var(--fc-neutral-100)'
+                              c='var(--fc-neutral-900)'
                               radius='md'
                               type='button'
                               onClick={btnCancel.onClick}
@@ -297,7 +297,7 @@ const TableClaims = (props?: PendingClaimProps) => {
                       withCloseButton: false,
                       classNames: {
                         content: 'p-6 space-y-6 rounded-lg',
-                        title: 'text-3xl font-semibold text-[#0F172A] capitalize text-center',
+                        title: 'text-3xl font-semibold text-[var(--fc-neutral-900)] capitalize text-center',
                         header: 'flex items-center justify-center',
                       },
                     });
@@ -326,7 +326,7 @@ const TableClaims = (props?: PendingClaimProps) => {
     },
     mantinePaperProps: {
       classNames: {
-        root: '!border-none !shadow-none w-full !bg-[#F1F5F9]',
+        root: '!border-none !shadow-none w-full !bg-[var(--fc-neutral-100)]',
       },
     },
     mantineTableBodyRowProps: () => ({
@@ -579,7 +579,7 @@ const TableClaims = (props?: PendingClaimProps) => {
           <div className='flex gap-2'>
             <Button
               color='#E2E8F0'
-              c='#0F172A'
+              c='var(--fc-neutral-900)'
               onClick={() => {
                 setActionType('recovery');
                 reset();
@@ -626,8 +626,8 @@ const TableClaims = (props?: PendingClaimProps) => {
                       <Flex justify='center' align='center' gap={16}>
                         <Button
                           id={value}
-                          color='#F1F5F9'
-                          c='#0F172A'
+                          color='var(--fc-neutral-100)'
+                          c='var(--fc-neutral-900)'
                           radius='md'
                           type='button'
                           onClick={btnCancel.onClick}
@@ -647,12 +647,12 @@ const TableClaims = (props?: PendingClaimProps) => {
                   withCloseButton: false,
                   classNames: {
                     content: 'p-6 space-y-6 rounded-lg',
-                    title: 'text-3xl font-semibold text-[#0F172A] capitalize text-center',
+                    title: 'text-3xl font-semibold text-[var(--fc-neutral-900)] capitalize text-center',
                     header: 'flex items-center justify-center',
                   },
                 }))
               }}
-              className='hover:!bg-[#E2E8F0] hover:!text-[#0F172A] transition-all duration-300 ease-in-out'
+              className='hover:!bg-[#E2E8F0] hover:!text-[var(--fc-neutral-900)] transition-all duration-300 ease-in-out'
             >Recovery</Button>
           </div>
         }

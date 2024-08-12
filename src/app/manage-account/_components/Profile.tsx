@@ -3,17 +3,29 @@
 import HeaderForm from '@/app/cycle/_components/Forms/HeaderForm';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
-import { Button, Flex, Group, InputWrapper, ScrollAreaAutosize, Text } from '@mantine/core';
+import { getUserDetails, updateUserDetails } from '@/lib/service';
+import { Button, Flex, Group, InputWrapper, Pill, rem, ScrollAreaAutosize, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import clsx from 'clsx';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import * as React from 'react'
 import { FormProvider, useForm } from 'react-hook-form';
 import { Radio, RadioGroup, TextInput } from 'react-hook-form-mantine';
 
+// Define the structure of each item in the InputList
+type InputItem = {
+  name: string;
+  label: string;
+  type: string;
+  value?: any;
+  disabled: boolean;
+};
+
 const Profile = ({ data = {} }: { data?: any; }) => {
+  const [profile, setProfile] = React.useState<any>(data);
   const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
   const toggleEdit = () => setIsEdit(!isEdit);
@@ -26,212 +38,169 @@ const Profile = ({ data = {} }: { data?: any; }) => {
   const pageUrl = `${pathname}?${searchParams}`;
 
 
-  const InputList = [
-    { name: 'user_id', label: 'User ID', type: 'text', value: data?.cycle_name, disabled: true },
-    { name: "full_name", label: 'Full Name', type: 'text', value: data?.cycle_id, disabled: true },
-    { name: "role", label: 'Role', type: 'text', value: data?.app_name, disabled: true },
-    { name: "email", label: 'Email', type: 'text', value: data?.cycle_created, disabled: true },
-    { name: "mobile_no", label: 'Mobile Number', type: 'text', value: data?.cycle_updated, disabled: true },
+  const InputList: InputItem[] = [
+    {
+      name: 'user_id',
+      label: 'User ID',
+      type: 'text',
+      value: profile?.id,
+      disabled: true
+    },
+    {
+      name: "full_name",
+      label: 'Full Name',
+      type: 'text',
+      value: profile?.name,
+      disabled: !isEdit
+    },
+    {
+      name: "role",
+      label: 'Role',
+      type: 'text',
+      value: profile?.role || "N/A",
+      disabled: true
+    },
+    {
+      name: "email",
+      label: 'Email',
+      type: 'text',
+      value: profile?.email,
+      disabled: true
+    },
+    {
+      name: "mobile_no",
+      label: 'Mobile Number',
+      type: 'text',
+      value: profile?.mobile_no || "N/A",
+      disabled: true
+    },
   ];
-
-  // const [statusRefList, setStatusRefList] = React.useState<StatusRef[]>([]);
 
   const methods = useForm({
     defaultValues: {
-      cycle_active: '',
-      cycle_description: '',
-      cycle_id: '',
-      app_name: '',
-      cycle_updated: '',
-      no_of_stages: '',
-      cycle_name: '',
+      user_id: '',
+      full_name: '',
+      role: '',
+      email: '',
+      mobile_no: '',
     },
     values: {
-      cycle_active: data?.cycle_active,
-      cycle_description: data?.cycle_description,
-      cycle_id: data?.cycle_id,
-      app_name: data?.app_name,
-      cycle_updated: data?.cycle_updated,
-      no_of_stages: data?.no_of_stages,
-      cycle_name: data?.cycle_name,
+      user_id: profile?.id,
+      full_name: profile?.name,
+      role: profile?.role,
+      email: profile?.email,
+      mobile_no: profile?.mobile_no,
     }
   });
-  const { control, handleSubmit, setValue } = methods;
+  const { control, handleSubmit } = methods;
 
   const onSubmit = async (formdata: any) => {
-    console.log('formdata:', formdata)
-    // const hasStatusChange = !compareStates((data?.cycle_active as unknown as number).toString(), formdata.cycle_active);
-    // const hasDescriptionChange = !compareStates(data?.cycle_description as unknown as string, formdata.cycle_description);
-    // modals.open({
-    //   title: 'Confirm update',
-    //   children: (
-    //     <>
-    //       <Text size="sm">Are you sure you want to update <strong>Cycle status & description</strong>?</Text>
-    //       <Flex gap={16} justify={'end'} mt="md">
-    //         <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
-    //           Cancel
-    //         </Button>
-    //         <Button onClick={
-    //           async () => {
 
-    //             if (!hasStatusChange && !hasDescriptionChange) {
-    //               toast.error('No changes detected');
-    //               modals.closeAll();
-    //               toggleEdit();
-    //             } else if (hasStatusChange || hasDescriptionChange) {
-    //               try {
-    //                 const response = await Promise.all([
-    //                   updateStatusCycle({
-    //                     cycle_id: data?.cycle_id.toString() as string,
-    //                     status_code: formdata.cycle_active
-    //                   }),
-    //                   updateCycle({
-    //                     cycle_uuid: data?.cycle_uuid as unknown as string,
-    //                     body: {
-    //                       cycle_description: formdata.cycle_description
-    //                     }
-    //                   })
-    //                 ]);
+    const data = {
+      email: session?.user?.email as string,
+      body: {
+        name: formdata.full_name,
+      }
+    };
 
-    //                 const statusResponseOk = !response[0].error;
-    //                 const descriptionResponseOk = !response[1].error;
-    //                 const statusMessage = response[0].message;
-    //                 const descriptionMessage = response[1].message;
-    //                 if (statusResponseOk && descriptionResponseOk) {
-
-    //                   toast.success(message`${statusMessage} ${descriptionMessage}`);
-    //                   modals.closeAll();
-    //                   toggleEdit();
-    //                   await setAuditTrail({
-    //                     action: 'update_cycle_info',
-    //                     location_url: pageUrl,
-    //                     object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
-    //                     process_state: 'TRIGGERAPI',
-    //                     sysfunc: '"onSubmit" func ',
-    //                     userid: user_id as string,
-    //                     sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-    //                     notes: `Cycle and description updated successfully`,
-    //                     json_object: formdata,
-    //                   });
-    //                   window.location.reload();
-    //                 } else if (statusResponseOk) {
-    //                   toast.success(statusMessage);
-    //                   modals.closeAll();
-    //                   toggleEdit();
-    //                   await setAuditTrail({
-    //                     action: 'update_cycle_info',
-    //                     location_url: pageUrl,
-    //                     object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
-    //                     process_state: 'TRIGGERAPI',
-    //                     sysfunc: '"onSubmit" func ',
-    //                     userid: user_id as string,
-    //                     sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-    //                     notes: `Cycle and description updated successfully`,
-    //                     json_object: formdata,
-    //                   });
-    //                   window.location.reload();
-    //                 } else if (descriptionResponseOk) {
-    //                   toast.success(descriptionMessage);
-    //                   modals.closeAll();
-    //                   toggleEdit();
-    //                   await setAuditTrail({
-    //                     action: 'update_cycle_info',
-    //                     location_url: pageUrl,
-    //                     object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
-    //                     process_state: 'TRIGGERAPI',
-    //                     sysfunc: '"onSubmit" func ',
-    //                     userid: user_id as string,
-    //                     sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-    //                     notes: `Cycle and description updated successfully`,
-    //                     json_object: formdata,
-    //                   });
-    //                   window.location.reload();
-    //                 } else {
-    //                   toast.error('Failed to update cycle and description');
-    //                   modals.closeAll();
-    //                   toggleEdit();
-    //                 }
-    //               } catch (error) {
-    //                 toast.error('Failed to update cycle and description' + "\n" + error);
-    //               }
-    //             } else {
-    //               toast.error('Failed to update cycle and description');
-    //               modals.closeAll();
-    //               toggleEdit();
-    //             }
-    //           }
-    //         } color='var(--fc-brand-700)' radius='md'>
-    //           Yes
-    //         </Button>
-    //       </Flex>
-    //     </>
-    //   ),
-    //   overlayProps: {
-    //     backgroundOpacity: 0.55,
-    //     blur: 10,
-    //   },
-    //   radius: 'md',
-    // });
+    modals.open({
+      title: 'Confirm update',
+      children: (
+        <>
+          <Text size="sm">Updating Profile Details</Text>
+          <Flex gap={16} justify={'end'} mt="md">
+            <Button onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
+              Cancel
+            </Button>
+            <Button onClick={async () => await updateUserDetails(data).then((res) => {
+              toast.success(res.message);
+            }).catch((err) => {
+              toast.error('Error updating profile');
+            }).finally(() => {
+              modals.closeAll();
+              toggleEdit();
+            })}
+              color='var(--fc-brand-700)'
+              radius='md'
+            >
+              Yes
+            </Button>
+          </Flex>
+        </>
+      ),
+      overlayProps: {
+        backgroundOpacity: 0.55,
+        blur: 10,
+      },
+      radius: 'md',
+    });
   }
 
-  return (
-    <ScrollAreaAutosize >
-      <FormProvider {...methods}>
-        <form
-          className={clsx('space-y-4 h-[calc(100vh-146.5px)] w-full')}
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <HeaderForm type='profile' {...{ toggleEdit, isEdit, toggleExpand: () => { } }} />
+  React.useEffect(() => {
+    const fetchProfile = async () => getUserDetails({ email: session?.user?.email as string });
+    fetchProfile().then(setProfile);
+  }, [])
 
-          <div className="container mx-auto space-y-8 py-4">
-            {InputList?.map(({ label, name, type, value, disabled }, index) => {
-              return ['Status'].includes(label) ? (
-                <InputWrapper
-                  key={index}
-                  label={label}
-                  classNames={{
+
+  return (
+    <FormProvider {...methods}>
+      <form
+        className={clsx('space-y-4 w-full')}
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <HeaderForm type='profile' {...{ toggleEdit, isEdit, toggleExpand: () => { } }} />
+        {/* create a box for image avatar on the left side */}
+        <div
+          className="flex">
+          <div
+            className='flex flex-col items-center ml-10 my-4 rounded-md overflow-hidden space-y-4'
+          >
+            <Image
+              src='/avatar.svg'
+              width={198}
+              height={198}
+              // fill
+              alt='avatar'
+            />
+            <span className='font-notosans'>{profile?.name}</span>
+            <Button
+              disabled={true}
+              color='var(--fc-neutral-600)'
+              type='button'
+              variant='filled'
+              classNames={{
+                root: clsx('disabled:!bg-fc-neutral-100 disabled:text-fc-neutral-600 disabled:border-transparent',
+                ),
+              }}
+            >
+              Admin
+            </Button>
+          </div>
+          <ScrollAreaAutosize className='flex-1 h-[calc(100vh-341.5px)]'>
+            <div className="container mx-auto space-y-8 pb-10">
+              {InputList?.map(({ label, name, type, value, disabled }, index) => {
+                return (
+                  <InputWrapper key={index} label={label} classNames={{
                     root: 'px-14 space-y-4',
                     label: '!text-sm !font-semibold',
                   }}>
-                  <LabelTooltip label={label} />
-                  <RadioGroup
-                    name={name as 'cycle_active' | 'cycle_description' | 'cycle_id' | 'app_name' | 'cycle_updated' | 'no_of_stages' | 'cycle_name'}
-                    control={control}
-                    defaultValue={value?.toString()}
-                  >
-                    <Group>
-                      {/* {statusRefList?.map((status: StatusRef) => (
-                        <Radio.Item
-                          key={status.uuid}
-                          disabled={disabled}
-                          value={status.code}
-                          label={<span className='capitalize'>{status.descriptions}</span>} />
-                      ))} */}
-                    </Group>
-                  </RadioGroup>
-                </InputWrapper>
-              ) : (
-                <InputWrapper key={index} label={label} classNames={{
-                  root: 'px-14 space-y-4',
-                  label: '!text-sm !font-semibold',
-                }}>
-                  <LabelTooltip label={label} />
-                  <TextInput
-                    name={name as 'cycle_active' | 'cycle_description' | 'cycle_id' | 'app_name' | 'cycle_updated' | 'no_of_stages' | 'cycle_name'}
-                    defaultValue={value}
-                    control={control}
-                    disabled={disabled}
-                    classNames={{
-                      input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
-                    }} />
-                </InputWrapper>
-              )
-            })}
-
-          </div>
-        </form>
-      </FormProvider>
-    </ScrollAreaAutosize >
+                    <LabelTooltip label={label} />
+                    <TextInput
+                      name={name as "user_id" | "full_name" | "role" | "email" | "mobile_no"}
+                      defaultValue={value}
+                      control={control}
+                      disabled={disabled}
+                      classNames={{
+                        input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+                      }} />
+                  </InputWrapper>
+                )
+              })}
+            </div>
+          </ScrollAreaAutosize >
+        </div>
+      </form>
+    </FormProvider>
   )
 }
 

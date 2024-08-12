@@ -46,7 +46,7 @@ const ApplicationSection = ({
   }, []);
 
   return (
-    <section className={clsx('px-20 py-1 bg-[#F1F5F9]',
+    <section className={clsx('px-20 py-1 bg-[var(--fc-neutral-100)]',
       'shadow-[inset_4px_4px_10px_0_rgb(203_213_225_/_0.25)]'
     )} > {/* #CBD5E140 */}
       <div className="p-4" >
