@@ -3,6 +3,7 @@
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
 import { Apps_label, getAllClaim, getCycleInfo, getStageList, getUsersPending, restructurePendings, sendMessagePending, testPending } from '@/lib/service';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Button, Flex, Menu, MenuDropdown, MenuItem, MenuTarget, Stack } from '@mantine/core';
 import { useDebouncedValue, useMediaQuery } from '@mantine/hooks';
@@ -13,7 +14,8 @@ import { MantineReactTable, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_RowSel
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react'
 import { Control, Form, useForm } from 'react-hook-form';
-import { MultiSelect, NumberInput, Select, Textarea, TextInput } from 'react-hook-form-mantine';
+import { MultiSelect, MultiSelectProps, NumberInput, Select, SelectProps, Textarea, TextareaProps, TextInput } from 'react-hook-form-mantine';
+import { z } from "zod";
 
 type AllClaimType = {
   actor_name: string;
@@ -34,7 +36,58 @@ type PendingClaimProps = {
   error_message?: string | null;
 }
 
-type ActionType = 'recovery' | 'send_pending' | 'send_message' | 'test';
+const actionTuple = ['recovery_all', 'recovery_stage', 'send_pending', 'send_message', 'test_pending'] as const;
+
+const actionEnum = z.enum(actionTuple);
+
+export type ActionType = z.infer<typeof actionEnum>;
+
+const schema = z.object({
+  claim_id: z.array(z.string().min(1)).optional(),
+  stage_uuid: z.custom((value) => {
+    if ((Array.isArray(value) && value.length === 0) || !value || value === '') {
+      return false;
+    }
+    return true;
+  }, { message: 'Stage UUID is required' }).optional(),
+  user_id: z.custom((value) => {
+    if ((Array.isArray(value) && value.length === 0) || !value || value === '') {
+      return false;
+    }
+    return true;
+  }, { message: 'User ID is required' }),
+  message: z.string().optional(),
+});
+
+const test_pending_schema = z.object({
+  user_id: z.string(),
+  // claim_id: z.array(z.string().min(1)),
+  action: z.literal('test_pending'),
+});
+
+const send_pending_schema = z.object({
+  user_id: z.array(z.string().min(1)),
+  action: z.literal('send_pending'),
+});
+
+const recovery_stage_schema = z.object({
+  user_id: z.array(z.string().min(1)),
+  // claim_id: z.array(z.string().min(1)),
+  stage_uuid: z.array(z.string().min(1)),
+  action: z.literal('recovery_stage'),
+});
+
+const recovery_all_schema = z.object({
+  user_id: z.array(z.string().min(1)),
+  action: z.literal('recovery_all'),
+});
+
+const send_message_schema = z.object({
+  user_id: z.array(z.string().min(1)),
+  // claim_id: z.array(z.string().min(1)),
+  message: z.string(),
+  action: z.literal('send_message'),
+});
 
 function PendingClaim() {
   const [cycleInfo, setCycleInfo] = React.useState<any>();
@@ -67,10 +120,31 @@ const TableClaims = (props?: PendingClaimProps) => {
   const searchParams = useSearchParams();
   const selected_app = searchParams.get('selected_app');
   const cycle_id = searchParams.get('cycle_id');
-  const methods = useForm({
-    // defaultValues: { claim_id: '', user_id: '', stage_uuid: '', message: '', action: '', actor_name: '', current_stage_name: '' },
+  const [action, setAction] = React.useState<ActionType>();
+  console.log('action:', action)
+
+  const { control, watch, handleSubmit, reset } = useForm<{
+    actor_name: string | undefined;
+    current_stage_name: string | undefined;
+    claim_id: number | string | string[] | undefined;
+    user_id: string | string[] | undefined;
+    stage_uuid: string | string[] | undefined;
+    message: string | undefined;
+    action: ActionType | undefined
+  }>({
+    reValidateMode: 'onSubmit',
+    resolver: zodResolver(action === 'test_pending' ? test_pending_schema : action === 'send_pending' ? send_pending_schema : action === 'recovery_stage' ? recovery_stage_schema : action === 'recovery_all' ? recovery_all_schema : action === 'send_message' ? send_message_schema : schema),
+    defaultValues: {
+      actor_name: undefined,
+      current_stage_name: undefined,
+      claim_id: undefined,
+      user_id: undefined,
+      stage_uuid: undefined,
+      message: undefined,
+      action: undefined,
+    },
   });
-  const { control, watch, handleSubmit, reset } = methods;
+
 
   const [debouncedClaimIdFilter] = useDebouncedValue(watch('claim_id'), 200, { leading: false });
   const [debouncedActorFilter] = useDebouncedValue(watch('actor_name'), 200, { leading: false });
@@ -83,9 +157,6 @@ const TableClaims = (props?: PendingClaimProps) => {
   const [rowSelection, setRowSelection] = React.useState<MRT_RowSelectionState>({});
 
   const [tableData, setTableData] = React.useState<AllClaimType[]>([]);
-  // const [claimsData, setClaimsData] = React.useState<PendingClaimProps>();
-  // const [selectedRowsData, setSelectedRowsData] = React.useState<AllClaimType[]>([]);
-  const [actionType, setActionType] = React.useState<ActionType>();
 
   const [opened, setOpened] = React.useState(false); // for action modal
   const [pendingUsersOptions, setPendingUsersOptions] = React.useReducer(
@@ -110,7 +181,7 @@ const TableClaims = (props?: PendingClaimProps) => {
   const allClaimOptions = {
     page: pagination.pageIndex + 1,
     per_page: pagination.pageSize,
-    claim_id: debouncedClaimIdFilter,
+    claim_id: debouncedClaimIdFilter as number,
     actor_name: debouncedActorFilter,
     stage_name: debouncedStageFilter
   };
@@ -136,6 +207,178 @@ const TableClaims = (props?: PendingClaimProps) => {
     {
       header: 'Stage',
       accessorFn: (originalRow) => originalRow.current_stage_name,
+    },
+  ];
+
+  const handleAction = async (data: any) => {
+    const convertData = (data: any) => {
+      return {
+        user_id: Array.isArray(data.user_id) ? data.user_id : [data.user_id],
+        claim_id: Object.keys(table.getState().rowSelection),
+        stage_uuid: data.stage_uuid,
+        message: data.message,
+        action: data.action,
+      };
+    };
+    const { user_id, claim_id, stage_uuid, message, action } = convertData(data);
+
+    const getRequestData = (action: ActionType) => {
+      switch (action) {
+        case 'test_pending':
+        case 'send_pending':
+          return { user_id, claim_id, action };
+        case 'recovery_stage':
+          return { user_id, claim_id, stage_uuid, action };
+        case 'recovery_all':
+          return { user_id, action };
+        case 'send_message':
+          return { user_id, claim_id, message, action };
+        default:
+          console.error('Action not found');
+          return null;
+      }
+    };
+
+    const sendData = getRequestData(action as ActionType);
+
+    if (!sendData) return;
+
+    try {
+      const res = await restructurePendings({ body: sendData });
+      toast.success(res.message);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+
+    // reset(); // reset form doesn't work don't know why
+    table.resetRowSelection();
+    modals.closeAll();
+  };
+
+  const listAction = [
+    {
+      value: 'test_pending',
+      label: 'test',
+      description: 'To test and send pending to the respective user.',
+      input: [{
+        type: 'select',
+        name: 'user_id',
+        label: 'Choose User Id',
+        placeholder: 'Selected User ID',
+        data: pendingUsersOptions,
+        control: control,
+      }, {
+        type: 'text',
+        name: 'action',
+        label: 'Action',
+        value: 'test_pending',
+        control: control,
+      }],
+      btnCancel: {
+        label: 'Cancel',
+        onClick: () => modals.closeAll(),
+      },
+      btnSubmit: {
+        label: 'test',
+        onClick: handleSubmit(handleAction),
+      },
+    },
+    {
+      value: 'recovery_stage',
+      label: 'Recovery',
+      description: 'To test and send to specific user to get their respective pending.',
+      input: [{
+        type: 'multi-select',
+        name: 'user_id',
+        label: 'Choose User Id',
+        placeholder: 'Selected User ID',
+        required: true,
+        data: pendingUsersOptions,
+        control: control,
+      }, {
+        type: 'multi-select',
+        name: 'stage_uuid',
+        label: 'Choose Stage Name',
+        placeholder: 'Selected Stage Name',
+        data: stageListOptions,
+        control: control,
+      }, {
+        type: 'text',
+        name: 'action',
+        label: 'Action',
+        value: 'recovery_stage',
+        control: control,
+      }],
+      btnCancel: {
+        label: 'Cancel',
+        onClick: () => modals.closeAll(),
+      },
+      btnSubmit: {
+        label: 'Recover',
+        onClick: handleSubmit(handleAction),
+      },
+    },
+    {
+      value: 'send_message',
+      label: 'Send Message',
+      description: 'Send message to all pending claim user of selected stage.',
+      input: [{
+        type: 'multi-select',
+        name: 'user_id',
+        label: 'Choose User Id',
+        placeholder: 'Selected User ID',
+        required: true,
+        data: pendingUsersOptions,
+        control: control,
+      }, {
+        type: 'textarea',
+        name: 'message',
+        label: 'Write message',
+        placeholder: 'Write the message here',
+        control: control,
+      }, {
+        type: 'text',
+        name: 'action',
+        label: 'Action',
+        value: 'send_message',
+        control: control,
+      }],
+      btnCancel: {
+        label: 'Cancel',
+        onClick: () => modals.closeAll(),
+      },
+      btnSubmit: {
+        label: 'Send',
+        onClick: handleSubmit(handleAction),
+      },
+    },
+    {
+      value: 'send_pending',
+      label: 'Send Pending',
+      description: 'Are you sure you want to send the selected pendings?',
+      input: [{
+        type: 'multi-select',
+        name: 'user_id',
+        label: 'Choose User Id',
+        placeholder: 'Selected User ID',
+        required: true,
+        data: pendingUsersOptions,
+        control: control,
+      }, {
+        type: 'text',
+        name: 'action',
+        label: 'Action',
+        value: 'send_pending',
+        control: control,
+      }],
+      btnCancel: {
+        label: 'Cancel',
+        onClick: () => modals.closeAll(),
+      },
+      btnSubmit: {
+        label: 'Send',
+        onClick: handleSubmit(handleAction),
+      },
     },
   ];
 
@@ -252,7 +495,7 @@ const TableClaims = (props?: PendingClaimProps) => {
                     itemLabel: 'font-light capitalize text-center'
                   }}
                   onClick={() => {
-                    setActionType(value as "recovery" | "send_pending" | 'send_message' | 'test');
+                    setAction(value as ActionType);
                     modals.open({
                       title: label,
                       size: 'sm',
@@ -263,11 +506,13 @@ const TableClaims = (props?: PendingClaimProps) => {
                           {input.map((item, i) => {
                             switch (item.type) {
                               case 'select':
-                                return <CustomSelect key={i}{...item} data={item.data as { value: string; label: string; }[]} />
+                                return <CustomSelect key={i}{...item} />
                               case 'multi-select':
-                                return <CustomMultiSelect key={i} {...item} data={item.data as { value: string; label: string; }[]} />
+                                return <CustomMultiSelect key={i} {...item} />
                               case 'textarea':
                                 return <CustomTextarea key={i} {...item} />
+                              case 'text':
+                                return <TextInput key={i} {...item} name={item.name as 'action'} defaultValue={item.value} display='none' />
                               default:
                                 return null;
                             }
@@ -334,224 +579,11 @@ const TableClaims = (props?: PendingClaimProps) => {
     }),
   });
 
-  const convertData = (data: any, actionType: ActionType) => {
-    return {
-      user_id: Array.isArray(data.user_id) ? data.user_id : [data.user_id],
-      claim_id: Object.keys(table.getState().rowSelection),
-      stage_uuid: data.stage_uuid,
-      message: data.message,
-      action: actionType,
-    };
-  }
-
-  const handleTest = async (data: any, e: any) => {
-    const { user_id, claim_id } = convertData(data, actionType!);
-    const sendTestData = {
-      user_id,
-      claim_id,
-    };
-    try {
-      const res = await testPending({ body: sendTestData });
-      toast.success(res.message);
-    } catch (error: any) {
-      console.error('error:', error);
-      toast.error(error.message);
-    }
-    reset(); // reset form doesn't work don't know why
-    table.resetRowSelection();
-    modals.closeAll();
-  };
-
-  const handleSendPending = async (data: any, e: any) => {
-    const { user_id, claim_id, action } = convertData(data, actionType!);
-    const sendPendingData = {
-      user_id,
-      claim_id,
-      action,
-    };
-    try {
-      const res = await restructurePendings({ body: sendPendingData });
-      toast.success(res.message);
-    } catch (error: any) {
-      console.error('error:', error);
-      toast.error(error.message);
-    }
-    reset(); // reset form doesn't work don't know why
-    table.resetRowSelection();
-    modals.closeAll();
-  };
-
-  const handleRecovery = async (data: any, e: any) => {
-    const { user_id, claim_id, stage_uuid, action } = convertData(data, actionType!);
-    const sendRecoveryByStageData = {
-      user_id,
-      claim_id,
-      stage_uuid,
-      action,
-    };
-    const sendRecoveryAllData = {
-      user_id,
-      action,
-    };
-    try {
-      if (stage_uuid) {
-        const res = await restructurePendings({ body: sendRecoveryByStageData });
-        toast.success(res.message);
-      } else {
-        const res = await restructurePendings({ body: sendRecoveryAllData });
-        toast.success(res.message);
-      }
-    } catch (error: any) {
-      console.error('error:', error);
-      toast.error(error.message);
-    }
-    reset(); // reset form doesn't work don't know why
-    table.resetRowSelection();
-    modals.closeAll();
-  };
-
-  const handleSendMessage = async (data: any, e: any) => {
-    const { user_id, claim_id, message } = convertData(data, actionType!);
-    const sendMessageData = {
-      user_id,
-      claim_id,
-      message,
-    };
-    try {
-      const res = await sendMessagePending({ body: sendMessageData });
-      toast.success(res.message);
-    } catch (error: any) {
-      console.error('error:', error);
-      toast.error(error.message);
-    }
-    reset(); // reset form doesn't work don't know why
-    table.resetRowSelection();
-    modals.closeAll();
-  };
-
-  const listAction = [
-    {
-      value: 'test',
-      label: 'test',
-      description: 'To test and send pending to the respective user.',
-      input: [{
-        type: 'select',
-        name: 'user_id',
-        label: 'Choose User Id',
-        placeholder: 'Selected User ID',
-        data: pendingUsersOptions,
-        control: control,
-      }],
-      btnCancel: {
-        label: 'Cancel',
-        onClick: () => modals.closeAll(),
-      },
-      btnSubmit: {
-        label: 'test',
-        onClick: handleSubmit(handleTest),
-      },
-    },
-    {
-      value: 'recovery',
-      label: 'Recovery',
-      description: 'To test and send to specific user to get their respective pending.',
-      input: [{
-        type: 'multi-select',
-        name: 'user_id',
-        label: 'Choose User Id',
-        placeholder: 'Selected User ID',
-        data: pendingUsersOptions,
-        control: control,
-      }, {
-        type: 'multi-select',
-        name: 'stage_uuid',
-        label: 'Choose Stage Name',
-        placeholder: 'Selected Stage Name',
-        data: stageListOptions,
-        control: control,
-      }],
-      btnCancel: {
-        label: 'Cancel',
-        onClick: () => modals.closeAll(),
-      },
-      btnSubmit: {
-        label: 'Recover',
-        onClick: handleSubmit(handleRecovery),
-      },
-    },
-    {
-      value: 'send_message',
-      label: 'Send Message',
-      description: 'Send message to all pending claim user of selected stage.',
-      input: [{
-        type: 'multi-select',
-        name: 'user_id',
-        label: 'Choose User Id',
-        placeholder: 'Selected User ID',
-        data: pendingUsersOptions,
-        control: control,
-      }, {
-        type: 'textarea',
-        name: 'message',
-        label: 'Write message',
-        placeholder: 'Write the message here',
-        control: control,
-      }],
-      btnCancel: {
-        label: 'Cancel',
-        onClick: () => modals.closeAll(),
-      },
-      btnSubmit: {
-        label: 'Send',
-        onClick: handleSubmit(handleSendMessage),
-      },
-    },
-    {
-      value: 'send_pending',
-      label: 'Send Pending',
-      description: 'Are you sure you want to send the selected pendings?',
-      input: [{
-        type: 'multi-select',
-        name: 'user_id',
-        label: 'Choose User Id',
-        placeholder: 'Selected User ID',
-        data: [],
-        control: control,
-      }],
-      btnCancel: {
-        label: 'Cancel',
-        onClick: () => modals.closeAll(),
-      },
-      btnSubmit: {
-        label: 'Send',
-        onClick: handleSubmit(handleSendPending),
-      },
-    },
-  ];
-
   React.useEffect(() => {
     if (data) {
       setTableData(data);
     }
   }, [data]);
-
-  // React.useEffect(() => {
-  //   const fetchClaims = async () => await getAllClaim({
-  //     per_page: 200,
-  //     // page: pagination.pageIndex + 1,
-  //     // per_page: pagination.pageSize,
-  //     // claim_id: debouncedClaimIdFilter,
-  //     // actor_name: debouncedActorFilter,
-  //     // stage_name: debouncedStageFilter,
-  //   });
-  //   fetchClaims().then(setClaimsData);
-  // }, [
-  //   // pagination.pageIndex,
-  //   // pagination.pageSize,
-  //   // debouncedClaimIdFilter,
-  //   // debouncedActorFilter,
-  //   // debouncedStageFilter
-  // ]);
 
   React.useEffect(() => {
     const fetchPendingUsers = async () => await getUsersPending({
@@ -581,10 +613,10 @@ const TableClaims = (props?: PendingClaimProps) => {
               color='#E2E8F0'
               c='var(--fc-neutral-900)'
               onClick={() => {
-                setActionType('recovery');
+                setAction('recovery_all');
                 reset();
                 [{
-                  value: 'recovery',
+                  value: 'recovery_all',
                   label: 'Recovery',
                   description: 'To test and send to specific user to get their respective pending by business prosess',
                   input: [{
@@ -592,65 +624,79 @@ const TableClaims = (props?: PendingClaimProps) => {
                     name: 'user_id',
                     label: 'Choose User Id',
                     placeholder: 'Selected User ID',
+                    required: true,
                     data: pendingUsersOptions,
+                    control: control,
+                  }, {
+                    type: 'text',
+                    name: 'action',
+                    label: 'Action',
+                    value: 'recovery_all',
                     control: control,
                   }],
                   btnCancel: {
                     label: 'Cancel',
-                    onClick: () => modals.closeAll(),
+                    onClick: () => {
+                      setAction(undefined);
+                      modals.closeAll();
+                    },
                   },
                   btnSubmit: {
                     label: 'Recover',
-                    onClick: handleSubmit(handleRecovery),
+                    onClick: handleSubmit(handleAction),
                   },
-                }].map(({ label, description, value, input, btnCancel, btnSubmit }, i) => modals.open({
-                  title: label,
-                  size: 'sm',
-                  children: (
-                    <div className='space-y-9'>
-                      <p className='text-center'>{description}</p>
+                }].map(({ label, description, value, input, btnCancel, btnSubmit }, i) => {
+                  modals.open({
+                    title: label,
+                    size: 'sm',
+                    children: (
+                      <div className='space-y-9'>
+                        <p className='text-center'>{description}</p>
 
-                      {input.map((item, i) => {
-                        switch (item.type) {
-                          case 'select':
-                            return <CustomSelect key={i}{...item} data={item.data as { value: string; label: string; }[]} />
-                          case 'multi-select':
-                            return <CustomMultiSelect key={i} {...item} data={item.data as { value: string; label: string; }[]} />
-                          case 'textarea':
-                            return <CustomTextarea key={i} {...item} />
-                          default:
-                            return null;
-                        }
-                      })}
+                        {input.map((item, i) => {
+                          switch (item.type) {
+                            case 'select':
+                              return <CustomSelect key={i} {...item} />
+                            case 'multi-select':
+                              return <CustomMultiSelect key={i} {...item} />
+                            case 'textarea':
+                              return <CustomTextarea key={i} {...item} />
+                            case 'text':
+                              return <TextInput key={i} {...item} name={item.name as 'action'} defaultValue={item.value} display='none' />
+                            default:
+                              return null;
+                          }
+                        })}
 
-                      <Flex justify='center' align='center' gap={16}>
-                        <Button
-                          id={value}
-                          color='var(--fc-neutral-100)'
-                          c='var(--fc-neutral-900)'
-                          radius='md'
-                          type='button'
-                          onClick={btnCancel.onClick}
-                        >
-                          {btnCancel.label}
-                        </Button>
-                        <Button
-                          id={value}
-                          color='var(--fc-brand-700)'
-                          radius='md'
-                          type='button'
-                          onClick={btnSubmit.onClick}
-                        >{btnSubmit.label}</Button>
-                      </Flex>
-                    </div>
-                  ),
-                  withCloseButton: false,
-                  classNames: {
-                    content: 'p-6 space-y-6 rounded-lg',
-                    title: 'text-3xl font-semibold text-[var(--fc-neutral-900)] capitalize text-center',
-                    header: 'flex items-center justify-center',
-                  },
-                }))
+                        <Flex justify='center' align='center' gap={16}>
+                          <Button
+                            id={value}
+                            color='var(--fc-neutral-100)'
+                            c='var(--fc-neutral-900)'
+                            radius='md'
+                            type='button'
+                            onClick={btnCancel.onClick}
+                          >
+                            {btnCancel.label}
+                          </Button>
+                          <Button
+                            id={value}
+                            color='var(--fc-brand-700)'
+                            radius='md'
+                            type='button'
+                            onClick={btnSubmit.onClick}
+                          >{btnSubmit.label}</Button>
+                        </Flex>
+                      </div>
+                    ),
+                    withCloseButton: false,
+                    classNames: {
+                      content: 'p-6 space-y-6 rounded-lg',
+                      title: 'text-3xl font-semibold text-[var(--fc-neutral-900)] capitalize text-center',
+                      header: 'flex items-center justify-center',
+                    },
+                  })
+                })
               }}
               className='hover:!bg-[#E2E8F0] hover:!text-[var(--fc-neutral-900)] transition-all duration-300 ease-in-out'
             >Recovery</Button>
@@ -744,11 +790,12 @@ const combinedStyles = `
 `;
 
 
-const CustomSelect = ({ name, label, placeholder, data, control }: { name: string, label: string, placeholder: string, data: { value: string; label: string; }[], control: Control }) => (
+const CustomSelect = ({ name, label, placeholder, data, control, required }: SelectProps<any>) => (
   <>
     <Select
       name={name}
       label={label}
+      required={required}
       placeholder={placeholder}
       checkIconPosition='left'
       rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
@@ -764,11 +811,12 @@ const CustomSelect = ({ name, label, placeholder, data, control }: { name: strin
 );
 
 
-const CustomMultiSelect = ({ name, label, placeholder, data, control }: { name: string, label: string, placeholder: string, data: { value: string; label: string; }[], control: Control }) => (
+const CustomMultiSelect = ({ name, label, placeholder, data, control, required }: MultiSelectProps<any>) => (
   <>
     <MultiSelect
       name={name}
       label={label}
+      required={required}
       placeholder={placeholder}
       checkIconPosition='left'
       rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
@@ -783,11 +831,12 @@ const CustomMultiSelect = ({ name, label, placeholder, data, control }: { name: 
 );
 
 
-const CustomTextarea = ({ name, label, placeholder, control }: { name: string, label: string, placeholder: string, control: Control }) => (
+const CustomTextarea = ({ name, label, placeholder, control, required }: TextareaProps<any>) => (
   <>
     <Textarea
       name={name}
       label={label}
+      required={required}
       placeholder={placeholder}
       resize="vertical"
       classNames={textareaInputStyles}

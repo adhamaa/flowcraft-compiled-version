@@ -1,6 +1,7 @@
 
 'use server';
 
+import { ActionType } from "@/app/manage-claim/[claim_slug]/_components/manage-claim/pending-claims";
 import { decryptPassword } from "../crypt";
 import { clientRevalidateTag } from "./helper";
 import { datasource_mapping } from "@/constant/datasource";
@@ -817,7 +818,7 @@ export const getRestructurePendingsLog = async ({
 export const restructurePendings = async ({
   body
 }: {
-  body: { claim_id?: string[]; user_id: string[]; stage_uuid?: string[]; action: "recovery" | "send_pending" | "send_message" | "test" };
+  body: { user_id: string[]; action: ActionType; claim_id?: string[]; stage_uuid?: string[]; message?: string; };
 }) => {
   const url = new URL(`/businessProcess/restructurePendings`, baseUrl);
 

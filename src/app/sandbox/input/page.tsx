@@ -2,11 +2,13 @@
 
 import InputWithOverlay from '@/components/form/InputWithOverlay';
 import useEditableState from '@/hooks/useEditableState';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Group, LoadingOverlay, Stack } from '@mantine/core';
 import clsx from 'clsx';
 import * as React from 'react'
 import { Form, FormProvider, useForm } from 'react-hook-form';
 import { MultiSelect, Select } from 'react-hook-form-mantine';
+import { z } from "zod";
 
 function InputPagesTesting() {
 
@@ -236,7 +238,14 @@ const FormWithProvider = () => {
 }
 
 const FormWithControl = () => {
-  const method = useForm({ defaultValues: { select: null, multiSelect: [] } });
+  const schema = z.object({
+    select: z.string().nonempty(),
+    multiSelect: z.array(z.string()).nonempty()
+  });
+  const method = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { select: null, multiSelect: [] }
+  });
   const { reset, control } = method;
 
   return (
@@ -251,6 +260,7 @@ const FormWithControl = () => {
         name='select'
         label='Select'
         placeholder='Select item'
+        required={true}
         data={['React', 'Angular', 'Vue']}
         control={control}
       />

@@ -87,9 +87,9 @@ const Profile = ({ data = {} }: { data?: any; }) => {
     values: {
       user_id: profile?.id,
       full_name: profile?.name,
-      role: profile?.role,
+      role: profile?.role || "N/A",
       email: profile?.email,
-      mobile_no: profile?.mobile_no,
+      mobile_no: profile?.mobile_no || "N/A",
     }
   });
   const { control, handleSubmit } = methods;
