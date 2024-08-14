@@ -957,3 +957,35 @@ export const getProfilePicture = async ({ email }: { email: string }) => {
   const data = await response.json();
   return data.url;
 };
+
+export const uploadProfilePicture = async ({ email, body }: { email: string; body: Record<string, any> }) => {
+  console.log('email:', email)
+  console.log('body:', body)
+  const url = new URL(`/businessProcess/uploadProfilePicture`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const formData = new FormData();
+
+  for (const key in body) {
+    formData.append(key, body[key]);
+  }
+  console.log('formData:', formData)
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      // 'Content-Type': 'multipart/form-data',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    body: formData,
+  });
+  console.log('response:', response)
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to upload profile picture.');
+  }
+  clientRevalidateTag('profilepicture');
+  return await response.json();
+};

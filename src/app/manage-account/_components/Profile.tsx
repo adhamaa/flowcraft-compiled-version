@@ -3,7 +3,7 @@
 import HeaderForm from '@/app/cycle/_components/Forms/HeaderForm';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
-import { getProfilePicture, getUserDetails, updateUserDetails } from '@/lib/service';
+import { getProfilePicture, getUserDetails, updateUserDetails, uploadProfilePicture } from '@/lib/service';
 import { ActionIcon, Avatar, Button, Flex, Group, InputWrapper, LoadingOverlay, Pill, rem, ScrollAreaAutosize, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
@@ -41,9 +41,10 @@ const Profile = ({ data = {} }: { data?: any; }) => {
   const [opened, { open, close, toggle }] = useDisclosure(false);
   const toggleEdit = () => setIsEdit(!isEdit);
 
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const username = session?.user?.name;
   const profileImg = session?.user?.image;
+  console.log('profileImg:', profileImg)
   const user_id = session?.user?.user_id;
   const pathname = usePathname();
   const params = useParams();
@@ -119,6 +120,22 @@ const Profile = ({ data = {} }: { data?: any; }) => {
       }
     };
 
+
+    // if (formdata.profile_picture) {
+
+    uploadProfilePicture({
+      email: session?.user?.email as string,
+      body: { profile_picture: formdata.profile_picture[0] as Blob }
+    })
+      .then((res) => {
+        toast.success(res.message)
+      })
+      .catch((err) => {
+        toast.error('Error uploading profile picture')
+      });
+    // }
+
+
     // modals.open({
     //   title: 'Confirm update',
     //   children: (
@@ -180,11 +197,10 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                 control={control}
                 name="profile_picture"
                 render={({ field }) => {
-                  console.log('field:', field)
                   return (
                     <Dropzone
                       onDrop={(files) =>
-                        setValue("profile_picture", files[0] as unknown as string)
+                        setValue("profile_picture", files as unknown as string)
                       }
                       onReject={(files) =>
                         console.log("rejected files", files)
@@ -192,7 +208,7 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                       maxSize={3 * 1024 ** 2}
                       accept={IMAGE_MIME_TYPE}
                       loaderProps={{ color: "var(--fc-brand-700)" }}
-                      loading={!field.value}
+                      // loading={!field.value}
                       {...field}
                     >
                       <Avatar

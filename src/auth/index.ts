@@ -107,6 +107,16 @@ export const authConfig = {
       isNewUser?: boolean | undefined;
       session?: Session | undefined;
     }) {
+      if (
+        params.trigger === 'update' &&
+        params.token &&
+        params.token.image
+      ) {
+        const profileImage = await getProfilePicture({ email: params.user.email as string });
+        params.token.image = profileImage;
+        return params.token;
+      }
+
       if (params.account) {
         const userWithLoginCount = await CustomAdapter.getUserByAccount!(params.account);
         const login_count = userWithLoginCount?.login_count;
@@ -121,13 +131,9 @@ export const authConfig = {
             expires,
           });
 
-          const profileImage = await getProfilePicture({ email: params.user.email as string });
-
-
           params.token.session_token = session.sessionToken;
           params.token.user_id = params.user.id;
           params.token.login_count = login_count;
-          params.token.profile_image = profileImage;
         }
       }
 
@@ -138,11 +144,13 @@ export const authConfig = {
       session: Session;
       token: JWT;
     }) {
+      const profileImage = await getProfilePicture({ email: params.token.email as string });
+
       if (params.session.user) {
         params.session.user.session_token = params.token.session_token as string;
         params.session.user.user_id = params.token.user_id as string;
         params.session.user.login_count = params.token.login_count as number;
-        params.session.user.image = params.token.profile_image as string
+        params.session.user.image = profileImage;
       }
       return params.session
 
