@@ -32,8 +32,6 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
 
   const username = session?.user?.name;
   const profileImg = session?.user?.image;
-  const profileImgExists = profileImg;
-  console.log('profileImgExists:', profileImgExists)
 
   React.useEffect(() => {
     if (switchRef.current) {
