@@ -60,30 +60,30 @@ const schema = z.object({
 });
 
 const test_pending_schema = z.object({
-  user_id: z.string(),
+  user_id: z.string({ message: 'User ID is required' }),
   // claim_id: z.array(z.string().min(1)),
   action: z.literal('test_pending'),
 });
 
 const send_pending_schema = z.object({
-  user_id: z.array(z.string().min(1)),
+  user_id: z.array(z.string().min(1), { message: 'User ID is required' }),
   action: z.literal('send_pending'),
 });
 
 const recovery_stage_schema = z.object({
-  user_id: z.array(z.string().min(1)),
+  user_id: z.array(z.string().min(1), { message: 'User ID is required' }),
   // claim_id: z.array(z.string().min(1)),
-  stage_uuid: z.array(z.string().min(1)),
+  stage_uuid: z.array(z.string().min(1), { message: 'Stage UUID is required' }),
   action: z.literal('recovery_stage'),
 });
 
 const recovery_all_schema = z.object({
-  user_id: z.array(z.string().min(1)),
+  user_id: z.array(z.string().min(1), { message: 'User ID is required' }),
   action: z.literal('recovery_all'),
 });
 
 const send_message_schema = z.object({
-  user_id: z.array(z.string().min(1)),
+  user_id: z.array(z.string().min(1), { message: 'User ID is required' }),
   // claim_id: z.array(z.string().min(1)),
   message: z.string(),
   action: z.literal('send_message'),
@@ -121,7 +121,6 @@ const TableClaims = (props?: PendingClaimProps) => {
   const selected_app = searchParams.get('selected_app');
   const cycle_id = searchParams.get('cycle_id');
   const [action, setAction] = React.useState<ActionType>();
-  console.log('action:', action)
 
   const { control, watch, handleSubmit, reset } = useForm<{
     actor_name: string | undefined;

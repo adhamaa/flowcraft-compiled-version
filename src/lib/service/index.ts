@@ -934,3 +934,26 @@ export const updateUserDetails = async ({ email, body }: { email: string; body: 
   clientRevalidateTag('userdetails');
   return await response.json();
 };
+
+
+export const getProfilePicture = async ({ email }: { email: string }) => {
+  const url = new URL(`/businessProcess/getProfilePicture`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    next: { tags: ['profilepicture'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to get profile picture.');
+  }
+  const data = await response.json();
+  return data.url;
+};

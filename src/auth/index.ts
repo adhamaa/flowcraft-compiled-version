@@ -19,6 +19,28 @@ class InvalidLoginError extends CredentialsSignin {
   }
 }
 
+const getProfilePicture = async ({ email }: { email: string }) => {
+  const url = new URL(`/businessProcess/getProfilePicture`, process.env.NEXT_PUBLIC_API_URL);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + 'pass2468').toString('base64')}`
+    },
+    next: { tags: ['profilepicture'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to get profile picture.');
+  }
+  const data = await response.json();
+  return data.url;
+};
+
 export const BASE_PATH = '/api/auth'
 
 export const authConfig = {
@@ -99,10 +121,13 @@ export const authConfig = {
             expires,
           });
 
+          const profileImage = await getProfilePicture({ email: params.user.email as string });
+
 
           params.token.session_token = session.sessionToken;
           params.token.user_id = params.user.id;
           params.token.login_count = login_count;
+          params.token.profile_image = profileImage;
         }
       }
 
@@ -117,6 +142,7 @@ export const authConfig = {
         params.session.user.session_token = params.token.session_token as string;
         params.session.user.user_id = params.token.user_id as string;
         params.session.user.login_count = params.token.login_count as number;
+        params.session.user.image = params.token.profile_image as string
       }
       return params.session
 
@@ -145,7 +171,7 @@ export const authConfig = {
     authorized({ auth, request }) {
       const { nextUrl } = request;
       const isLoggedIn = !!auth?.user;
-      
+
       const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
       const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
       const isAuthRoute = authRoutes.includes(nextUrl.pathname);

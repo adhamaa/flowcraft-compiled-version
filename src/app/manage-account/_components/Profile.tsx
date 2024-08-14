@@ -3,8 +3,8 @@
 import HeaderForm from '@/app/cycle/_components/Forms/HeaderForm';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
-import { getUserDetails, updateUserDetails } from '@/lib/service';
-import { Button, Flex, Group, InputWrapper, Pill, rem, ScrollAreaAutosize, Text } from '@mantine/core';
+import { getProfilePicture, getUserDetails, updateUserDetails } from '@/lib/service';
+import { Avatar, Button, Flex, Group, InputWrapper, Pill, rem, ScrollAreaAutosize, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import clsx from 'clsx';
@@ -13,7 +13,7 @@ import Image from 'next/image';
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import * as React from 'react'
 import { FormProvider, useForm } from 'react-hook-form';
-import { Radio, RadioGroup, TextInput } from 'react-hook-form-mantine';
+import { FileInput, Radio, RadioGroup, TextInput } from 'react-hook-form-mantine';
 
 // Define the structure of each item in the InputList
 type InputItem = {
@@ -26,11 +26,14 @@ type InputItem = {
 
 const Profile = ({ data = {} }: { data?: any; }) => {
   const [profile, setProfile] = React.useState<any>(data);
+  const [profilePicture, setProfilePicture] = React.useState<string>();
   const [isEdit, setIsEdit] = React.useState(false);
   const [opened, { open, close, toggle }] = useDisclosure(false);
   const toggleEdit = () => setIsEdit(!isEdit);
 
   const { data: session } = useSession();
+  const username = session?.user?.name;
+  const profileImg = session?.user?.image;
   const user_id = session?.user?.user_id;
   const pathname = usePathname();
   const params = useParams();
@@ -139,8 +142,12 @@ const Profile = ({ data = {} }: { data?: any; }) => {
   React.useEffect(() => {
     const fetchProfile = async () => getUserDetails({ email: session?.user?.email as string });
     fetchProfile().then(setProfile);
-  }, [])
+  }, []);
 
+  React.useEffect(() => {
+    const fetchProfilePicture = async () => getProfilePicture({ email: session?.user?.email as string });
+    fetchProfilePicture().then(setProfilePicture);
+  }, []);
 
   return (
     <FormProvider {...methods}>
@@ -153,15 +160,34 @@ const Profile = ({ data = {} }: { data?: any; }) => {
         <div
           className="flex">
           <div
-            className='flex flex-col items-center ml-10 my-4 rounded-md overflow-hidden space-y-4'
+            className='flex flex-col items-center ml-10 my-4 overflow-hidden space-y-4'
           >
-            <Image
-              src='/avatar.svg'
-              width={198}
-              height={198}
-              // fill
-              alt='avatar'
-            />
+            <InputWrapper>
+              {/* <Dropzone
+                accept={[
+                  MIME_TYPES.png,
+                  MIME_TYPES.jpeg,
+                  MIME_TYPES.svg,
+                  MIME_TYPES.gif,
+                ]}
+                onDrop={() => { }}
+              > */}
+              <FileInput
+                name='profile_picture'
+                accept={MIME_TYPES.png,
+                  MIME_TYPES.jpeg,
+                  MIME_TYPES.svg,
+                  MIME_TYPES.gif,} />;
+              <Avatar
+                name={username as string}
+                src={profilePicture}
+                color="initials"
+                size={rem(150)}
+                radius="md"
+                alt="avatar"
+              />
+              {/* </Dropzone> */}
+            </InputWrapper>
             <span className='font-notosans'>{profile?.name}</span>
             <Button
               disabled={true}

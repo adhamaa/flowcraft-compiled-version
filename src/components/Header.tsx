@@ -30,7 +30,10 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
   });
   const isLight = colorScheme === "light";
 
-  const profileImg = true;
+  const username = session?.user?.name;
+  const profileImg = session?.user?.image;
+  const profileImgExists = profileImg;
+  console.log('profileImgExists:', profileImgExists)
 
   React.useEffect(() => {
     if (switchRef.current) {
@@ -130,15 +133,11 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
               c="var(--fc-brand-700)"
               className="disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-[var(--fc-brand-700)] dark:hover:text-[var(--fc-brand-700)] transition-all duration-300 ease-in-out"
             >
-              {profileImg ?
-                <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} src={session?.user?.image} alt="it's me" />
-                :
-                <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} color="var(--fc-brand-700)" radius="xl">AA</Avatar>
-              }
+              <Avatar classNames={{ root: profilePage ? 'border-2 border-[#9747FF]/100 drop-shadow-[0_0_3px_#9747FF]' : '' }} src={profileImg} name={username as string} color="initials" alt="me" />
             </Anchor>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Label><span className="text-[0.6rem]">{session?.user?.name}</span></Menu.Label>
+            <Menu.Label><span className="text-[0.6rem]">{username}</span></Menu.Label>
             <Menu.Item
               component="button"
               onClick={async () => {
