@@ -16,6 +16,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { FileInput, Radio, RadioGroup, TextInput } from 'react-hook-form-mantine';
 import { Dropzone, IMAGE_MIME_TYPE, MIME_TYPES } from '@mantine/dropzone';
 import { Icon } from '@iconify-icon/react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 // Define the structure of each item in the InputList
 type InputItem = {
@@ -35,57 +36,93 @@ const previewUrl = ((file: Blob | MediaSource) => {
 });
 
 const Profile = ({ data = {} }: { data?: any; }) => {
-  const [profile, setProfile] = React.useState<any>(data);
-  const [profilePicture, setProfilePicture] = React.useState<string>();
-  const [isEdit, setIsEdit] = React.useState(false);
-  const [opened, { open, close, toggle }] = useDisclosure(false);
-  const toggleEdit = () => setIsEdit(!isEdit);
-
+  const openDropzoneRef = React.useRef<() => void>(null);
+  const [isEdit, { open: openEdit, close: closeEdit, toggle: toggleEdit }] = useDisclosure(false);
   const { data: session, update } = useSession();
   const username = session?.user?.name;
   const profileImg = session?.user?.image;
-  console.log('profileImg:', profileImg)
   const user_id = session?.user?.user_id;
   const pathname = usePathname();
   const params = useParams();
   const searchParams = useSearchParams();
   const pageUrl = `${pathname}?${searchParams}`;
 
+  const { data: userDetails, isLoading: isUserDetailsLoading, refetch: userDetailsRefetch } = useQuery({
+    queryKey: ['userDetails', session?.user?.email],
+    queryFn: () => getUserDetails({ email: session?.user?.email as string }),
+    enabled: !!session?.user?.email,
+  });
+
+  const { data: profilePictureUrl, isLoading: isProfilePictureUrlLoading, refetch: profilePictureUrlRefetch } = useQuery({
+    queryKey: ['profilePicture', session?.user?.email],
+    queryFn: () => getProfilePicture({ email: session?.user?.email as string }),
+    enabled: !!session?.user?.email,
+  });
+
+  const { mutate: uploadProfilePictureMutate } = useMutation({
+    mutationFn: uploadProfilePicture,
+    onSuccess: async (response) => {
+      profilePictureUrlRefetch();
+      await update({ ...session!.user, image: profilePictureUrl });
+      toast.success(response.message);
+
+      modals.closeAll();
+      closeEdit();
+    },
+    onError: (error) => {
+      toast.error('Error updating profile');
+    }
+  });
+
+  const { mutate: updateUserDetailsMutate } = useMutation({
+    mutationFn: updateUserDetails,
+    onSuccess: async (response) => {
+      userDetailsRefetch();
+      await update({ ...session!.user, name: userDetails?.name });
+      toast.success(response.message);
+
+      modals.closeAll();
+      closeEdit();
+    },
+    onError: (error) => {
+      toast.error('Error updating profile');
+    }
+  });
 
   const InputList: InputItem[] = [
     {
       name: 'user_id',
       label: 'User ID',
       type: 'text',
-      value: profile?.id,
+      value: userDetails?.id,
       disabled: true
     },
     {
       name: "full_name",
       label: 'Full Name',
       type: 'text',
-      value: profile?.name,
+      value: userDetails?.name,
       disabled: !isEdit
     },
     {
       name: "role",
       label: 'Role',
       type: 'text',
-      value: profile?.role || "N/A",
+      value: userDetails?.role || "N/A",
       disabled: true
     },
     {
       name: "email",
       label: 'Email',
       type: 'text',
-      value: profile?.email,
+      value: userDetails?.email,
       disabled: true
     },
     {
       name: "mobile_no",
       label: 'Mobile Number',
       type: 'text',
-      value: profile?.mobile_no || "N/A",
+      value: userDetails?.mobile_no || "N/A",
       disabled: true
     },
   ];
@@ -100,84 +137,69 @@ const Profile = ({ data = {} }: { data?: any; }) => {
       profile_picture: null,
     },
     values: {
-      user_id: profile?.id,
-      full_name: profile?.name,
-      role: profile?.role || "N/A",
-      email: profile?.email,
-      mobile_no: profile?.mobile_no || "N/A",
-      profile_picture: profilePicture,
+      user_id: userDetails?.id,
+      full_name: userDetails?.name,
+      role: userDetails?.role || "N/A",
+      email: userDetails?.email,
+      mobile_no: userDetails?.mobile_no || "N/A",
+      profile_picture: profilePictureUrl,
     }
   });
   const { control, handleSubmit, setValue } = methods;
 
-  const onSubmit = async (formdata: any) => {
-    console.log('formdata:', formdata)
+  const onSubmit = async (data: any) => {
+    modals.open({
+      title: 'Confirm update',
+      children: (
+        <>
+          <Text size="sm">Updating Profile Details</Text>
+          <Flex gap={16} justify={'end'} mt="md">
+            <Button onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
+              Cancel
+            </Button>
+            <Button onClick={() => {
+              const sendData = {
+                email: session?.user?.email as string,
+                body: {
+                  name: data.full_name,
+                }
+              };
+              updateUserDetailsMutate(sendData, {
+                onSuccess: (response) => {
+                  if (!response.error) {
+                    if (data.profile_picture) {
+                      const formData = new FormData();
+                      formData.append('profile_picture', data.profile_picture[0]);
+                      uploadProfilePictureMutate({
+                        email: session?.user?.email as string,
+                        formData
+                      }, {
+                        onSuccess: () => {
+                        }
+                      });
+                    }
+                  }
+                  modals.closeAll();
+                  toggleEdit();
+                }
+              });
 
-    const data = {
-      email: session?.user?.email as string,
-      body: {
-        name: formdata.full_name,
-      }
-    };
-
-
-    // if (formdata.profile_picture) {
-
-    uploadProfilePicture({
-      email: session?.user?.email as string,
-      body: { profile_picture: formdata.profile_picture[0] as Blob }
-    })
-      .then((res) => {
-        toast.success(res.message)
-      })
-      .catch((err) => {
-        toast.error('Error uploading profile picture')
-      });
-    // }
-
-
-    // modals.open({
-    //   title: 'Confirm update',
-    //   children: (
-    //     <>
-    //       <Text size="sm">Updating Profile Details</Text>
-    //       <Flex gap={16} justify={'end'} mt="md">
-    //         <Button onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
-    //           Cancel
-    //         </Button>
-    //         <Button onClick={async () => await updateUserDetails(data).then((res) => {
-    //           toast.success(res.message);
-    //         }).catch((err) => {
-    //           toast.error('Error updating profile');
-    //         }).finally(() => {
-    //           modals.closeAll();
-    //           toggleEdit();
-    //         })}
-    //           color='var(--fc-brand-700)'
-    //           radius='md'
-    //         >
-    //           Yes
-    //         </Button>
-    //       </Flex>
-    //     </>
-    //   ),
-    //   overlayProps: {
-    //     backgroundOpacity: 0.55,
-    //     blur: 10,
-    //   },
-    //   radius: 'md',
-    // });
+            }}
+              color='var(--fc-brand-700)'
+              radius='md'
+            >
+              Yes
+            </Button>
+          </Flex>
+        </>
+      ),
+      overlayProps: {
+        backgroundOpacity: 0.55,
+        blur: 10,
+      },
+      radius: 'md',
+    });
   }
-
-  React.useEffect(() => {
-    const fetchProfile = async () => getUserDetails({ email: session?.user?.email as string });
-    fetchProfile().then(setProfile);
-  }, []);
-
-  React.useEffect(() => {
-    const fetchProfilePicture = async () => getProfilePicture({ email: session?.user?.email as string });
-    fetchProfilePicture().then(setProfilePicture);
-  }, []);
 
   return (
     <FormProvider {...methods}>
@@ -199,16 +221,18 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                 render={({ field }) => {
                   return (
                     <Dropzone
+                      openRef={openDropzoneRef}
+                      activateOnClick={false}
                       onDrop={(files) =>
                         setValue("profile_picture", files as unknown as string)
                       }
                       onReject={(files) =>
                         console.log("rejected files", files)
                       }
-                      maxSize={3 * 1024 ** 2}
+                      // maxSize={3 * 1024 ** 2}
                       accept={IMAGE_MIME_TYPE}
                       loaderProps={{ color: "var(--fc-brand-700)" }}
-                      // loading={!field.value}
+                      loading={isProfilePictureUrlLoading}
                       {...field}
                     >
                       <Avatar
@@ -223,12 +247,12 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                   )
                 }}
               />
-              <Tooltip
+              {isEdit && <Tooltip
                 label={'Change Profile Picture'}
               >
                 <ActionIcon
                   disabled={false}
-                  onClick={() => console.log('change profile picture')}
+                  onClick={() => openDropzoneRef.current?.()}
                   variant="transparent"
                   // bg="var(--fc-neutral-100)"
                   color='var(--fc-neutral-100)'
@@ -239,10 +263,10 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                 >
                   <Icon icon="heroicons:camera" width="1rem" />
                 </ActionIcon>
-              </Tooltip>
+              </Tooltip>}
 
             </InputWrapper>
-            <span className='font-notosans'>{profile?.name}</span>
+            <span className='font-notosans'>{userDetails?.name}</span>
             <Button
               disabled={true}
               color='var(--fc-neutral-600)'

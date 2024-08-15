@@ -29,7 +29,8 @@ const getProfilePicture = async ({ email }: { email: string }) => {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + 'pass2468').toString('base64')}`
     },
-    next: { tags: ['profilepicture'] }
+    // next: { tags: ['profilepicture'] },
+    cache: 'no-cache',
   });
   if (response.status === 404) {
     return [];
@@ -107,13 +108,8 @@ export const authConfig = {
       isNewUser?: boolean | undefined;
       session?: Session | undefined;
     }) {
-      if (
-        params.trigger === 'update' &&
-        params.token &&
-        params.token.image
-      ) {
-        const profileImage = await getProfilePicture({ email: params.user.email as string });
-        params.token.image = profileImage;
+      if (params.trigger === "update") {
+        params.token = { ...params.token, user: params.session };
         return params.token;
       }
 

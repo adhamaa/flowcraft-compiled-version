@@ -15,7 +15,6 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-
   return (
     <div className="w-full h-[calc(100vh-146.5px)] overflow-hidden">
       <TitleSection title='Manage Account' className='h-max w-full border-b-2 border-[var(--fc-border-gray)]' />
@@ -24,7 +23,6 @@ export default async function Layout({
         {children}
       </div>
     </div>
-
   );
 };
 

@@ -14,6 +14,7 @@ import { OnbordaProvider } from 'onborda';
 
 import { NavigationEvents } from '@/components/navigation-events';
 import { KickToLogin } from '@/components/kick-to-login';
+import { SessionProvider } from 'next-auth/react';
 
 const theme = createTheme({
   fontFamily: 'inherit',
@@ -59,25 +60,27 @@ export default function ClientProvider({
   const queryClient = getQueryClient()
 
   return (
-    <MantineProvider theme={theme}>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryStreamedHydration>
-          <ModalsProvider modals={modals}>
-            <Notifications position="top-right" classNames={{
-              root: 'w-max'
-            }} />
-            <SideMenuProvider >
-              <GlobalStateProvider>
-                <OnbordaProvider>
-                  <KickToLogin /> {/* running effect to kick out user when idle */}
-                  <NavigationEvents /> {/* running effect to track navigation */}
-                  {children}
-                </OnbordaProvider>
-              </GlobalStateProvider>
-            </SideMenuProvider>
-          </ModalsProvider>
-        </ReactQueryStreamedHydration>
-      </QueryClientProvider>
-    </MantineProvider>
+    <SessionProvider>
+      <MantineProvider theme={theme}>
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryStreamedHydration>
+            <ModalsProvider modals={modals}>
+              <Notifications position="top-right" classNames={{
+                root: 'w-max'
+              }} />
+              <SideMenuProvider >
+                <GlobalStateProvider>
+                  <OnbordaProvider>
+                    <KickToLogin /> {/* running effect to kick out user when idle */}
+                    <NavigationEvents /> {/* running effect to track navigation */}
+                    {children}
+                  </OnbordaProvider>
+                </GlobalStateProvider>
+              </SideMenuProvider>
+            </ModalsProvider>
+          </ReactQueryStreamedHydration>
+        </QueryClientProvider>
+      </MantineProvider>
+    </SessionProvider >
   )
 }

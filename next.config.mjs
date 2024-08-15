@@ -4,7 +4,12 @@ const nextConfig = {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
   },
   images: {
-    domains: ['s3-flowcraft.s3.amazonaws.com'],
+    remotePatterns: [{
+      protocol: 'https',
+      hostname: 's3-flowcraft.s3.amazonaws.com',
+      // port: '',
+      // pathname: '',
+    }]
   },
 };
 

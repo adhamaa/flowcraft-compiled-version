@@ -958,23 +958,14 @@ export const getProfilePicture = async ({ email }: { email: string }) => {
   return data.url;
 };
 
-export const uploadProfilePicture = async ({ email, body }: { email: string; body: Record<string, any> }) => {
-  console.log('email:', email)
-  console.log('body:', body)
+export const uploadProfilePicture = async ({ email, formData }: { email: string; formData: FormData }) => {
   const url = new URL(`/businessProcess/uploadProfilePicture`, baseUrl);
   url.searchParams.set('email', email);
-
-  const formData = new FormData();
-
-  for (const key in body) {
-    formData.append(key, body[key]);
-  }
-  console.log('formData:', formData)
 
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      // 'Content-Type': 'multipart/form-data',
+      // 'Content-Type': 'multipart/form-data', // hindering the upload makes cors error
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
     body: formData,
