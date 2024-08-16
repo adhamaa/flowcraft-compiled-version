@@ -4,12 +4,11 @@ import HeaderForm from '@/app/cycle/_components/Forms/HeaderForm';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
 import { getProfilePicture, getUserDetails, updateUserDetails, uploadProfilePicture } from '@/lib/service';
-import { ActionIcon, Avatar, Button, Flex, Group, InputWrapper, LoadingOverlay, Pill, rem, ScrollAreaAutosize, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Avatar, Button, Flex, Group, InputWrapper, LoadingOverlay, Overlay, Pill, rem, ScrollAreaAutosize, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import clsx from 'clsx';
 import { useSession } from 'next-auth/react';
-import Image from 'next/image';
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import * as React from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form';
@@ -17,6 +16,10 @@ import { FileInput, Radio, RadioGroup, TextInput } from 'react-hook-form-mantine
 import { Dropzone, IMAGE_MIME_TYPE, MIME_TYPES } from '@mantine/dropzone';
 import { Icon } from '@iconify-icon/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useProfilePicturePreview } from '@/hooks/useProfilePicturePreview';
+import { Blurhash } from 'react-blurhash';
+import { encode } from 'blurhash';
+import { encodeImageToBlurhash } from '@/lib/encodeImageToBlurhash';
 
 // Define the structure of each item in the InputList
 type InputItem = {
@@ -26,14 +29,6 @@ type InputItem = {
   value?: any;
   disabled: boolean;
 };
-
-const previewUrl = ((file: Blob | MediaSource) => {
-  const imageUrl = URL.createObjectURL(file);
-  React.useEffect(() => {
-    return () => URL.revokeObjectURL(imageUrl);
-  }, [imageUrl]);
-  return imageUrl;
-});
 
 const Profile = ({ data = {} }: { data?: any; }) => {
   const openDropzoneRef = React.useRef<() => void>(null);
@@ -145,7 +140,38 @@ const Profile = ({ data = {} }: { data?: any; }) => {
       profile_picture: profilePictureUrl,
     }
   });
-  const { control, handleSubmit, setValue } = methods;
+  const { control, handleSubmit, setValue, watch } = methods;
+
+  const imgSrc = useProfilePicturePreview(watch('profile_picture'));
+  console.log('imgSrc:', imgSrc)
+
+  const [blurhash, setBlurhash] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [src, setSrc] = React.useState<string | null>(null);
+  console.log('src:', src)
+  React.useEffect(() => {
+    const fetchBlurhash = async () => {
+      // try {
+      const hash = await encodeImageToBlurhash(imgSrc);
+      console.log('hash:', hash)
+      // setBlurhash(hash);
+      // const img = new Image();
+      // img.src = imgSrc;
+      // img.onload = () => {
+      //   setSrc(imgSrc);
+      //   setLoading(false);
+      // };
+      // img.onerror = () => {
+      //   setLoading(false);
+      // };
+      //   } catch (error) {
+      //     console.error('Failed to encode image to blurhash:', error);
+      //     setLoading(false);
+      //   }
+    };
+
+    fetchBlurhash();
+  }, [imgSrc]);
 
   const onSubmit = async (data: any) => {
     modals.open({
@@ -199,7 +225,7 @@ const Profile = ({ data = {} }: { data?: any; }) => {
       },
       radius: 'md',
     });
-  }
+  };
 
   return (
     <FormProvider {...methods}>
@@ -235,14 +261,30 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                       loading={isProfilePictureUrlLoading}
                       {...field}
                     >
-                      <Avatar
-                        name={username as string}
-                        src={field.value}
-                        color="initials"
-                        size={rem(150)}
-                        radius="md"
-                        alt="avatar"
-                      />
+                      {isEdit && <Overlay color="var(--fc-basic-black)" backgroundOpacity={0.35} blur={4} className='z-40 rounded-md' />}
+                      <div className="rounded-md overflow-hidden w-48 h-48">
+                        {/* {loading && blurhash ? ( */}
+                        <Blurhash
+                          hash={blurhash as string ?? "LEHV6nWB2yk8pyo0adR*.7kCMdnj"}
+                          width={200}
+                          height={200}
+                          resolutionX={32}
+                          resolutionY={32}
+                          punch={1}
+                        />
+                        {/* ) : (
+                          src && (
+                            <Avatar
+                              name={username as string}
+                              src={src}
+                              color="initials"
+                              size={rem(150)}
+                              radius="md"
+                              alt="avatar"
+                              className='w-full h-full'
+                            />
+                          ))} */}
+                      </div>
                     </Dropzone>
                   )
                 }}
@@ -253,15 +295,15 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                 <ActionIcon
                   disabled={false}
                   onClick={() => openDropzoneRef.current?.()}
-                  variant="transparent"
+                  variant="subtle"
                   // bg="var(--fc-neutral-100)"
                   color='var(--fc-neutral-100)'
-                  size="lg"
+                  size="100%"
                   radius="md"
                   aria-label="Change Profile Picture"
-                  className='absolute right-0 bottom-0 p-2'
+                  className='absolute bottom-0 z-50'
                 >
-                  <Icon icon="heroicons:camera" width="1rem" />
+                  <Icon icon="heroicons:camera" width="4rem" className='' />
                 </ActionIcon>
               </Tooltip>}
 
