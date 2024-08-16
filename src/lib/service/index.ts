@@ -970,7 +970,6 @@ export const uploadProfilePicture = async ({ email, formData }: { email: string;
     },
     body: formData,
   });
-  console.log('response:', response)
   if (response.status === 404) {
     return [];
   }
