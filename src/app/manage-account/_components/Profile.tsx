@@ -233,7 +233,12 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                       loading={isProfilePictureUrlLoading}
                       {...field}
                     >
-                      {isEdit && <Overlay color="var(--fc-basic-black)" backgroundOpacity={0.35} blur={4} className='z-40 rounded-md' />}
+                      {isEdit && <Overlay
+                        color="var(--fc-basic-black)"
+                        backgroundOpacity={0.35}
+                        blur={4}
+                        className='!absolute !z-10 !rounded-md'
+                      />}
                       <div className="rounded-md overflow-hidden w-48 h-48 transition-all duration-500 ease-in-out">
                         {/* <BlurhashImage
                           src={imgSrc}
@@ -241,15 +246,15 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                           height={198}
                           alt="Example Image"
                         > */}
-                          <Avatar
-                            name={username as string}
-                            src={imgSrc}
-                            color="initials"
-                            size={rem(150)}
-                            radius="md"
-                            alt="avatar"
-                            className='w-full h-full'
-                          />
+                        <Avatar
+                          name={username as string}
+                          src={imgSrc}
+                          color="initials"
+                          size={rem(150)}
+                          radius="md"
+                          alt="avatar"
+                          className='!w-full !h-full'
+                        />
                         {/* </BlurhashImage> */}
                       </div>
                     </Dropzone>
@@ -268,7 +273,7 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                   size="100%"
                   radius="md"
                   aria-label="Change Profile Picture"
-                  className='absolute bottom-0 z-50'
+                  className='!absolute !bottom-0 !z-50'
                 >
                   <Icon icon="heroicons:camera" width="4rem" className='' />
                 </ActionIcon>
