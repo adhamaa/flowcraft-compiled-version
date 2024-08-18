@@ -668,9 +668,17 @@ export const setAuditTrail = async ({
   json_object: Record<string, any>;
   location_url: string;
 }) => {
-  const encodedUrl = encodeURIComponent(process.env.AUTH_URL + location_url);
-  const endpoint = `/auditrail/businessProcess/?action=${action}&notes=${notes}&object=${object}&process_state=${process_state}&sysapp=${sysapp}&sysfunc=${sysfunc}&userid=${userid}&json_object=${JSON.stringify(json_object)}&location_url=${encodedUrl}`;
-  const url = `${baseUrl}${endpoint}`;
+  const url = new URL(`/auditrail/businessProcess/`, baseUrl);
+  url.searchParams.set('action', action);
+  url.searchParams.set('notes', notes);
+  url.searchParams.set('object', object);
+  url.searchParams.set('process_state', process_state);
+  url.searchParams.set('sysapp', sysapp);
+  url.searchParams.set('sysfunc', sysfunc);
+  url.searchParams.set('userid', userid);
+  url.searchParams.set('json_object', JSON.stringify(json_object));
+  url.searchParams.set('location_url', encodeURIComponent(process.env.AUTH_URL + location_url));
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {

@@ -42,6 +42,57 @@ const getProfilePicture = async ({ email }: { email: string }) => {
   return data.url;
 };
 
+const setAuditTrail = async ({
+  action,
+  notes,
+  object,
+  process_state,
+  sysapp,
+  sysfunc,
+  userid,
+  json_object,
+  location_url
+}: {
+  action: string;
+  notes: string;
+  object: string;
+  process_state: string;
+  sysapp: string;
+  sysfunc: string;
+  userid: string;
+  json_object: Record<string, any>;
+  location_url: string;
+}) => {
+  const url = new URL(`/auditrail/businessProcess/`, process.env.NEXT_PUBLIC_API_URL);
+  url.searchParams.set('action', action);
+  url.searchParams.set('notes', notes);
+  url.searchParams.set('object', object);
+  url.searchParams.set('process_state', process_state);
+  url.searchParams.set('sysapp', sysapp);
+  url.searchParams.set('sysfunc', sysfunc);
+  url.searchParams.set('userid', userid);
+  url.searchParams.set('json_object', JSON.stringify(json_object));
+  url.searchParams.set('location_url', encodeURIComponent(process.env.AUTH_URL + location_url));
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + Fernet.decrypt(process.env.NEXT_PUBLIC_API_PASSWORD, process.env.FERNET_KEY as string)).toString('base64')}`
+    },
+    // next: { tags: ['audittrail'] },
+    cache: 'no-cache',
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to fetch audit trail.');
+  // }
+  const data = await response.json();
+  return data;
+};
+
 export const BASE_PATH = '/api/auth'
 
 export const authConfig = {
@@ -201,7 +252,36 @@ export const authConfig = {
     // },
   },
   events: {
-    async signOut(params) {
+    signIn: async (params) => {
+      await setAuditTrail({
+        action: `login`,
+        location_url: '/auth/signin',
+        object: 'src/auth/index.ts',
+        process_state: 'LOGIN',
+        sysfunc: '"signIn" func ',
+        userid: params.user.id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User logged in`,
+        json_object: {
+          ...params.user,
+          ...params.account,
+        },
+      });
+    },
+    signOut: async (params: any) => {
+      await setAuditTrail({
+        action: `logout`,
+        location_url: '/auth/signout',
+        object: 'src/auth/index.ts',
+        process_state: 'LOGOUT',
+        sysfunc: '"signOut" func ',
+        userid: params.token.user_id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User logged out`,
+        json_object: {
+          ...params.token,
+        },
+      });
       if ("token" in params && params.token?.session_token) {
         await CustomAdapter.deleteSession?.(params.token.session_token as string);
         await CustomAdapter.updateAccountLoginCount?.(params.token.user_id as string);
