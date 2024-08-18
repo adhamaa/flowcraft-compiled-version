@@ -125,7 +125,7 @@ function TourComponent() {
         </Group>
 
         <Stack p={32}>
-          <Button onClick={() => startOnborda()}>Start The Tour</Button>
+          <Button onClick={() => startOnborda("onborda-step1")}>Start The Tour</Button>
           <div id="onborda-step1" className='p-10 m-auto rounded h-40 border w-40'>Onboard Step</div>
 
           <div id="onborda-step2" className='p-10 m-auto rounded h-40 border w-40'>Onboard Step</div>
