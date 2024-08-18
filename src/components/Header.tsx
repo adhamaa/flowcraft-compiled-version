@@ -24,7 +24,6 @@ function Header({ darkmode = false, className }: { darkmode?: boolean; className
     state = value;
     return state;
   }, "cycle");
-  console.log('activeTab:', activeTab)
   const switchRef = React.useRef<HTMLInputElement>(null);
   const { colorScheme, toggleColorScheme } = useMantineColorScheme({
     keepTransitions: true,
