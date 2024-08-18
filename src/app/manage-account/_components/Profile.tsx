@@ -20,6 +20,7 @@ import { useProfilePicturePreview } from '@/hooks/useProfilePicturePreview';
 import { Blurhash } from 'react-blurhash';
 import { encode } from 'blurhash';
 import { encodeImageToBlurhash } from '@/lib/encodeImageToBlurhash';
+import BlurhashImage from './BlurhashImage';
 
 // Define the structure of each item in the InputList
 type InputItem = {
@@ -143,35 +144,6 @@ const Profile = ({ data = {} }: { data?: any; }) => {
   const { control, handleSubmit, setValue, watch } = methods;
 
   const imgSrc = useProfilePicturePreview(watch('profile_picture'));
-  console.log('imgSrc:', imgSrc)
-
-  const [blurhash, setBlurhash] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [src, setSrc] = React.useState<string | null>(null);
-  console.log('src:', src)
-  React.useEffect(() => {
-    const fetchBlurhash = async () => {
-      // try {
-      const hash = await encodeImageToBlurhash(imgSrc);
-      console.log('hash:', hash)
-      // setBlurhash(hash);
-      // const img = new Image();
-      // img.src = imgSrc;
-      // img.onload = () => {
-      //   setSrc(imgSrc);
-      //   setLoading(false);
-      // };
-      // img.onerror = () => {
-      //   setLoading(false);
-      // };
-      //   } catch (error) {
-      //     console.error('Failed to encode image to blurhash:', error);
-      //     setLoading(false);
-      //   }
-    };
-
-    fetchBlurhash();
-  }, [imgSrc]);
 
   const onSubmit = async (data: any) => {
     modals.open({
@@ -262,28 +234,23 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                       {...field}
                     >
                       {isEdit && <Overlay color="var(--fc-basic-black)" backgroundOpacity={0.35} blur={4} className='z-40 rounded-md' />}
-                      <div className="rounded-md overflow-hidden w-48 h-48">
-                        {/* {loading && blurhash ? ( */}
-                        <Blurhash
-                          hash={blurhash as string ?? "LEHV6nWB2yk8pyo0adR*.7kCMdnj"}
-                          width={200}
-                          height={200}
-                          resolutionX={32}
-                          resolutionY={32}
-                          punch={1}
-                        />
-                        {/* ) : (
-                          src && (
-                            <Avatar
-                              name={username as string}
-                              src={src}
-                              color="initials"
-                              size={rem(150)}
-                              radius="md"
-                              alt="avatar"
-                              className='w-full h-full'
-                            />
-                          ))} */}
+                      <div className="rounded-md overflow-hidden w-48 h-48 transition-all duration-500 ease-in-out">
+                        {/* <BlurhashImage
+                          src={imgSrc}
+                          width={198}
+                          height={198}
+                          alt="Example Image"
+                        > */}
+                          <Avatar
+                            name={username as string}
+                            src={imgSrc}
+                            color="initials"
+                            size={rem(150)}
+                            radius="md"
+                            alt="avatar"
+                            className='w-full h-full'
+                          />
+                        {/* </BlurhashImage> */}
                       </div>
                     </Dropzone>
                   )

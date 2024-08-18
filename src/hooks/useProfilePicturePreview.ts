@@ -16,9 +16,10 @@ const revokePreviewUrls = (urls: string[]): void => {
 // Custom hook for handling profile picture previews
 export const useProfilePicturePreview = (profilePicture: FileInput[] | string | null) => {
   const [previewsUrl, setPreviewsUrl] = React.useState<string[]>([]);
+  const editMode = Array.isArray(profilePicture);
 
   React.useEffect(() => {
-    if (Array.isArray(profilePicture)) {
+    if (editMode) {
       // Generate preview URLs and set them in state
       const urls = generatePreviewUrls(profilePicture);
       setPreviewsUrl(urls);
@@ -35,7 +36,7 @@ export const useProfilePicturePreview = (profilePicture: FileInput[] | string | 
   }, [profilePicture]);
 
   // Determine the source of the profile picture
-  const src = Array.isArray(profilePicture) && previewsUrl.length > 0
+  const src = editMode && previewsUrl.length > 0
     ? previewsUrl[0]
     : (typeof profilePicture === 'string' ? profilePicture : '');
 
