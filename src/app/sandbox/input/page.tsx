@@ -2,11 +2,13 @@
 
 import InputWithOverlay from '@/components/form/InputWithOverlay';
 import useEditableState from '@/hooks/useEditableState';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Group, LoadingOverlay, Stack } from '@mantine/core';
 import clsx from 'clsx';
 import * as React from 'react'
 import { Form, FormProvider, useForm } from 'react-hook-form';
 import { MultiSelect, Select } from 'react-hook-form-mantine';
+import { z } from "zod";
 
 function InputPagesTesting() {
 
@@ -48,7 +50,7 @@ const FormOverlayWithProvider = () => {
       radius: 'md',
       classNames: {
         wrapper: 'w-full',
-        input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+        input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
       }
     },
     {
@@ -61,7 +63,7 @@ const FormOverlayWithProvider = () => {
       radius: 'md',
       classNames: {
         wrapper: 'w-full',
-        input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+        input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
       }
     },
     {
@@ -74,7 +76,7 @@ const FormOverlayWithProvider = () => {
       radius: 'md',
       classNames: {
         wrapper: 'w-full',
-        input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+        input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
       }
     },
     {
@@ -87,7 +89,7 @@ const FormOverlayWithProvider = () => {
       radius: 'md',
       classNames: {
         wrapper: 'w-full',
-        input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+        input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
       }
     }
   ]
@@ -126,7 +128,7 @@ const FormOverlayWithProvider = () => {
       </Button>
       <div className="flex space-x-4">
         <form className='relative' onSubmit={handleSubmit(onSubmit)}>
-          <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} loaderProps={{ color: '#895CF3', type: 'oval' }} />
+          <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} loaderProps={{ color: 'var(--fc-brand-700)', type: 'oval' }} />
           <Stack classNames={{
             root: 'bg-white p-4 py-10 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out',
           }}
@@ -236,7 +238,14 @@ const FormWithProvider = () => {
 }
 
 const FormWithControl = () => {
-  const method = useForm({ defaultValues: { select: null, multiSelect: [] } });
+  const schema = z.object({
+    select: z.string().nonempty(),
+    multiSelect: z.array(z.string()).nonempty()
+  });
+  const method = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { select: null, multiSelect: [] }
+  });
   const { reset, control } = method;
 
   return (
@@ -251,6 +260,7 @@ const FormWithControl = () => {
         name='select'
         label='Select'
         placeholder='Select item'
+        required={true}
         data={['React', 'Angular', 'Vue']}
         control={control}
       />

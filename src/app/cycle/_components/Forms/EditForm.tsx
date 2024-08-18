@@ -99,7 +99,7 @@ export const onSyntaxSubmit = async (formdata: any, e: any) => {
                       </List>
                     ))}
                     <Flex gap={16} justify={'end'} mt="md">
-                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                      <Button onClick={() => modals.closeAll()} color='var(--fc-brand-700)' radius='md'>
                         Close
                       </Button>
                     </Flex>
@@ -137,7 +137,7 @@ export const onSyntaxSubmit = async (formdata: any, e: any) => {
                       </List>
                     ))}
                     <Flex gap={16} justify={'end'} mt="md">
-                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                      <Button onClick={() => modals.closeAll()} color='var(--fc-brand-700)' radius='md'>
                         Close
                       </Button>
                     </Flex>
@@ -190,7 +190,7 @@ export const onSemanticSubmit = async (formdata: any, e: any) => {
                       </List>
                     ))}
                     <Flex gap={16} justify={'end'} mt="md">
-                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                      <Button onClick={() => modals.closeAll()} color='var(--fc-brand-700)' radius='md'>
                         Close
                       </Button>
                     </Flex>
@@ -228,7 +228,7 @@ export const onSemanticSubmit = async (formdata: any, e: any) => {
                       </List>
                     ))}
                     <Flex gap={16} justify={'end'} mt="md">
-                      <Button onClick={() => modals.closeAll()} color='#895CF3' radius='md'>
+                      <Button onClick={() => modals.closeAll()} color='var(--fc-brand-700)' radius='md'>
                         Close
                       </Button>
                     </Flex>
@@ -335,8 +335,8 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
           <Flex gap={16} justify={'end'} mt="md">
             <Button
               onClick={() => modals.closeAll()}
-              color='#F1F5F9'
-              c='#0F172A'
+              color='var(--fc-neutral-100)'
+              c='var(--fc-neutral-900)'
               radius='md'>
               Cancel
             </Button>
@@ -473,7 +473,7 @@ const EditFormContent = ({ data, toggle: toggleExpand }: {
                   toast.error(`Failed to update ${label}`);
                 }
 
-              }} color='#895CF3' radius='md'>
+              }} color='var(--fc-brand-700)' radius='md'>
               Yes
             </Button>
           </Flex>

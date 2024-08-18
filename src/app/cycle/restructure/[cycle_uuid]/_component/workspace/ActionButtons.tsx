@@ -45,7 +45,7 @@ const ActionButtons = () => {
       disabled: false,
       canShow: true,
       onClick: () => onReset(reset),
-      color: '#F1F5F9',
+      color: 'var(--fc-neutral-100)',
       icon: { name: "heroicons-outline:x-circle", width: '1.5rem' },
     },
     {
@@ -54,7 +54,7 @@ const ActionButtons = () => {
       disabled: !isEditable,
       canShow: true,
       onClick: handleSubmit(onApplySubmit),
-      color: '#895CF3',
+      color: 'var(--fc-brand-700)',
       icon: { name: "heroicons-outline:check-circle", width: '1.5rem' },
     },
     // {
@@ -63,7 +63,7 @@ const ActionButtons = () => {
     //   disabled: !isEditable,
     //   canShow: true,
     //   onClick: onDraft,
-    //   color: '#895CF3',
+    //   color: 'var(--fc-brand-700)',
     //   icon: { name: "heroicons-outline:folder", width: '1.5rem' },
     // },
     {
@@ -79,7 +79,7 @@ const ActionButtons = () => {
           }
         });
       },
-      color: '#895CF3',
+      color: 'var(--fc-brand-700)',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
     // {
@@ -88,7 +88,7 @@ const ActionButtons = () => {
     //   disabled: false,
     //   canShow: true,
     //   onClick: () => window.location.reload(),
-    //   color: '#F1F5F9',
+    //   color: 'var(--fc-neutral-100)',
     //   icon: { name: "heroicons:refresh", width: '1.5rem' },
     // }
   ] satisfies CustomButtonProps[];

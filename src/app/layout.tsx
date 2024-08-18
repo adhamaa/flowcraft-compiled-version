@@ -6,9 +6,17 @@ import '@/styles/globals.css';
 
 import { ColorSchemeScript } from '@mantine/core';
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Noto_Sans } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+const notoSans = Noto_Sans({
+  subsets: ["latin"],
+  variable: "--font-noto-sans",
+});
+
 
 export const metadata: Metadata = {
   title: {
@@ -27,13 +35,12 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: {
   children: React.ReactNode;
 }) {
-
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${notoSans.variable}`}>
       <head>
         <ColorSchemeScript />
       </head>
-      <body className={inter.className}>
+      <body>
         <Providers>
           <Header />
           <Breadcrumbs />

@@ -68,7 +68,7 @@ function SigninForm() {
                 classNames={{
                   root: 'w-full',
                   label: 'mb-3 ml-4 !text-sm !font-semibold',
-                  input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+                  input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
                 }} />
             ) : (
               <TextInput
@@ -80,7 +80,7 @@ function SigninForm() {
                 classNames={{
                   root: 'w-full',
                   label: 'mb-3 ml-4 !text-sm !font-semibold',
-                  input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
+                  input: '!rounded-lg p-4 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent',
                 }} />
             )
           )}
@@ -93,7 +93,7 @@ function SigninForm() {
               // target="_blank"
               onClick={() => console.log("clicked")}
               underline="hover"
-              // c="#895CF3"
+              // c="var(--fc-brand-700)"
               classNames={{
                 root: 'disabled:cursor-default disabled:!no-underline disabled:opacity-50 hover:text-blue-500 dark:hover:text-blue-500 transition-all duration-300 ease-in-out !text-xs',
               }}
@@ -104,7 +104,7 @@ function SigninForm() {
           <Button
             loading={isSubmitting || isLoading || isValidating}
             type='submit'
-            color='#895CF3'
+            color='var(--fc-brand-700)'
             radius='md'
             classNames={{
               root: '!w-full !my-8',

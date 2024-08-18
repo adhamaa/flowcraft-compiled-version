@@ -55,7 +55,7 @@ const InputWithOverlay = (props: InputProps<any> & {
         radius={props.radius || 'md'}
         classNames={{
           wrapper: 'w-full',
-          input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+          input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
           ...props.classNames
         }}
         rightSectionWidth={72}
@@ -114,7 +114,7 @@ const InputWithOverlay = (props: InputProps<any> & {
         autosize
         minRows={4}
         classNames={{
-          input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+          input: '!rounded-none !rounded-b-lg !h-32 p-4 w-full focus:outline-none focus:!ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
         }}
       />
       {isEditable && <SyntaxSemanticActions  {...{
@@ -156,7 +156,7 @@ const InputWithOverlay = (props: InputProps<any> & {
         radius={props.radius || 'md'}
         classNames={{
           wrapper: 'w-full',
-          input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+          input: '!rounded-lg !p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
           ...props.classNames
         }}
         rightSectionWidth={72}

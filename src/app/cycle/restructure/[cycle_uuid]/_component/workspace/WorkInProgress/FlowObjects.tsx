@@ -182,7 +182,7 @@ function FlowObjects() {
                             placeholder={input.placeholder}
                             disabled={input.disabled}
                             classNames={{
-                              input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+                              input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                             }}
                             control={input.control}
                           />
@@ -209,7 +209,7 @@ function FlowObjects() {
                             allowDeselect
                             nothingFoundMessage="No stage found"
                             classNames={{
-                              input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+                              input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                             }}
                             control={input.control}
                             // value={input.value}
@@ -241,7 +241,7 @@ function FlowObjects() {
                               rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
                               checkIconPosition='right'
                               classNames={{
-                                input: '!rounded-lg py-3 pr-3 w-full !focus:outline-none !focus:ring-2 !focus:ring-[#895CF3] !focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] !disabled:border-transparent !disabled:text-black',
+                                input: '!rounded-lg py-3 pr-3 w-full !focus:outline-none !focus:ring-2 !focus:ring-[var(--fc-brand-700)] !focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] !disabled:border-transparent !disabled:text-black',
                               }}
                               nothingFoundMessage="No stage found"
                               control={input.control}
@@ -250,17 +250,17 @@ function FlowObjects() {
                             />
                             <style jsx global>{`
                             .mantine-MultiSelect-input:focus {
-                              outline: 2px solid #895CF3;
+                              outline: 2px solid var(--fc-brand-700);
                               border-color: transparent;
                               transition: all 0.1s ease;
                               }
                             .mantine-MultiSelect-input:focus-visible {
-                              outline: 2px solid #895CF3;
+                              outline: 2px solid var(--fc-brand-700);
                               border-color: transparent;
                               transition: all 0.1s ease;
                               }
                             .mantine-MultiSelect-input:focus-within {
-                              outline: 2px solid #895CF3;
+                              outline: 2px solid var(--fc-brand-700);
                               border-color: transparent;
                               transition: all 0.1s ease;
                               }

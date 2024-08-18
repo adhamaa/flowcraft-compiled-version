@@ -8,7 +8,7 @@ const WithEntryAndExitNode = ({ data: { label }, selected }: NodeProps) => {
   return (
     <div className={clsx(
       'flex flex-col items-center w-60',
-      selected && 'border border-dashed border-[#895CF3]'
+      selected && 'border border-dashed border-[var(--fc-brand-700)]'
     )}>
       {/* <NodeResizer color="#ff0071" isVisible={selected} minWidth={100} minHeight={30} /> */}
       <Handle type="target" position={Position.Top} className='opacity-0' />

@@ -19,10 +19,10 @@ const TextareaHeader = ({ table, actionsButton }: {
           <MRT_TablePagination
             autoContrast
             table={table}
-            color='#895CF3'
+            color='var(--fc-brand-700)'
             classNames={{
               root: '',
-              // control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[#895CF3] !hover:text-white/90 !hover:!border-[#895CF3] !transition-all !duration-300 !ease-in-out',
+              // control: '!bg-transparent !border-none !text-sm !text-black/60 !font-semibold !hover:bg-[var(--fc-brand-700)] !hover:text-white/90 !hover:!border-[var(--fc-brand-700)] !transition-all !duration-300 !ease-in-out',
             }}
           />}
         {actionsButton}

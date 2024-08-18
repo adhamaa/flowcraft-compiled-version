@@ -792,7 +792,7 @@ const Diagram = ({ disabled }: {
         radius='lg'
         transitionProps={{ transition: 'fade', duration: 200 }}
         closeButtonProps={{
-          icon: <Icon icon="mingcute:close-fill" width="1.2rem" height="1.2rem" className='!text-[#895CF3]' />,
+          icon: <Icon icon="mingcute:close-fill" width="1.2rem" height="1.2rem" className='!text-[var(--fc-brand-700)]' />,
         }}
         size={renderDiagram ? "xl" : "xs"}
       >
@@ -834,8 +834,8 @@ const Diagram = ({ disabled }: {
       <Button
         disabled={disabled}
         variant='filled'
-        color='#F1F5F9'
-        c='#0F172A'
+        color='var(--fc-neutral-100)'
+        c='var(--fc-neutral-900)'
         radius='md'
         size="sm"
         fz={14}

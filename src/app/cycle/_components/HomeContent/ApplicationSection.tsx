@@ -46,7 +46,7 @@ const ApplicationSection = ({
   }, []);
 
   return (
-    <section className={clsx('px-20 py-1 bg-[#F1F5F9]',
+    <section className={clsx('px-20 py-1 bg-[var(--fc-neutral-100)]',
       'shadow-[inset_4px_4px_10px_0_rgb(203_213_225_/_0.25)]'
     )} > {/* #CBD5E140 */}
       <div className="p-4" >
@@ -55,7 +55,7 @@ const ApplicationSection = ({
           &nbsp;
           {selectedApp && <span>{`(${selectedApp})`}</span>}
           <UnstyledButton className='ml-auto text-sm' onClick={toggle} color='blue'>
-            <span className='flex items-center gap-2 text-[#895CF3]'>
+            <span className='flex items-center gap-2 text-[var(--fc-brand-700)]'>
               {opened ? 'Hide' : 'Unhide'}
               <Icon icon="tabler:chevron-down" width="1rem" height="1rem" rotate={opened ? 90 : 0} />
             </span>
@@ -75,14 +75,14 @@ const ApplicationSection = ({
                   key={index}
                   variant='default'
                   classNames={{
-                    root: apps_label != selected_app_param ? '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none' : '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none shadow-[#895CF3]/30',
+                    root: apps_label != selected_app_param ? '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none' : '!w-44 !h-48 bg-white shadow-lg !rounded-xl !border-none shadow-[var(--fc-brand-700)]/30',
                     label: 'flex flex-col items-center justify-center',
                   }}
                   onClick={handleAppClick}
                 >
                   {logoImg ? <Image src={logoImg} width={opened ? 400 : 600} height={opened ? 500 : 700} className={clsx('object-cover',
                   )} alt='process illustration' /> :
-                    <div className='bg-[#895CF3] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
+                    <div className='bg-[var(--fc-brand-700)] w-32 h-32 rounded-full flex justify-center items-center font-semibold text-white text-2xl text-center'>
                       <p className='w-20 whitespace-pre-wrap'>FREE DEMO</p>
                     </div>}
                   <p className='text-wrap text-sm text-[#4F4F4F]'>{apps_name}</p>

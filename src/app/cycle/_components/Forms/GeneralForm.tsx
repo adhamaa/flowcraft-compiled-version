@@ -161,7 +161,7 @@ const GeneralFormContent = ({
         <>
           <Text size="sm">Are you sure you want to update <strong>Cycle status & description</strong>?</Text>
           <Flex gap={16} justify={'end'} mt="md">
-            <Button onClick={() => modals.closeAll()} color='#F1F5F9' c='#0F172A' radius='md'>
+            <Button onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
               Cancel
             </Button>
             <Button onClick={
@@ -253,7 +253,7 @@ const GeneralFormContent = ({
                   toggleEdit();
                 }
               }
-            } color='#895CF3' radius='md'>
+            } color='var(--fc-brand-700)' radius='md'>
               Yes
             </Button>
           </Flex>
@@ -280,16 +280,16 @@ const GeneralFormContent = ({
   const max_h_768 = useMediaQuery('(max-height: 768px)');
 
   return (
-    <ScrollAreaAutosize >
-      <FormProvider {...methods}>
-        <form
-          className={clsx('space-y-4 h-[calc(100vh-146.5px)]')}
-          onSubmit={handleSubmit(onSubmit)}
-          onError={(e) => console.log(e)}
-        >
-          <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
+    <FormProvider {...methods}>
+      <form
+        className={clsx('space-y-4 w-full')}
+        onSubmit={handleSubmit(onSubmit)}
+        onError={(e) => console.log(e)}
+      >
+        <HeaderForm type='general' {...{ toggleEdit, isEdit, toggleExpand }} />
 
-          <div className="container mx-auto space-y-8 py-4">
+        <ScrollAreaAutosize className='h-[calc(100vh-231.5px)]'>
+          <div className="container mx-auto space-y-8 pt-4 pb-10">
             <DiagramBar />
             {InputList?.map(({ label, name, type, value, disabled }, index) => {
               return ['Status'].includes(label) ? (
@@ -329,16 +329,16 @@ const GeneralFormContent = ({
                     control={control}
                     disabled={disabled}
                     classNames={{
-                      input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[#895CF3] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
+                      input: '!rounded-lg p-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
                     }} />
                 </InputWrapper>
               )
             })}
 
           </div>
-        </form>
-      </FormProvider>
-    </ScrollAreaAutosize >
+        </ScrollAreaAutosize >
+      </form>
+    </FormProvider>
   )
 };
 
@@ -369,7 +369,7 @@ function DiagramBar() {
       <ActionIcon
         disabled
         variant="filled"
-        color="#895CF3" size="lg"
+        color="var(--fc-brand-700)" size="lg"
         radius="md" aria-label="Settings" mr="auto"
         onClick={() => router.refresh()}
       >

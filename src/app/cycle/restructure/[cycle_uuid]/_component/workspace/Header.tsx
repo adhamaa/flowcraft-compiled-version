@@ -23,7 +23,7 @@ function Header() {
         type='submit'
         // disabled
         variant="transparent"
-        color='#895CF3'
+        color='var(--fc-brand-700)'
         size="2.5rem"
         radius="md"
         aria-label="Back"

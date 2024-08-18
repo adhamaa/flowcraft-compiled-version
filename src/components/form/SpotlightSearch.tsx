@@ -48,7 +48,7 @@ function SpotlightSearch() {
       <Spotlight
         actions={spotlightActions}
         nothingFound="Nothing found..."
-        color='#895CF3'
+        color='var(--fc-brand-700)'
         highlightQuery
         scrollable
         maxHeight={340}
@@ -56,7 +56,7 @@ function SpotlightSearch() {
           leftSection: <Icon
             icon="heroicons-outline:search"
             width={20}
-            className="hover:text-[#895CF3] cursor-pointer"
+            className="hover:text-[var(--fc-brand-700)] cursor-pointer"
           />,
           placeholder: 'Search...',
           classNames: {
@@ -88,7 +88,7 @@ function SpotlightSearch() {
         <Icon
           icon="mingcute:search-line"
           width={20}
-          className="text-gray-500 hover:text-[#895CF3] cursor-pointer"
+          className="text-gray-500 hover:text-[var(--fc-brand-700)] cursor-pointer"
         />
         <Text fz='sm'>Search</Text>
         {/* <Text

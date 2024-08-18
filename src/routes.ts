@@ -15,7 +15,8 @@ export const protectedRoutes = [
   "/profile",
   "/documentation",
   "/maintenance",
-  "/manage-claim"
+  "/manage-claim",
+  "/manage-account",
 ];
 export type ProtectedRoutes = typeof protectedRoutes;
 /**

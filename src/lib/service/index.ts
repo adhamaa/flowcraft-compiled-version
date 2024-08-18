@@ -1,6 +1,7 @@
 
 'use server';
 
+import { ActionType } from "@/app/manage-claim/[claim_slug]/_components/manage-claim/pending-claims";
 import { decryptPassword } from "../crypt";
 import { clientRevalidateTag } from "./helper";
 import { datasource_mapping } from "@/constant/datasource";
@@ -716,6 +717,7 @@ export const restructureBizProcess = async ({
   }
 };
 
+// ----------------- Claim management ----------------- //
 export const getAllClaim = async ({
   claim_id,
   per_page,
@@ -816,7 +818,7 @@ export const getRestructurePendingsLog = async ({
 export const restructurePendings = async ({
   body
 }: {
-  body: { claim_id?: string[]; user_id: string[]; stage_uuid?: string[]; action: "recovery" | "send_pending" | "send_message" | "test" };
+  body: { user_id: string[]; action: ActionType; claim_id?: string[]; stage_uuid?: string[]; message?: string; };
 }) => {
   const url = new URL(`/businessProcess/restructurePendings`, baseUrl);
 
@@ -885,5 +887,95 @@ export const sendMessagePending = async ({
   if (!response.ok) {
     throw new Error('Failed to send message pending.');
   }
+  return await response.json();
+};
+
+export const getUserDetails = async ({ email }: { email: string }) => {
+  const url = new URL(`/businessProcess/user`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    next: { tags: ['userdetails'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to get user details.');
+  }
+  const data = await response.json();
+  const [user] = data.data;
+  return user;
+};
+
+export const updateUserDetails = async ({ email, body }: { email: string; body: Record<string, any> }) => {
+  const url = new URL(`/businessProcess/userUpdate`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    body: JSON.stringify(body)
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to update user details.');
+  }
+  clientRevalidateTag('userdetails');
+  return await response.json();
+};
+
+
+export const getProfilePicture = async ({ email }: { email: string }) => {
+  const url = new URL(`/businessProcess/getProfilePicture`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    next: { tags: ['profilepicture'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to get profile picture.');
+  }
+  const data = await response.json();
+  return data.url;
+};
+
+export const uploadProfilePicture = async ({ email, formData }: { email: string; formData: FormData }) => {
+  const url = new URL(`/businessProcess/uploadProfilePicture`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      // 'Content-Type': 'multipart/form-data', // hindering the upload makes cors error
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    body: formData,
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to upload profile picture.');
+  }
+  clientRevalidateTag('profilepicture');
   return await response.json();
 };
