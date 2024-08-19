@@ -988,3 +988,24 @@ export const uploadProfilePicture = async ({ email, formData }: { email: string;
   clientRevalidateTag('profilepicture');
   return await response.json();
 };
+
+export const removeProfilePicture = async ({ email }: { email: string }) => {
+  const url = new URL(`/businessProcess/deleteProfilePicture`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to delete profile picture.');
+  }
+  clientRevalidateTag('profilepicture');
+  return await response.json();
+}

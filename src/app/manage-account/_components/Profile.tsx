@@ -3,8 +3,8 @@
 import HeaderForm from '@/app/cycle/_components/Forms/HeaderForm';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
-import { getProfilePicture, getUserDetails, setAuditTrail, updateUserDetails, uploadProfilePicture } from '@/lib/service';
-import { ActionIcon, Avatar, Button, Flex, Group, InputWrapper, LoadingOverlay, Overlay, Pill, rem, ScrollAreaAutosize, Text, Tooltip } from '@mantine/core';
+import { getProfilePicture, getUserDetails, removeProfilePicture, setAuditTrail, updateUserDetails, uploadProfilePicture } from '@/lib/service';
+import { ActionIcon, Avatar, Button, CloseButton, Flex, Group, InputWrapper, LoadingOverlay, Overlay, Pill, rem, ScrollAreaAutosize, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import clsx from 'clsx';
@@ -102,6 +102,21 @@ const Profile = ({ data = {} }: { data?: any; }) => {
     },
     onError: (error) => {
       toast.error('Error updating profile');
+    }
+  });
+
+  const { mutate: removeProfilePictureMutate } = useMutation({
+    mutationFn: removeProfilePicture,
+    onSuccess: async (response) => {
+      profilePictureUrlRefetch();
+      await update({ ...session!.user, image: profilePictureUrl });
+      toast.success(response.message);
+
+      modals.closeAll();
+      closeEdit();
+    },
+    onError: (error) => {
+      toast.error('Error removing profile');
     }
   });
 
@@ -297,6 +312,16 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                 >
                   <Icon icon="heroicons:camera" width="4rem" className='' />
                 </ActionIcon>
+              </Tooltip>}
+              {isEdit && <Tooltip
+                label={'Remove Profile Picture'}
+              >
+                <CloseButton
+                  variant='transparent'
+                  aria-label="Remove Picture"
+                  className='!absolute !top-1 !right-1 !z-50 !text-white'
+                  onClick={() => removeProfilePictureMutate({ email: session?.user?.email as string })}
+                />
               </Tooltip>}
 
             </InputWrapper>

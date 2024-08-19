@@ -266,7 +266,7 @@ const useDiagramStore = create<RFState>()(
                 callback?.({
                   success: true,
                   message: res.message,
-                  cycle_uuid,
+                  data: { cycle_uuid, ...ApiFormat },
                 });
 
                 return;

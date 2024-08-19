@@ -8,7 +8,9 @@ import * as  React from 'react'
 import { useFormContext } from 'react-hook-form';
 import { addEdge, ConnectionLineType, Edge } from 'reactflow';
 import { ActionType, useActionIcons } from './WorkInProgress/hooks/useActionIcons';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { setAuditTrail } from '@/lib/service';
+import { useSession } from 'next-auth/react';
 
 type ActionButtonsType = {
   label: string;
@@ -22,9 +24,14 @@ type ActionButtonsType = {
 };
 
 const ActionButtons = () => {
+  const { data: session } = useSession();
+  const userId = session?.user?.user_id;
   const router = useRouter();
+  const pathname = usePathname();
   const params = useParams();
+  const searchParams = useSearchParams();
   const cycle_uuid = params.cycle_uuid as string;
+  const pageUrl = `${pathname}?${searchParams}`;
 
   const { isEditable: isEditData, reset: resetIsEditable, getAction, getIsAnyEditable } = useActionIcons();
 
@@ -37,7 +44,42 @@ const ActionButtons = () => {
 
   const action = getAction(isEditData as { [key in ActionType]: boolean });
 
-  const onApplySubmit = (data: any, e: any) => onApply({ action: action as ActionType, data, callback: reset });
+  const onApplySubmit = (data: any, e: any) => onApply({
+    action: action as ActionType, data, callback: () => {
+      reset();
+      setAuditTrail({
+        action: 'apply_' + (action as string) + '_restructure_cycle',
+        notes: `Apply ${action} on restructuring cycle`,
+        object: 'src/app/cycle/restructure/[cycle_uuid]/_component/workspace/ActionButtons.tsx',
+        process_state: 'RESTRUCTURE_CYCLE',
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        sysfunc: '"onApplySubmit" func',
+        userid: userId as string,
+        json_object: { ...data },
+        location_url: pageUrl,
+      });
+    }
+  });
+
+  const onSaveSubmit = () => onSave(cycle_uuid, (response) => {
+    if (response.success) {
+      setAuditTrail({
+        action: 'save_restructure_cycle',
+        notes: `Save restructuring cycle`,
+        object: 'src/app/cycle/restructure/[cycle_uuid]/_component/workspace/ActionButtons.tsx',
+        process_state: 'TRIGGERAPI',
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        sysfunc: '"onSaveSubmit" func',
+        userid: userId as string,
+        json_object: { ...response.data },
+        location_url: pageUrl,
+      });
+      resetIsEditable();
+      window.location.reload();
+    }
+  });
+
+  const onResetSubmit = () => onReset(reset);
 
   const buttons: ActionButtonsType[] = [
     {
@@ -45,7 +87,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: false,
       canShow: true,
-      onClick: () => onReset(reset),
+      onClick: onResetSubmit,
       color: 'var(--fc-neutral-100)',
       c: 'var(--bc-neutral-900)',
       icon: { name: "heroicons-outline:x-circle", width: '1.5rem' },
@@ -73,14 +115,7 @@ const ActionButtons = () => {
       type: 'button',
       disabled: !isEditable,
       canShow: true,
-      onClick: () => {
-        onSave(cycle_uuid, (message) => {
-          if (message.success) {
-            resetIsEditable();
-            window.location.reload();
-          }
-        });
-      },
+      onClick: onSaveSubmit,
       color: 'var(--fc-brand-700)',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
