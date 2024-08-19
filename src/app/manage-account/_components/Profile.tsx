@@ -3,7 +3,7 @@
 import HeaderForm from '@/app/cycle/_components/Forms/HeaderForm';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
-import { getProfilePicture, getUserDetails, updateUserDetails, uploadProfilePicture } from '@/lib/service';
+import { getProfilePicture, getUserDetails, setAuditTrail, updateUserDetails, uploadProfilePicture } from '@/lib/service';
 import { ActionIcon, Avatar, Button, Flex, Group, InputWrapper, LoadingOverlay, Overlay, Pill, rem, ScrollAreaAutosize, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
@@ -61,7 +61,17 @@ const Profile = ({ data = {} }: { data?: any; }) => {
       profilePictureUrlRefetch();
       await update({ ...session!.user, image: profilePictureUrl });
       toast.success(response.message);
-
+      setAuditTrail({
+        action: `update_profile_picture`,
+        location_url: pageUrl,
+        object: 'src/app/manage-account/_components/Profile.tsx',
+        process_state: 'TRIGGERAPI',
+        sysfunc: '"onSuccess" callback of "uploadProfilePictureMutate"',
+        userid: user_id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User updated profile picture`,
+        json_object: { email: session?.user?.email, ...response },
+      });
       modals.closeAll();
       closeEdit();
     },
@@ -76,7 +86,17 @@ const Profile = ({ data = {} }: { data?: any; }) => {
       userDetailsRefetch();
       await update({ ...session!.user, name: userDetails?.name });
       toast.success(response.message);
-
+      setAuditTrail({
+        action: `update_user_details`,
+        location_url: pageUrl,
+        object: 'src/app/manage-account/_components/Profile.tsx',
+        process_state: 'TRIGGERAPI',
+        sysfunc: '"onSuccess" callback of "updateUserDetailsMutate"',
+        userid: user_id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User updated profile details`,
+        json_object: { email: session?.user?.email, ...response },
+      });
       modals.closeAll();
       closeEdit();
     },

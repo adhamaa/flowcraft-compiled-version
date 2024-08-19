@@ -5,7 +5,7 @@ import { Icon } from "@iconify-icon/react";
 import { Spotlight, SpotlightActionData, SpotlightActionGroupData, spotlight } from "@mantine/spotlight";
 import { Text, UnstyledButton } from '@mantine/core';
 import '@mantine/spotlight/styles.css';
-import { CycleData } from '@/app/cycle/_components/HomeContent';
+import { CycleData } from '@/components/HomeContent';
 import { getCycleList } from '@/lib/service';
 import { useRouter } from 'next/navigation';
 

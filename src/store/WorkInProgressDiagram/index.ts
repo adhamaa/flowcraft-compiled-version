@@ -29,7 +29,7 @@ import { ActionType } from '@/app/cycle/restructure/[cycle_uuid]/_component/work
 import { FormValues } from '@/app/cycle/restructure/[cycle_uuid]/_component/workspace/WorkInProgress/FlowObjects';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
-import { CycleData } from '@/app/cycle/_components/HomeContent';
+import { CycleData } from '@/components/HomeContent';
 import { revalidateCustomPath } from '@/actions/revalidatePath';
 
 const dagreGraph = new dagre.graphlib.Graph();

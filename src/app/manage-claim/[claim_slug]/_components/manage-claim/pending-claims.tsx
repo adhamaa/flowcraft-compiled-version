@@ -2,7 +2,7 @@
 
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
-import { Apps_label, getAllClaim, getCycleInfo, getStageList, getUsersPending, restructurePendings, sendMessagePending, testPending } from '@/lib/service';
+import { Apps_label, getAllClaim, getCycleInfo, getStageList, getUsersPending, restructurePendings, sendMessagePending, setAuditTrail, testPending } from '@/lib/service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Button, Flex, Menu, MenuDropdown, MenuItem, MenuTarget, Stack } from '@mantine/core';
@@ -11,7 +11,7 @@ import { modals } from '@mantine/modals';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { MantineReactTable, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_RowSelectionState, MRT_TablePagination, useMantineReactTable } from 'mantine-react-table';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import * as React from 'react'
 import { Control, Form, useForm } from 'react-hook-form';
 import { MultiSelect, MultiSelectProps, NumberInput, Select, SelectProps, Textarea, TextareaProps, TextInput } from 'react-hook-form-mantine';
@@ -118,6 +118,8 @@ export default PendingClaim
 
 const TableClaims = (props?: PendingClaimProps) => {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const pageUrl = `${pathname}?${searchParams}`;
   const selected_app = searchParams.get('selected_app');
   const cycle_id = searchParams.get('cycle_id');
   const [action, setAction] = React.useState<ActionType>();
@@ -245,6 +247,17 @@ const TableClaims = (props?: PendingClaimProps) => {
     try {
       const res = await restructurePendings({ body: sendData });
       toast.success(res.message);
+      setAuditTrail({
+        action: `${action}_pending_claims`,
+        location_url: pageUrl,
+        object: 'src/app/manage-claim/[claim_slug]/_components/manage-claim/pending-claims.tsx',
+        process_state: 'TRIGGERAPI',
+        sysfunc: '"handleAction" func',
+        userid: user_id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `Update pending claims`,
+        json_object: { ...sendData, ...res },
+      });
     } catch (error: any) {
       toast.error(error.message);
     }

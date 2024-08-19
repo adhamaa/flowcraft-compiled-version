@@ -5,7 +5,7 @@ import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import HeaderForm from './HeaderForm';
-import { StageInfoData } from '../HomeContent';
+import { StageInfoData } from '../../../../components/HomeContent';
 import { FormProvider, useForm } from 'react-hook-form';
 import { MRT_ColumnDef, MantineReactTable, useMantineReactTable } from 'mantine-react-table';
 import clsx from 'clsx';
