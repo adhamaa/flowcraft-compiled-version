@@ -2,14 +2,14 @@ import NextAuth, { Account, CredentialsSignin, NextAuthConfig, Profile, Session,
 import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, protectedRoutes, publicRoutes } from "../routes"
 import { NextResponse } from "next/server"
 import Credentials from "next-auth/providers/credentials"
-import { JWT, encode } from "next-auth/jwt"
+import { JWT } from "next-auth/jwt"
 import { CustomAdapter } from "@/db/Adapter"
 import { ZodError } from "zod"
-import { Fernet } from "fernet-nodejs"
 import { loginSchema } from "../lib/validation"
 import { DrizzleError } from "drizzle-orm"
 import { AdapterUser } from "next-auth/adapters"
 import { randomUUID } from "crypto"
+import { decryptPassword } from "@/lib/crypt"
 
 class InvalidLoginError extends CredentialsSignin {
   constructor(code: string) {
@@ -78,7 +78,7 @@ const setAuditTrail = async ({
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + Fernet.decrypt(process.env.NEXT_PUBLIC_API_PASSWORD, process.env.FERNET_KEY as string)).toString('base64')}`
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + decryptPassword(process.env.NEXT_PUBLIC_API_PASSWORD)).toString('base64')}`
     },
     // next: { tags: ['audittrail'] },
     cache: 'no-cache',
@@ -117,7 +117,7 @@ export const authConfig = {
             throw new InvalidLoginError("User account does not exist");
           }
 
-          const passwordDB = Fernet.decrypt(user.password, process.env.FERNET_KEY as string)
+          const passwordDB = decryptPassword(user.password, process.env.FERNET_KEY as string)
 
           const passwordsMatch = password === passwordDB;
 
