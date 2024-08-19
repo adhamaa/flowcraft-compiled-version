@@ -19,6 +19,30 @@ class InvalidLoginError extends CredentialsSignin {
   }
 }
 
+const getUserDetails = async ({ email }: { email: string }) => {
+  const url = new URL(`/businessProcess/user`, process.env.NEXT_PUBLIC_API_URL);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + 'pass2468').toString('base64')}`
+    },
+    // next: { tags: ['userdetails'] }
+    cache: 'no-cache',
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to get user details.');
+  }
+  const data = await response.json();
+  const [user] = data.data;
+  return user;
+};
+
 const getProfilePicture = async ({ email }: { email: string }) => {
   const url = new URL(`/businessProcess/getProfilePicture`, process.env.NEXT_PUBLIC_API_URL);
   url.searchParams.set('email', email);
@@ -160,11 +184,20 @@ export const authConfig = {
       session?: Session | undefined;
     }) {
       if (params.trigger === "update") {
-        params.token = { ...params.token, user: params.session };
+        const profileImage = await getProfilePicture({ email: params.token.email as string });
+        const userDetails = await getUserDetails({ email: params.token.email as string });
+
+        params.token = {
+          ...params.token,
+          image: profileImage,
+          name: userDetails.name,
+        };
         return params.token;
       }
 
       if (params.account) {
+        const profileImage = await getProfilePicture({ email: params.token.email as string });
+        const userDetails = await getUserDetails({ email: params.token.email as string });
         const userWithLoginCount = await CustomAdapter.getUserByAccount!(params.account);
         const login_count = userWithLoginCount?.login_count;
 
@@ -181,6 +214,8 @@ export const authConfig = {
           params.token.session_token = session.sessionToken;
           params.token.user_id = params.user.id;
           params.token.login_count = login_count;
+          params.token.image = profileImage;
+          params.token.name = userDetails.name;
         }
       }
 
@@ -191,13 +226,12 @@ export const authConfig = {
       session: Session;
       token: JWT;
     }) {
-      const profileImage = await getProfilePicture({ email: params.token.email as string });
-
       if (params.session.user) {
         params.session.user.session_token = params.token.session_token as string;
         params.session.user.user_id = params.token.user_id as string;
         params.session.user.login_count = params.token.login_count as number;
-        params.session.user.image = profileImage;
+        params.session.user.image = params.token.image as string;
+        params.session.user.name = params.token.name as string;
       }
       return params.session
 
@@ -244,12 +278,6 @@ export const authConfig = {
 
       return true
     },
-  },
-  jwt: {
-    // maxAge: 60 * 1,
-    // async encode(arg) {
-    //   return (arg.token?.sessionId as string) ?? encode(arg);
-    // },
   },
   events: {
     signIn: async (params) => {

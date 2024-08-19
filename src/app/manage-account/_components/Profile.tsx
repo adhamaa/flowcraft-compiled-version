@@ -48,6 +48,8 @@ const Profile = ({ data = {} }: { data?: any; }) => {
     queryFn: () => getUserDetails({ email: session?.user?.email as string }),
     enabled: !!session?.user?.email,
   });
+  console.log('userDetails:', userDetails)
+  console.log('session user:', session?.user)
 
   const { data: profilePictureUrl, isLoading: isProfilePictureUrlLoading, refetch: profilePictureUrlRefetch } = useQuery({
     queryKey: ['profilePicture', session?.user?.email],
@@ -59,7 +61,7 @@ const Profile = ({ data = {} }: { data?: any; }) => {
     mutationFn: uploadProfilePicture,
     onSuccess: async (response) => {
       profilePictureUrlRefetch();
-      await update({ ...session!.user, image: profilePictureUrl });
+      await update({ user: { ...session!.user, image: profilePictureUrl } });
       toast.success(response.message);
       setAuditTrail({
         action: `update_profile_picture`,
@@ -84,7 +86,7 @@ const Profile = ({ data = {} }: { data?: any; }) => {
     mutationFn: updateUserDetails,
     onSuccess: async (response) => {
       userDetailsRefetch();
-      await update({ ...session!.user, name: userDetails?.name });
+      await update({ user: { ...session!.user, name: userDetails?.name } });
       toast.success(response.message);
       setAuditTrail({
         action: `update_user_details`,
@@ -109,7 +111,7 @@ const Profile = ({ data = {} }: { data?: any; }) => {
     mutationFn: removeProfilePicture,
     onSuccess: async (response) => {
       profilePictureUrlRefetch();
-      await update({ ...session!.user, image: profilePictureUrl });
+      await update({ user: { ...session!.user, image: profilePictureUrl } });
       toast.success(response.message);
       setAuditTrail({
         action: `remove_profile_picture`,
