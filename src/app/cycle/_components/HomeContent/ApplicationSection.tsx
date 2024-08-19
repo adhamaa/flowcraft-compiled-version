@@ -1,7 +1,7 @@
 'use client';
 
 import { Icon } from '@iconify-icon/react';
-import { Button, Collapse, Tooltip, UnstyledButton } from '@mantine/core';
+import { Button, Collapse, Skeleton, Tooltip, UnstyledButton } from '@mantine/core';
 import clsx from 'clsx';
 import * as React from 'react'
 import { ApplicationData } from '.';
@@ -10,6 +10,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import useQueryString from '@/hooks/useQueryString';
 import { getApplicationList } from '@/lib/service';
+import { useQuery } from '@tanstack/react-query';
 
 const ApplicationSection = ({
   opened,
@@ -18,7 +19,6 @@ const ApplicationSection = ({
   opened: boolean;
   toggle: () => void;
 }) => {
-  const [applicationData, setApplicationData] = React.useState<ApplicationData[]>([]);
   const { selectedApp, setSelectedApp } = useGlobalState();
   const { createQueryString } = useQueryString();
   const searchParams = useSearchParams();
@@ -28,22 +28,10 @@ const ApplicationSection = ({
   const isManageClaim = pathname === '/manage-claim';
   const isCycle = pathname === '/cycle';
 
-  // const listApps = useQuery({
-  //   queryKey: ["applications"],
-  //   queryFn: async () => await (await fetch(`${process.env.NEXT_PUBLIC_API_URL}/businessProcess/listAppsBizProcess`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + process.env.NEXT_PUBLIC_API_PASSWORD).toString('base64')}`
-  //     },
-  //   })).json(),
-  // }).data.result;
-  // console.log('listApps:', listApps)
-
-  React.useEffect(() => {
-    const fetchApplications = () => getApplicationList();
-    fetchApplications().then(setApplicationData);
-  }, []);
+  const { data: applicationData, isLoading: applicationIsLoading } = useQuery<{ apps_label: string; apps_name: string; }[]>({
+    queryKey: ["applications"],
+    queryFn: () => getApplicationList(),
+  });
 
   return (
     <section className={clsx('px-20 py-1 bg-[var(--fc-neutral-100)]',
@@ -63,7 +51,15 @@ const ApplicationSection = ({
         </div>
         <Collapse in={opened}>
           <div className="flex gap-7 pt-7">
-            {applicationData?.map(({ apps_label, apps_name }, index) => {
+            {applicationIsLoading && (
+              <>
+                <Skeleton height={192} width={176} radius="md" />
+                <Skeleton height={192} width={176} radius="md" />
+                <Skeleton height={192} width={176} radius="md" />
+                <Skeleton height={192} width={176} radius="md" />
+              </>
+            )}
+            {!applicationIsLoading && applicationData?.map(({ apps_label, apps_name }, index) => {
               const handleAppClick = () => {
                 setSelectedApp(apps_name);
                 router.push(pathname + "?" + createQueryString('selected_app', apps_label))

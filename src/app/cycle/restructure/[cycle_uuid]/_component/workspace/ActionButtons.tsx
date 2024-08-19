@@ -16,6 +16,7 @@ type ActionButtonsType = {
   icon: { name: string; width: string; rotate?: number };
   onClick?: (e: any) => void;
   color: string;
+  c?: string;
   disabled: boolean;
   type: 'button';
 };
@@ -46,6 +47,7 @@ const ActionButtons = () => {
       canShow: true,
       onClick: () => onReset(reset),
       color: 'var(--fc-neutral-100)',
+      c: 'var(--bc-neutral-900)',
       icon: { name: "heroicons-outline:x-circle", width: '1.5rem' },
     },
     {

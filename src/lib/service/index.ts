@@ -20,7 +20,8 @@ export const getApplicationList = async () => {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
-    next: { tags: ['applist'] }
+    // next: { tags: ['applist'] }
+    cache: 'no-store'
   });
   if (response.status === 404) {
     return [];
