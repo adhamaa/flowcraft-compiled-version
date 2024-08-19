@@ -111,7 +111,17 @@ const Profile = ({ data = {} }: { data?: any; }) => {
       profilePictureUrlRefetch();
       await update({ ...session!.user, image: profilePictureUrl });
       toast.success(response.message);
-
+      setAuditTrail({
+        action: `remove_profile_picture`,
+        location_url: pageUrl,
+        object: 'src/app/manage-account/_components/Profile.tsx',
+        process_state: 'TRIGGERAPI',
+        sysfunc: '"onSuccess" callback of "removeProfilePictureMutate"',
+        userid: user_id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User removed profile picture`,
+        json_object: { email: session?.user?.email, ...response },
+      });
       modals.closeAll();
       closeEdit();
     },
