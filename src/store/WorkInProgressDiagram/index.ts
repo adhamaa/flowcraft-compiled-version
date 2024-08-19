@@ -219,8 +219,12 @@ const useDiagramStore = create<RFState>()(
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
       onSave: async ({ cycle_uuid, callback }) => {
-
         const setToDraft = get().onDraft;
+        const onLayout = get().onLayout;
+
+        onLayout('TB'); // Re-arrange the diagram using Dagre layout before saving
+
+
         modals.openConfirmModal({
           title: 'Save Cycle',
           children: 'Are you confirm to save this cycle to the latest one? ',
@@ -653,6 +657,8 @@ const useDiagramStore = create<RFState>()(
         apps_label,
       }) => {
         const setToDraft = get().onDraft;
+        const onLayout = get().onLayout;
+
 
         const diagramData = await getDiagramData({ cycle_id, apps_label });
         const editedNodes = diagramData.nodes.map(({ position, ...node }: Node) => {
@@ -672,6 +678,7 @@ const useDiagramStore = create<RFState>()(
           edges: layoutedEdges,
         });
 
+        onLayout('TB');
         setToDraft();
       },
       fetchDeletedNodes: async ({

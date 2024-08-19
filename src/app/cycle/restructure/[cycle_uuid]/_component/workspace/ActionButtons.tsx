@@ -11,6 +11,7 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import { setAuditTrail } from '@/lib/service';
 import { useSession } from 'next-auth/react';
 import useQueryString from '@/hooks/useQueryString';
+import useCurrentDiagram from '@/store/CurrentDiagram';
 
 type ActionButtonsType = {
   label: string;
@@ -37,7 +38,8 @@ const ActionButtons = () => {
 
   const { isEditable: isEditData, reset: resetIsEditable, getAction, getIsAnyEditable } = useActionIcons();
 
-  const { onApply, onReset, onSave, onDraft, deselectAllNodes, fetchNodesEdges } = useWorkInProgressDiagram();
+  const { onApply, onReset, onSave, onDraft, deselectAllNodes, fetchNodesEdges: fetchWipNodesEdges } = useWorkInProgressDiagram();
+  const { fetchNodesEdges: fetchCurrentNodesEdges } = useCurrentDiagram();
 
   const isEditable = getIsAnyEditable(isEditData as { [key in ActionType]: boolean });
   const { remainQueryString } = useQueryString();
@@ -78,7 +80,7 @@ const ActionButtons = () => {
           location_url: pageUrl,
         }).then(() => {
           resetIsEditable();
-          router.push(`/cycle/restructure/${cycle_uuid}?${remainQueryString()}`);
+          window.location.reload();
         });
       }
     }
@@ -124,18 +126,25 @@ const ActionButtons = () => {
       color: 'var(--fc-brand-700)',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
-    {
-      label: 'Refresh',
-      type: 'button',
-      disabled: false,
-      canShow: true,
-      onClick: () => fetchNodesEdges({
-        cycle_id: cycle_id as string,
-        apps_label: selected_app as any
-      }),
-      color: 'var(--fc-neutral-100)',
-      icon: { name: "heroicons:refresh", width: '1.5rem' },
-    }
+    // {
+    //   label: 'Refresh',
+    //   type: 'button',
+    //   disabled: false,
+    //   canShow: true,
+    //   onClick: async () => {
+    //     router.refresh();
+    //     await fetchWipNodesEdges({
+    //       cycle_id: cycle_id as string,
+    //       apps_label: selected_app as any
+    //     });
+    //     await fetchCurrentNodesEdges({
+    //       cycle_id: cycle_id as string,
+    //       apps_label: selected_app as any
+    //     });
+    //   },
+    //   color: 'var(--fc-neutral-100)',
+    //   icon: { name: "heroicons:refresh", width: '1.5rem' },
+    // }
   ] satisfies CustomButtonProps[];
 
   return (

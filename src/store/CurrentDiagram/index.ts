@@ -127,6 +127,8 @@ const useDiagramStore = create<RFState>()(
         cycle_id,
         apps_label,
       }) => {
+        const onLayout = get().onLayout;
+
         const diagramData = await getDiagramData({ cycle_id, apps_label });
         const editedNodes = diagramData.nodes.map(({ position, ...node }: Node) => {
           return { ...node, position: { x: 0, y: 0 } } // remove position and set x, y to 0
@@ -144,6 +146,7 @@ const useDiagramStore = create<RFState>()(
           nodes: layoutedNodes,
           edges: layoutedEdges,
         });
+        onLayout('TB');
       },
       updateNodeColor: (nodeId: string, color: string) => {
         set({
