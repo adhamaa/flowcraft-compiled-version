@@ -52,14 +52,12 @@ type RFState = {
   getNextInputOptions: () => ComboboxItem[];
   getPreviousNodesId: (nodeId?: string) => string[];
   getNextNodesId: (nodeId?: string) => string[];
-  // getAllEdgesByNodeId: (nodeId?: string) => Edge[];
-  // getAllPreviousAndNextNodesId: (nodeId?: string) => string[];
   generateNodeId: () => string;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   onLayout: (direction: string | undefined) => void;
-  onSave: (cycle_uuid: string, callback?: (...args: any[]) => void) => void;
+  onSave: (items: { cycle_uuid: string; callback?: (...args: any[]) => void }) => void;
   onDraft: () => void;
   onApply: (items: { action: ActionType; data: FormValues; callback?: (...args: any[]) => void }) => void;
   onAdd: (data: FormValues) => void;
@@ -220,7 +218,7 @@ const useDiagramStore = create<RFState>()(
 
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
-      onSave: async (cycle_uuid, callback) => {
+      onSave: async ({ cycle_uuid, callback }) => {
 
         const setToDraft = get().onDraft;
         modals.openConfirmModal({
@@ -269,7 +267,7 @@ const useDiagramStore = create<RFState>()(
                   data: { cycle_uuid, ...ApiFormat },
                 });
 
-                return;
+                return; // return to pass the success callback
               });
 
             } catch (error: any) {
@@ -566,7 +564,6 @@ const useDiagramStore = create<RFState>()(
         set({ edges });
       },
       setRfInstance: (rfInstance: any) => {
-
         set({ rfInstance });
       },
       toggleSelectedByNodeId: (nodeId: string) => {

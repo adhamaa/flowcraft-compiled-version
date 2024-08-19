@@ -6,11 +6,11 @@ import { Icon } from '@iconify-icon/react';
 import { Button } from '@mantine/core';
 import * as  React from 'react'
 import { useFormContext } from 'react-hook-form';
-import { addEdge, ConnectionLineType, Edge } from 'reactflow';
 import { ActionType, useActionIcons } from './WorkInProgress/hooks/useActionIcons';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { setAuditTrail } from '@/lib/service';
 import { useSession } from 'next-auth/react';
+import useQueryString from '@/hooks/useQueryString';
 
 type ActionButtonsType = {
   label: string;
@@ -31,14 +31,16 @@ const ActionButtons = () => {
   const params = useParams();
   const searchParams = useSearchParams();
   const cycle_uuid = params.cycle_uuid as string;
+  const cycle_id = searchParams.get('cycle_id');
+  const selected_app = searchParams.get('selected_app');
   const pageUrl = `${pathname}?${searchParams}`;
 
   const { isEditable: isEditData, reset: resetIsEditable, getAction, getIsAnyEditable } = useActionIcons();
 
-  const { onApply, onReset, onSave, onDraft, deselectAllNodes } = useWorkInProgressDiagram();
+  const { onApply, onReset, onSave, onDraft, deselectAllNodes, fetchNodesEdges } = useWorkInProgressDiagram();
 
   const isEditable = getIsAnyEditable(isEditData as { [key in ActionType]: boolean });
-
+  const { remainQueryString } = useQueryString();
   const method = useFormContext();
   const { handleSubmit, reset } = method;
 
@@ -61,21 +63,24 @@ const ActionButtons = () => {
     }
   });
 
-  const onSaveSubmit = () => onSave(cycle_uuid, (response) => {
-    if (response.success) {
-      setAuditTrail({
-        action: 'save_restructure_cycle',
-        notes: `Save restructuring cycle`,
-        object: 'src/app/cycle/restructure/[cycle_uuid]/_component/workspace/ActionButtons.tsx',
-        process_state: 'TRIGGERAPI',
-        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-        sysfunc: '"onSaveSubmit" func',
-        userid: userId as string,
-        json_object: { ...response.data },
-        location_url: pageUrl,
-      });
-      resetIsEditable();
-      window.location.reload();
+  const onSaveSubmit = () => onSave({
+    cycle_uuid, callback: ({ data, ...response }) => {
+      if (response.success) {
+        setAuditTrail({
+          action: 'save_restructure_cycle',
+          notes: `Save restructuring cycle`,
+          object: 'src/app/cycle/restructure/[cycle_uuid]/_component/workspace/ActionButtons.tsx',
+          process_state: 'TRIGGERAPI',
+          sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+          sysfunc: '"onSaveSubmit" func',
+          userid: userId as string,
+          json_object: { ...response },
+          location_url: pageUrl,
+        }).then(() => {
+          resetIsEditable();
+          router.push(`/cycle/restructure/${cycle_uuid}?${remainQueryString()}`);
+        });
+      }
     }
   });
 
@@ -119,15 +124,18 @@ const ActionButtons = () => {
       color: 'var(--fc-brand-700)',
       icon: { name: "heroicons:arrow-right-end-on-rectangle-20-solid", width: '1.5rem', rotate: 45 },
     },
-    // {
-    //   label: 'Refresh',
-    //   type: 'button',
-    //   disabled: false,
-    //   canShow: true,
-    //   onClick: () => window.location.reload(),
-    //   color: 'var(--fc-neutral-100)',
-    //   icon: { name: "heroicons:refresh", width: '1.5rem' },
-    // }
+    {
+      label: 'Refresh',
+      type: 'button',
+      disabled: false,
+      canShow: true,
+      onClick: () => fetchNodesEdges({
+        cycle_id: cycle_id as string,
+        apps_label: selected_app as any
+      }),
+      color: 'var(--fc-neutral-100)',
+      icon: { name: "heroicons:refresh", width: '1.5rem' },
+    }
   ] satisfies CustomButtonProps[];
 
   return (
