@@ -52,6 +52,7 @@ const useBreadcrumbs = ({
     const cycleCrumbsTitle = deletedStages ? "Deleted Stages" : stages ? "Stages" : generalInformation ? "General Information" : "";
 
     const pathTitles = !!segments.length && getTitles(pathname)
+    console.log('pathTitles:', pathTitles)
 
     return [
       ...DEFAULT_BREADCRUMBS, // add home|cycle to the list
@@ -72,7 +73,7 @@ const useBreadcrumbs = ({
       ...(pathname.includes("manage-claim") ? segments.map((segment, index) => {
         let href = segments.slice(0, index + 1).join('/');
         return {
-          title: segment,
+          title: getTitles(segment),
           href: `/${href}`,
           disabled: true
         }
@@ -80,7 +81,7 @@ const useBreadcrumbs = ({
       ...(pathname.includes("manage-account") ? segments.map((segment, index) => {
         let href = segments.slice(0, index + 1).join('/');
         return {
-          title: segment,
+          title: getTitles(segment),
           href: `/${href}`,
           disabled: true
         }

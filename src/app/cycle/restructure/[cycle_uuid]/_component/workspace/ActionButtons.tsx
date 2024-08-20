@@ -89,7 +89,6 @@ const ActionButtons = () => {
           },
           location_url: pageUrl,
         }).then(() => {
-          // setLogUuid(crypto.randomUUID());
           resetIsEditable();
           window.location.reload();
         });
