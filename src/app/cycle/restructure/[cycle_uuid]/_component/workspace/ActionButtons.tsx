@@ -71,7 +71,6 @@ const ActionButtons = () => {
 
   const onSaveSubmit = () => onSave({
     cycle_uuid, callback: ({ data, ...response }) => {
-      console.log('data:', data)
       if (response.success) {
         setAuditTrail({
           action: 'save_restructure_cycle',
@@ -96,7 +95,20 @@ const ActionButtons = () => {
     }
   });
 
-  const onResetSubmit = () => onReset(reset);
+  const onResetSubmit = () => onReset(() => {
+    reset();
+    setAuditTrail({
+      action: 'reset_restructure_cycle',
+      notes: `Reset restructuring cycle`,
+      object: 'src/app/cycle/restructure/[cycle_uuid]/_component/workspace/ActionButtons.tsx',
+      process_state: 'RESTRUCTURE_CYCLE',
+      sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+      sysfunc: '"onResetSubmit" func',
+      userid: userId as string,
+      json_object: { cycle_uuid, data: applyData },
+      location_url: pageUrl,
+    });
+  });
 
   const buttons: ActionButtonsType[] = [
     {
