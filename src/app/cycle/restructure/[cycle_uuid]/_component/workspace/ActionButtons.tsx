@@ -48,6 +48,9 @@ const ActionButtons = () => {
 
   const action = getAction(isEditData as { [key in ActionType]: boolean });
 
+  const [logUuid, setLogUuid] = React.useState<string>(() => crypto.randomUUID());
+  console.log('logUuid:', logUuid)
+
   const onApplySubmit = (data: any, e: any) => onApply({
     action: action as ActionType, data, callback: () => {
       reset();
@@ -59,7 +62,7 @@ const ActionButtons = () => {
         sysapp: 'FLOWCRAFTBUSINESSPROCESS',
         sysfunc: '"onApplySubmit" func',
         userid: userId as string,
-        json_object: { ...data },
+        json_object: { ...data, uuid: `log_${logUuid}` },
         location_url: pageUrl,
       });
     }
@@ -76,9 +79,10 @@ const ActionButtons = () => {
           sysapp: 'FLOWCRAFTBUSINESSPROCESS',
           sysfunc: '"onSaveSubmit" func',
           userid: userId as string,
-          json_object: { ...response },
+          json_object: { ...response, uuid: `log_${logUuid}` },
           location_url: pageUrl,
         }).then(() => {
+          // setLogUuid(crypto.randomUUID());
           resetIsEditable();
           window.location.reload();
         });

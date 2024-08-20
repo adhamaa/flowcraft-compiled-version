@@ -48,8 +48,6 @@ const Profile = ({ data = {} }: { data?: any; }) => {
     queryFn: () => getUserDetails({ email: session?.user?.email as string }),
     enabled: !!session?.user?.email,
   });
-  console.log('userDetails:', userDetails)
-  console.log('session user:', session?.user)
 
   const { data: profilePictureUrl, isLoading: isProfilePictureUrlLoading, refetch: profilePictureUrlRefetch } = useQuery({
     queryKey: ['profilePicture', session?.user?.email],
@@ -209,26 +207,19 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                   name: data.full_name,
                 }
               };
-              updateUserDetailsMutate(sendData, {
-                onSuccess: (response) => {
-                  if (!response.error) {
-                    if (data.profile_picture) {
-                      const formData = new FormData();
-                      formData.append('profile_picture', data.profile_picture[0]);
-                      uploadProfilePictureMutate({
-                        email: session?.user?.email as string,
-                        formData
-                      }, {
-                        onSuccess: () => {
-                        }
-                      });
-                    }
-                  }
-                  modals.closeAll();
-                  toggleEdit();
-                }
-              });
+              updateUserDetailsMutate(sendData);
 
+              if (data.profile_picture) {
+                const formData = new FormData();
+                formData.append('profile_picture', data.profile_picture[0]);
+                uploadProfilePictureMutate({
+                  email: session?.user?.email as string,
+                  formData
+                });
+              }
+
+              modals.closeAll();
+              toggleEdit();
             }}
               color='var(--fc-brand-700)'
               radius='md'
