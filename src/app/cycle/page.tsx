@@ -1,5 +1,5 @@
 import * as React from 'react'
-import HomeContent from './_components/HomeContent'
+import HomeContent from '../../components/HomeContent'
 
 async function HomePage() {
   return (

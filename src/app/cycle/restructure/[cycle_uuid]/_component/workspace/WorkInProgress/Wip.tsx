@@ -52,12 +52,12 @@ function Wip() {
     markerEnd: { type: MarkerType.Arrow },
   };
 
-  React.useEffect(() => {
-    fetchNodesEdges({
-      cycle_id: cycle_id as string,
-      apps_label: selected_app as any
-    });
-  }, [cycle_id, selected_app]);
+  // React.useEffect(() => {
+  //   fetchNodesEdges({
+  //     cycle_id: cycle_id as string,
+  //     apps_label: selected_app as any
+  //   });
+  // }, [cycle_id, selected_app]);
 
   React.useEffect(() => {
     if (isInteractive) {
@@ -72,7 +72,13 @@ function Wip() {
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          onInit={setRfInstance}
+          onInit={(instance) => {
+            fetchNodesEdges({
+              cycle_id: cycle_id as string,
+              apps_label: selected_app as any
+            });
+            setRfInstance(instance);
+          }}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
@@ -85,11 +91,7 @@ function Wip() {
           nodesDraggable={false}
         >
           <Background />
-          <Controls showInteractive={true} onInteractiveChange={
-            (isInteractive) => {
-              console.log('Interactive change:', isInteractive);
-            }
-          } />
+          <Controls showInteractive={true} />
           {/* <DevTools /> */}
 
           {/* <span className='absolute top-3 right-3 text-xs text-safwa-gray-3'>

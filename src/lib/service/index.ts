@@ -20,7 +20,8 @@ export const getApplicationList = async () => {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
-    next: { tags: ['applist'] }
+    // next: { tags: ['applist'] }
+    cache: 'no-store'
   });
   if (response.status === 404) {
     return [];
@@ -323,7 +324,8 @@ export const getDiagramData = async ({
       'Content-Type': 'application/json',
       'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
     },
-    next: { tags: ['diagramdata'] },
+    // next: { tags: ['diagramdata'] },
+    cache: 'no-store'
   });
   if (response.status === 404) {
     return [];
@@ -668,9 +670,17 @@ export const setAuditTrail = async ({
   json_object: Record<string, any>;
   location_url: string;
 }) => {
-  const encodedUrl = encodeURIComponent(process.env.AUTH_URL + location_url);
-  const endpoint = `/auditrail/businessProcess/?action=${action}&notes=${notes}&object=${object}&process_state=${process_state}&sysapp=${sysapp}&sysfunc=${sysfunc}&userid=${userid}&json_object=${JSON.stringify(json_object)}&location_url=${encodedUrl}`;
-  const url = `${baseUrl}${endpoint}`;
+  const url = new URL(`/auditrail/businessProcess/`, baseUrl);
+  url.searchParams.set('action', action);
+  url.searchParams.set('notes', notes);
+  url.searchParams.set('object', object);
+  url.searchParams.set('process_state', process_state);
+  url.searchParams.set('sysapp', sysapp);
+  url.searchParams.set('sysfunc', sysfunc);
+  url.searchParams.set('userid', userid);
+  url.searchParams.set('json_object', JSON.stringify(json_object));
+  url.searchParams.set('location_url', encodeURIComponent(process.env.AUTH_URL + location_url));
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -709,7 +719,7 @@ export const restructureBizProcess = async ({
       next: { tags: ['restructureprocess'] }
     });
 
-    clientRevalidateTag('diagramdata');
+    // clientRevalidateTag('diagramdata');
     return await response.json();
   } catch (error) {
     console.error('Error occurred while restructuring business process:', error);
@@ -979,3 +989,24 @@ export const uploadProfilePicture = async ({ email, formData }: { email: string;
   clientRevalidateTag('profilepicture');
   return await response.json();
 };
+
+export const removeProfilePicture = async ({ email }: { email: string }) => {
+  const url = new URL(`/businessProcess/deleteProfilePicture`, baseUrl);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to delete profile picture.');
+  }
+  clientRevalidateTag('profilepicture');
+  return await response.json();
+}

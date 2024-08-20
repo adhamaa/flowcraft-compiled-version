@@ -29,7 +29,7 @@ import { ActionType } from '@/app/cycle/restructure/[cycle_uuid]/_component/work
 import { FormValues } from '@/app/cycle/restructure/[cycle_uuid]/_component/workspace/WorkInProgress/FlowObjects';
 import toast from '@/components/toast';
 import { modals } from '@mantine/modals';
-import { CycleData } from '@/app/cycle/_components/HomeContent';
+import { CycleData } from '@/components/HomeContent';
 import { revalidateCustomPath } from '@/actions/revalidatePath';
 
 const dagreGraph = new dagre.graphlib.Graph();
@@ -52,14 +52,12 @@ type RFState = {
   getNextInputOptions: () => ComboboxItem[];
   getPreviousNodesId: (nodeId?: string) => string[];
   getNextNodesId: (nodeId?: string) => string[];
-  // getAllEdgesByNodeId: (nodeId?: string) => Edge[];
-  // getAllPreviousAndNextNodesId: (nodeId?: string) => string[];
   generateNodeId: () => string;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
   onConnect: OnConnect;
   onLayout: (direction: string | undefined) => void;
-  onSave: (cycle_uuid: string, callback?: (...args: any[]) => void) => void;
+  onSave: (items: { cycle_uuid: string; callback?: (...args: any[]) => void }) => void;
   onDraft: () => void;
   onApply: (items: { action: ActionType; data: FormValues; callback?: (...args: any[]) => void }) => void;
   onAdd: (data: FormValues) => void;
@@ -220,9 +218,13 @@ const useDiagramStore = create<RFState>()(
 
         set({ nodes: layoutedNodes, edges: layoutedEdges })
       },
-      onSave: async (cycle_uuid, callback) => {
-
+      onSave: async ({ cycle_uuid, callback }) => {
         const setToDraft = get().onDraft;
+        const onLayout = get().onLayout;
+
+        onLayout('TB'); // Re-arrange the diagram using Dagre layout before saving
+
+
         modals.openConfirmModal({
           title: 'Save Cycle',
           children: 'Are you confirm to save this cycle to the latest one? ',
@@ -266,10 +268,10 @@ const useDiagramStore = create<RFState>()(
                 callback?.({
                   success: true,
                   message: res.message,
-                  cycle_uuid,
+                  data: { cycle_uuid, ...ApiFormat },
                 });
 
-                return;
+                return; // return to pass the success callback
               });
 
             } catch (error: any) {
@@ -566,7 +568,6 @@ const useDiagramStore = create<RFState>()(
         set({ edges });
       },
       setRfInstance: (rfInstance: any) => {
-
         set({ rfInstance });
       },
       toggleSelectedByNodeId: (nodeId: string) => {
@@ -656,6 +657,8 @@ const useDiagramStore = create<RFState>()(
         apps_label,
       }) => {
         const setToDraft = get().onDraft;
+        const onLayout = get().onLayout;
+
 
         const diagramData = await getDiagramData({ cycle_id, apps_label });
         const editedNodes = diagramData.nodes.map(({ position, ...node }: Node) => {
@@ -675,6 +678,7 @@ const useDiagramStore = create<RFState>()(
           edges: layoutedEdges,
         });
 
+        onLayout('TB');
         setToDraft();
       },
       fetchDeletedNodes: async ({

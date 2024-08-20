@@ -54,12 +54,12 @@ function Current() {
     markerEnd: { type: MarkerType.Arrow },
   };
 
-  React.useEffect(() => {
-    fetchNodesEdges({
-      cycle_id: cycle_id as string,
-      apps_label: selected_app as any
-    });
-  }, [cycle_id, selected_app]);
+  // React.useEffect(() => {
+  //   fetchNodesEdges({
+  //     cycle_id: cycle_id as string,
+  //     apps_label: selected_app as any
+  //   });
+  // }, [cycle_id, selected_app]);
 
   React.useEffect(() => {
     if (isInteractive) {
@@ -75,6 +75,12 @@ function Current() {
         <ReactFlow
           nodes={nodes}
           edges={edges}
+          onInit={(instance) => {
+            fetchNodesEdges({
+              cycle_id: cycle_id as string,
+              apps_label: selected_app as any
+            });
+          }}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}

@@ -3,8 +3,8 @@
 import HeaderForm from '@/app/cycle/_components/Forms/HeaderForm';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
 import toast from '@/components/toast';
-import { getProfilePicture, getUserDetails, updateUserDetails, uploadProfilePicture } from '@/lib/service';
-import { ActionIcon, Avatar, Button, Flex, Group, InputWrapper, LoadingOverlay, Overlay, Pill, rem, ScrollAreaAutosize, Text, Tooltip } from '@mantine/core';
+import { getProfilePicture, getUserDetails, removeProfilePicture, setAuditTrail, updateUserDetails, uploadProfilePicture } from '@/lib/service';
+import { ActionIcon, Avatar, Button, CloseButton, Flex, Group, InputWrapper, LoadingOverlay, Overlay, Pill, rem, ScrollAreaAutosize, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import clsx from 'clsx';
@@ -59,9 +59,19 @@ const Profile = ({ data = {} }: { data?: any; }) => {
     mutationFn: uploadProfilePicture,
     onSuccess: async (response) => {
       profilePictureUrlRefetch();
-      await update({ ...session!.user, image: profilePictureUrl });
+      await update({ user: { ...session!.user, image: profilePictureUrl } });
       toast.success(response.message);
-
+      setAuditTrail({
+        action: `update_profile_picture`,
+        location_url: pageUrl,
+        object: 'src/app/manage-account/_components/Profile.tsx',
+        process_state: 'TRIGGERAPI',
+        sysfunc: '"onSuccess" callback of "uploadProfilePictureMutate"',
+        userid: user_id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User updated profile picture`,
+        json_object: { email: session?.user?.email, ...response },
+      });
       modals.closeAll();
       closeEdit();
     },
@@ -74,14 +84,49 @@ const Profile = ({ data = {} }: { data?: any; }) => {
     mutationFn: updateUserDetails,
     onSuccess: async (response) => {
       userDetailsRefetch();
-      await update({ ...session!.user, name: userDetails?.name });
+      await update({ user: { ...session!.user, name: userDetails?.name } });
       toast.success(response.message);
-
+      setAuditTrail({
+        action: `update_user_details`,
+        location_url: pageUrl,
+        object: 'src/app/manage-account/_components/Profile.tsx',
+        process_state: 'TRIGGERAPI',
+        sysfunc: '"onSuccess" callback of "updateUserDetailsMutate"',
+        userid: user_id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User updated profile details`,
+        json_object: { email: session?.user?.email, ...response },
+      });
       modals.closeAll();
       closeEdit();
     },
     onError: (error) => {
       toast.error('Error updating profile');
+    }
+  });
+
+  const { mutate: removeProfilePictureMutate } = useMutation({
+    mutationFn: removeProfilePicture,
+    onSuccess: async (response) => {
+      profilePictureUrlRefetch();
+      await update({ user: { ...session!.user, image: profilePictureUrl } });
+      toast.success(response.message);
+      setAuditTrail({
+        action: `remove_profile_picture`,
+        location_url: pageUrl,
+        object: 'src/app/manage-account/_components/Profile.tsx',
+        process_state: 'TRIGGERAPI',
+        sysfunc: '"onSuccess" callback of "removeProfilePictureMutate"',
+        userid: user_id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User removed profile picture`,
+        json_object: { email: session?.user?.email, ...response },
+      });
+      modals.closeAll();
+      closeEdit();
+    },
+    onError: (error) => {
+      toast.error('Error removing profile');
     }
   });
 
@@ -162,26 +207,19 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                   name: data.full_name,
                 }
               };
-              updateUserDetailsMutate(sendData, {
-                onSuccess: (response) => {
-                  if (!response.error) {
-                    if (data.profile_picture) {
-                      const formData = new FormData();
-                      formData.append('profile_picture', data.profile_picture[0]);
-                      uploadProfilePictureMutate({
-                        email: session?.user?.email as string,
-                        formData
-                      }, {
-                        onSuccess: () => {
-                        }
-                      });
-                    }
-                  }
-                  modals.closeAll();
-                  toggleEdit();
-                }
-              });
+              updateUserDetailsMutate(sendData);
 
+              if (data.profile_picture) {
+                const formData = new FormData();
+                formData.append('profile_picture', data.profile_picture[0]);
+                uploadProfilePictureMutate({
+                  email: session?.user?.email as string,
+                  formData
+                });
+              }
+
+              modals.closeAll();
+              toggleEdit();
             }}
               color='var(--fc-brand-700)'
               radius='md'
@@ -233,7 +271,12 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                       loading={isProfilePictureUrlLoading}
                       {...field}
                     >
-                      {isEdit && <Overlay color="var(--fc-basic-black)" backgroundOpacity={0.35} blur={4} className='z-40 rounded-md' />}
+                      {isEdit && <Overlay
+                        color="var(--fc-basic-black)"
+                        backgroundOpacity={0.35}
+                        blur={4}
+                        className='!absolute !z-10 !rounded-md'
+                      />}
                       <div className="rounded-md overflow-hidden w-48 h-48 transition-all duration-500 ease-in-out">
                         {/* <BlurhashImage
                           src={imgSrc}
@@ -241,15 +284,15 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                           height={198}
                           alt="Example Image"
                         > */}
-                          <Avatar
-                            name={username as string}
-                            src={imgSrc}
-                            color="initials"
-                            size={rem(150)}
-                            radius="md"
-                            alt="avatar"
-                            className='w-full h-full'
-                          />
+                        <Avatar
+                          name={username as string}
+                          src={imgSrc}
+                          color="initials"
+                          size={rem(150)}
+                          radius="md"
+                          alt="avatar"
+                          className='!w-full !h-full'
+                        />
                         {/* </BlurhashImage> */}
                       </div>
                     </Dropzone>
@@ -268,10 +311,20 @@ const Profile = ({ data = {} }: { data?: any; }) => {
                   size="100%"
                   radius="md"
                   aria-label="Change Profile Picture"
-                  className='absolute bottom-0 z-50'
+                  className='!absolute !bottom-0 !z-50'
                 >
                   <Icon icon="heroicons:camera" width="4rem" className='' />
                 </ActionIcon>
+              </Tooltip>}
+              {isEdit && <Tooltip
+                label={'Remove Profile Picture'}
+              >
+                <CloseButton
+                  variant='transparent'
+                  aria-label="Remove Picture"
+                  className='!absolute !top-1 !right-1 !z-50 !text-white'
+                  onClick={() => removeProfilePictureMutate({ email: session?.user?.email as string })}
+                />
               </Tooltip>}
 
             </InputWrapper>

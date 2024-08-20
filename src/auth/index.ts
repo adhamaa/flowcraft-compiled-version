@@ -2,14 +2,14 @@ import NextAuth, { Account, CredentialsSignin, NextAuthConfig, Profile, Session,
 import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, protectedRoutes, publicRoutes } from "../routes"
 import { NextResponse } from "next/server"
 import Credentials from "next-auth/providers/credentials"
-import { JWT, encode } from "next-auth/jwt"
+import { JWT } from "next-auth/jwt"
 import { CustomAdapter } from "@/db/Adapter"
 import { ZodError } from "zod"
-import { Fernet } from "fernet-nodejs"
 import { loginSchema } from "../lib/validation"
 import { DrizzleError } from "drizzle-orm"
 import { AdapterUser } from "next-auth/adapters"
 import { randomUUID } from "crypto"
+import { decryptPassword } from "@/lib/crypt"
 
 class InvalidLoginError extends CredentialsSignin {
   constructor(code: string) {
@@ -18,6 +18,30 @@ class InvalidLoginError extends CredentialsSignin {
     this.message = code;
   }
 }
+
+const getUserDetails = async ({ email }: { email: string }) => {
+  const url = new URL(`/businessProcess/user`, process.env.NEXT_PUBLIC_API_URL);
+  url.searchParams.set('email', email);
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + 'pass2468').toString('base64')}`
+    },
+    // next: { tags: ['userdetails'] }
+    cache: 'no-cache',
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to get user details.');
+  }
+  const data = await response.json();
+  const [user] = data.data;
+  return user;
+};
 
 const getProfilePicture = async ({ email }: { email: string }) => {
   const url = new URL(`/businessProcess/getProfilePicture`, process.env.NEXT_PUBLIC_API_URL);
@@ -40,6 +64,57 @@ const getProfilePicture = async ({ email }: { email: string }) => {
   }
   const data = await response.json();
   return data.url;
+};
+
+const setAuditTrail = async ({
+  action,
+  notes,
+  object,
+  process_state,
+  sysapp,
+  sysfunc,
+  userid,
+  json_object,
+  location_url
+}: {
+  action: string;
+  notes: string;
+  object: string;
+  process_state: string;
+  sysapp: string;
+  sysfunc: string;
+  userid: string;
+  json_object: Record<string, any>;
+  location_url: string;
+}) => {
+  const url = new URL(`/auditrail/businessProcess/`, process.env.NEXT_PUBLIC_API_URL);
+  url.searchParams.set('action', action);
+  url.searchParams.set('notes', notes);
+  url.searchParams.set('object', object);
+  url.searchParams.set('process_state', process_state);
+  url.searchParams.set('sysapp', sysapp);
+  url.searchParams.set('sysfunc', sysfunc);
+  url.searchParams.set('userid', userid);
+  url.searchParams.set('json_object', JSON.stringify(json_object));
+  url.searchParams.set('location_url', encodeURIComponent(process.env.AUTH_URL + location_url));
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + decryptPassword(process.env.NEXT_PUBLIC_API_PASSWORD)).toString('base64')}`
+    },
+    // next: { tags: ['audittrail'] },
+    cache: 'no-cache',
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  // if (!response.ok) {
+  //   throw new Error('Failed to fetch audit trail.');
+  // }
+  const data = await response.json();
+  return data;
 };
 
 export const BASE_PATH = '/api/auth'
@@ -66,7 +141,7 @@ export const authConfig = {
             throw new InvalidLoginError("User account does not exist");
           }
 
-          const passwordDB = Fernet.decrypt(user.password, process.env.FERNET_KEY as string)
+          const passwordDB = decryptPassword(user.password, process.env.FERNET_KEY as string)
 
           const passwordsMatch = password === passwordDB;
 
@@ -109,11 +184,20 @@ export const authConfig = {
       session?: Session | undefined;
     }) {
       if (params.trigger === "update") {
-        params.token = { ...params.token, user: params.session };
+        const profileImage = await getProfilePicture({ email: params.token.email as string });
+        const userDetails = await getUserDetails({ email: params.token.email as string });
+
+        params.token = {
+          ...params.token,
+          image: profileImage,
+          name: userDetails.name,
+        };
         return params.token;
       }
 
       if (params.account) {
+        const profileImage = await getProfilePicture({ email: params.token.email as string });
+        const userDetails = await getUserDetails({ email: params.token.email as string });
         const userWithLoginCount = await CustomAdapter.getUserByAccount!(params.account);
         const login_count = userWithLoginCount?.login_count;
 
@@ -130,6 +214,8 @@ export const authConfig = {
           params.token.session_token = session.sessionToken;
           params.token.user_id = params.user.id;
           params.token.login_count = login_count;
+          params.token.image = profileImage;
+          params.token.name = userDetails.name;
         }
       }
 
@@ -140,13 +226,12 @@ export const authConfig = {
       session: Session;
       token: JWT;
     }) {
-      const profileImage = await getProfilePicture({ email: params.token.email as string });
-
       if (params.session.user) {
         params.session.user.session_token = params.token.session_token as string;
         params.session.user.user_id = params.token.user_id as string;
         params.session.user.login_count = params.token.login_count as number;
-        params.session.user.image = profileImage;
+        params.session.user.image = params.token.image as string;
+        params.session.user.name = params.token.name as string;
       }
       return params.session
 
@@ -194,14 +279,37 @@ export const authConfig = {
       return true
     },
   },
-  jwt: {
-    // maxAge: 60 * 1,
-    // async encode(arg) {
-    //   return (arg.token?.sessionId as string) ?? encode(arg);
-    // },
-  },
   events: {
-    async signOut(params) {
+    signIn: async (params) => {
+      await setAuditTrail({
+        action: `login`,
+        location_url: '/auth/signin',
+        object: 'src/auth/index.ts',
+        process_state: 'LOGIN',
+        sysfunc: '"signIn" func ',
+        userid: params.user.id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User logged in`,
+        json_object: {
+          ...params.user,
+          ...params.account,
+        },
+      });
+    },
+    signOut: async (params: any) => {
+      await setAuditTrail({
+        action: `logout`,
+        location_url: '/auth/signout',
+        object: 'src/auth/index.ts',
+        process_state: 'LOGOUT',
+        sysfunc: '"signOut" func ',
+        userid: params.token.user_id as string,
+        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+        notes: `User logged out`,
+        json_object: {
+          ...params.token,
+        },
+      });
       if ("token" in params && params.token?.session_token) {
         await CustomAdapter.deleteSession?.(params.token.session_token as string);
         await CustomAdapter.updateAccountLoginCount?.(params.token.user_id as string);

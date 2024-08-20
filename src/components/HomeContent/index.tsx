@@ -8,7 +8,7 @@ import '@mantine/dates/styles.css'; //if using mantine date picker features
 
 import clsx from 'clsx';
 
-import TitleSection from '../../../../components/TitleSection';
+import TitleSection from '../TitleSection';
 import ApplicationSection from './ApplicationSection';
 import TabularSection from './TabularSection';
 

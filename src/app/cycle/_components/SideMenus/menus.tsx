@@ -207,7 +207,7 @@ function SideMenus() {
                               root: 'h-full',
                               tab: 'w-40 !border-r-0 !border-l-4 !rounded-none data-[active=true]:!border-[var(--fc-brand-700)] ml-4 my-4 !pl-1 hover:bg-transparent data-[active=true]:font-semibold',
                               tabLabel: '~text-md/lg',
-                              list: 'flex-nowrap',
+                              list: '!flex-nowrap',
                             }}
                             onChange={child.onChange}
                           >

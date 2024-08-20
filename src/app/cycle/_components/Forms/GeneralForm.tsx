@@ -5,7 +5,7 @@ import { ActionIcon, Button, Flex, Group, InputWrapper, Modal, ScrollAreaAutosiz
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import Image from 'next/image';
 import * as React from 'react'
-import { CycleData } from '../HomeContent';
+import { CycleData } from '../../../../components/HomeContent';
 import HeaderForm from './HeaderForm';
 import { FormProvider, useForm } from "react-hook-form";
 import { Radio, RadioGroup, TextInput } from 'react-hook-form-mantine';

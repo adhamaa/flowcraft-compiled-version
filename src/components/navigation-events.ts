@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react'
+import * as React from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { setAuditTrail } from '@/lib/service';
 import { useSession } from 'next-auth/react';
@@ -11,9 +11,9 @@ export function NavigationEvents() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const pageUrl = `${pathname}?${searchParams}`;
-  const prevUrlRef = useRef<string | null>(null);
+  const prevUrlRef = React.useRef<string | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const currentUrl = `${pathname}`
     if (prevUrlRef.current && prevUrlRef.current !== currentUrl) {
       setAuditTrail({
