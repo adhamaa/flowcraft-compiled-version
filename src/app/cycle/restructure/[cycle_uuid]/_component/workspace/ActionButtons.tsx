@@ -49,10 +49,11 @@ const ActionButtons = () => {
   const action = getAction(isEditData as { [key in ActionType]: boolean });
 
   const [logUuid, setLogUuid] = React.useState<string>(() => crypto.randomUUID());
-  console.log('logUuid:', logUuid)
+  const [applyData, setApplyData] = React.useReducer((state: any, action: any) => ([...state, { action: action.type, stage_uuid: action.data.curr_stage_uuid }]), []);
 
   const onApplySubmit = (data: any, e: any) => onApply({
     action: action as ActionType, data, callback: () => {
+      setApplyData({ type: action, data });
       reset();
       setAuditTrail({
         action: 'apply_' + (action as string) + '_restructure_cycle',
@@ -70,6 +71,7 @@ const ActionButtons = () => {
 
   const onSaveSubmit = () => onSave({
     cycle_uuid, callback: ({ data, ...response }) => {
+      console.log('data:', data)
       if (response.success) {
         setAuditTrail({
           action: 'save_restructure_cycle',
@@ -79,7 +81,12 @@ const ActionButtons = () => {
           sysapp: 'FLOWCRAFTBUSINESSPROCESS',
           sysfunc: '"onSaveSubmit" func',
           userid: userId as string,
-          json_object: { ...response, uuid: `log_${logUuid}` },
+          json_object: {
+            ...response,
+            uuid: `log_${logUuid}`,
+            cycle_uuid: cycle_uuid,
+            data: applyData
+          },
           location_url: pageUrl,
         }).then(() => {
           // setLogUuid(crypto.randomUUID());
