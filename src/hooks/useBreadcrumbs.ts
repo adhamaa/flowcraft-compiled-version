@@ -52,7 +52,6 @@ const useBreadcrumbs = ({
     const cycleCrumbsTitle = deletedStages ? "Deleted Stages" : stages ? "Stages" : generalInformation ? "General Information" : "";
 
     const pathTitles = !!segments.length && getTitles(pathname)
-    console.log('pathTitles:', pathTitles)
 
     return [
       ...DEFAULT_BREADCRUMBS, // add home|cycle to the list
