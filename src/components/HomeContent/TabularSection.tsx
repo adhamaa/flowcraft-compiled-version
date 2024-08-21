@@ -308,7 +308,7 @@ const TabularSection = ({ opened,
           {tripleDotMenu.map((menuLayer, i) => (
             <div key={menuLayer.group + i}>
               {menuLayer.menu.map((menu) => (
-                <Menu.Item key={menu.label} onClick={() => menu.onClick(row)} disabled={menu.disabled}>
+                <Menu.Item key={menu.label} onClick={() => menu.onClick(row as never)} disabled={menu.disabled}>
                   {menu.label}
                 </Menu.Item>
               ))}
@@ -336,7 +336,7 @@ const TabularSection = ({ opened,
       classNames: { tr: '!border-none' },
     }),
     mantineTableBodyCellProps: ({ cell, row }) => ({
-      onClick: () => handleCellClick(cell, row),
+      onClick: () => handleCellClick(cell as never, row as never),
       classNames: { td: cell.column.id !== 'mrt-row-actions' && 'cursor-pointer' } as never,
     }),
   });
