@@ -17,6 +17,21 @@ import useQueryString from '@/hooks/useQueryString';
 import { Select } from 'react-hook-form-mantine';
 import { useForm } from 'react-hook-form';
 import { datasource_type, DatasourceType } from '@/constant/datasource';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+
+type PendingLogData = {
+  action: string;
+  apps_name: string;
+  claim_id: number;
+  cycle_id: number;
+  cycle_name: string;
+  cycle_uuid: string;
+  last_updated_datetime: string;
+  stage_count: string;
+  user_id: string;
+  user_name: string;
+  uuid: string;
+};
 
 const TabularSection = ({ opened,
   statusIndicator,
@@ -26,10 +41,8 @@ const TabularSection = ({ opened,
   statusIndicator?: boolean;
   isPagination?: boolean;
 }) => {
-  const [cycleData, setCycleData] = React.useState<CycleData[]>([]);
-  const [restructurePendingsLog, setRestructurePendingsLog] = React.useState<any[]>([]);
   const { resetDiagramLocalStorage } = useWorkInProgressDiagram();
-  const [tableData, setTableData] = React.useState<CycleData[]>([]);
+  const [tableData, setTableData] = React.useState<CycleData[] | PendingLogData[]>([]);
   const { createQueryString } = useQueryString();
   const router = useRouter();
   const pathname = usePathname();
@@ -42,6 +55,39 @@ const TabularSection = ({ opened,
   const status = searchParams.get('status');
 
   const [activeTab, setActiveTab] = React.useState<string | null>(data_source || (isCycle ? 'database' : 'success'));
+
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10, //customize the default page size
+  });
+
+  const { data: cycleData } = useQuery({
+    queryKey: ['cycle', selected_app, data_source],
+    queryFn: () => getCycleList({
+      apps_label: selected_app as Apps_label,
+      datasource_type: data_source as DatasourceType,
+    }),
+    enabled: !!(isCycle && selected_app && data_source),
+  });
+
+  const allClaimOptions = {
+    page: pagination.pageIndex + 1,
+    per_page: pagination.pageSize,
+    status: status as "success" | "failed" | "wip",
+  };
+  // const listAllClaim = useQuery({
+  //   queryKey: ["allclaim", allClaimOptions],
+  //   queryFn: () => getAllClaim(allClaimOptions),
+  //   placeholderData: keepPreviousData // keep previous data while loading new data
+  // });
+  const pendingsLog = useQuery({
+    queryKey: ['pending-claim', allClaimOptions],
+    queryFn: () => getRestructurePendingsLog(allClaimOptions),
+    enabled: !!(isManageClaim && status),
+    placeholderData: keepPreviousData,
+  });
+
+  const { data: pendingsLogData, total_items } = pendingsLog.data || {};
 
   const methods = useForm();
 
@@ -188,60 +234,33 @@ const TabularSection = ({ opened,
     }
   ];
 
-  const columnsPendingsLog: MRT_ColumnDef<{
-    action: string;
-    apps_name: string;
-    claim_id: number;
-    cycle_id: number;
-    cycle_name: string;
-    cycle_uuid: string;
-    last_updated_datetime: string;
-    stage_count: string;
-    user_id: string;
-    user_name: string;
-    uuid: string;
-  }>[] = [
-      {
-        header: 'Cycle id',
-        accessorFn: (originalRow) => originalRow.cycle_id,
-      },
-      {
-        header: 'Applications',
-        accessorFn: (originalRow) => originalRow.apps_name,
-      },
-      {
-        header: 'Claim id',
-        accessorFn: (originalRow) => originalRow.claim_id,
-      },
-      {
-        header: 'Stage name',
-        accessorFn: (originalRow) => 'N/A',
-      },
-      {
-        header: 'Actor',
-        accessorFn: (originalRow) => originalRow.user_name,
-      },
-      {
-        header: 'Last updated date',
-        accessorFn: (originalRow) => originalRow.last_updated_datetime,
-      },
-      {
-        header: 'Action',
-        accessorFn: (originalRow) => originalRow.action,
-        Cell: ({ cell }) => {
-          return (
-            <div className='flex gap-2 items-center'>
-              <span className={clsx('capitalize rounded-full px-2 py-1 text-sm font-semibold', statusIndicator && 'bg-green-500 text-white')}>{(cell?.getValue() as string).replace(/_/g, ' ') as string}</span>
-            </div>
-          )
-        },
-      }
-    ];
+  const columnsPendingsLog: MRT_ColumnDef<PendingLogData>[] = [
+    {
+      header: 'Cycle id',
+      accessorFn: (originalRow) => originalRow.cycle_id,
+    },
+    {
+      header: 'Applications',
+      accessorFn: (originalRow) => originalRow.apps_name,
+    },
+    {
+      header: 'Claim id',
+      accessorFn: (originalRow) => originalRow.claim_id,
+    },
+    {
+      header: 'Stage name',
+      accessorFn: (originalRow) => 'N/A',
+    },
+    {
+      header: 'Actor',
+      accessorFn: (originalRow) => originalRow.user_name,
+    },
+    {
+      header: 'Last updated date',
+      accessorFn: (originalRow) => originalRow.last_updated_datetime,
+    }
+  ];
 
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10, //customize the default page size
-  });
 
   const handleCellClick = (cell: MRT_Cell<CycleData>, row: MRT_Row<CycleData>) => {
     if (isCycle) cell.column.id !== 'mrt-row-actions' && router.push(pathname + "/" + row.original.cycle_id + '?' + createQueryString('', ''))
@@ -251,15 +270,17 @@ const TabularSection = ({ opened,
 
   const table = useMantineReactTable({
     columns: isCycle ? columnsCycle : isManageClaim ? columnsPendingsLog : [] as any,
-    data: React.useMemo(() => tableData, [tableData]),
+    data: React.useMemo(() => tableData, [tableData]) as any,
     // enableRowSelection: true,
     onPaginationChange: setPagination, //hoist pagination state to your state when it changes internally
+    manualPagination: true,
+    rowCount: total_items,
     state: { pagination }, //pass the pagination state to the table
     initialState: {
       // pagination: { pageSize: 10, pageIndex: 0 },
       showGlobalFilter: true,
     },
-    enableRowActions: true,
+    enableRowActions: isCycle,
     enableSorting: false,
     enableTopToolbar: false,
     enableBottomToolbar: false,
@@ -332,23 +353,14 @@ const TabularSection = ({ opened,
     { name: 'Failed', value: "failed", disabled: false }
   ];
 
-  React.useEffect(() => {
-    const fetchCycleData = () => getCycleList({
-      apps_label: selected_app as Apps_label,
-      datasource_type: data_source as DatasourceType,
-    });
-    fetchCycleData().then(setCycleData);
-  }, [selected_app, data_source]);
 
   React.useEffect(() => {
-    const fetchPendingsLog = () => getRestructurePendingsLog({ status: status as "success" | "failed" | "wip" });
-    fetchPendingsLog().then(setRestructurePendingsLog);
-  }, [status]);
+    if (isCycle) setTableData(cycleData ?? []);
+  }, [cycleData, isCycle]);
 
   React.useEffect(() => {
-    if (isCycle) setTableData(cycleData);
-    if (isManageClaim) setTableData(restructurePendingsLog);
-  }, [cycleData, restructurePendingsLog, isCycle, isManageClaim]);
+    if (isManageClaim) setTableData(pendingsLogData ?? []);
+  }, [pendingsLogData, isManageClaim]);
 
   React.useEffect(() => {
     if (selected_app && isCycle && !data_source) {

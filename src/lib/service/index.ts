@@ -799,13 +799,18 @@ export const getUsersPending = async ({
 
 export const getRestructurePendingsLog = async ({
   status = 'success',
+  page,
+  per_page,
 }: {
   status?: "success" | "wip" | "failed";
-
+  page?: number;
+  per_page?: number;
 }) => {
   const url = new URL(`/businessProcess/restructurePendingLogs`, baseUrl);
 
   url.searchParams.set('status', status);
+  url.searchParams.set('page', page?.toString() || '');
+  url.searchParams.set('per_page', per_page?.toString() || '');
 
   const response = await fetch(url, {
     method: 'GET',
@@ -822,7 +827,7 @@ export const getRestructurePendingsLog = async ({
     throw new Error('Failed to fetch restructure pendings log.');
   }
   const data = await response.json();
-  return data.data;
+  return data;
 };
 
 export const restructurePendings = async ({
