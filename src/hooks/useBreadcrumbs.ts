@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useParams, usePathname, useSelectedLayoutSegments } from 'next/navigation';
+import useQueryString from './useQueryString';
 
 export type Breadcrumb = {
   title: string;
@@ -43,6 +44,7 @@ const useBreadcrumbs = ({
   const params = useParams();
   const cycle_id = params?.cycle_id as string;
   const stage_uuid = params?.stage_uuid as string;
+  const { remainQueryString } = useQueryString();
 
 
   const getGeneralBreadcrumbs = React.useMemo(() => {
@@ -55,12 +57,12 @@ const useBreadcrumbs = ({
 
     return [
       ...DEFAULT_BREADCRUMBS, // add home|cycle to the list
-      ...(!pathname.includes("cycle") && !pathname.includes("manage-cycle") && !pathname.includes("manage-account") ? [{
+      ...(!pathname.includes("/cycle") && !pathname.includes("/manage-cycle") && !pathname.includes("/manage-account") ? [{
         title: pathTitles as string,
         href: "",
         disabled: true
       },] : []),
-      ...(pathname.includes("cycle") ? [{ // add cycle to the list
+      ...(pathname.includes("/cycle") ? [{ // add cycle to the list
         title: 'Cycle',
         href: "",
         disabled: false
@@ -69,19 +71,19 @@ const useBreadcrumbs = ({
         href: "",
         disabled: true
       }] : []),
-      ...(pathname.includes("manage-cycle") ? segments.map((segment, index) => {
+      ...(pathname.includes("/manage-cycle") ? segments.map((segment, index) => {
         let href = segments.slice(0, index + 1).join('/');
         return {
           title: getTitles(segment),
-          href: `/${href}`,
+          href: `/${href}?${remainQueryString()}`,
           disabled: true
         }
       }) : []),
-      ...(pathname.includes("manage-account") ? segments.map((segment, index) => {
+      ...(pathname.includes("/manage-account") ? segments.map((segment, index) => {
         let href = segments.slice(0, index + 1).join('/');
         return {
           title: getTitles(segment),
-          href: `/${href}`,
+          href: `/${href}?${remainQueryString()}`,
           disabled: true
         }
       }) : []),
