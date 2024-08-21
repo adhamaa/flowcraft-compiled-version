@@ -102,7 +102,7 @@ export default function HomeContent({
     <div
       className={clsx('w-full'
       )}>
-      <TitleSection title={['Business Process', 'Claim Management']} multiple />
+      <TitleSection title={['Business Process', 'Cycle Management']} multiple />
       <ApplicationSection {...{ opened, toggle }} />
       <TabularSection isPagination {...{ opened }} />
     </div>

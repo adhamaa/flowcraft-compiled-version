@@ -21,9 +21,9 @@ function SideMenus() {
   const sideMenuList = [
     {
       name: 'Manage Claim',
-      value: 'manage-claim',
+      value: 'manage-cycle',
       disabled: false,
-      onChange: async (value: any) => router.push(`/manage-claim/${value}/` + '?' + remainQueryString()),
+      onChange: async (value: any) => router.push(`/manage-cycle/${value}/` + '?' + remainQueryString()),
       children: {
         defaultValue: defaultValues,
         data: [
@@ -32,7 +32,7 @@ function SideMenus() {
             value: 'pending-claim',
             disabled: false,
             onChange: async (value: any) => {
-              router.push(`/manage-claim/${value}/` + '?' + remainQueryString());
+              router.push(`/manage-cycle/${value}/` + '?' + remainQueryString());
             },
           },
           {
@@ -40,7 +40,7 @@ function SideMenus() {
             value: 'completed-claim',
             disabled: true,
             onChange: async (value: any) => {
-              router.push(`/manage-claim/${value}/` + '?' + remainQueryString());
+              router.push(`/manage-cycle/${value}/` + '?' + remainQueryString());
             },
           },
           {
@@ -48,7 +48,7 @@ function SideMenus() {
             value: 'stage',
             disabled: true,
             onChange: async (value: any) => {
-              router.push(`/manage-claim/${value}/` + '?' + remainQueryString());
+              router.push(`/manage-cycle/${value}/` + '?' + remainQueryString());
             },
           },
           {
@@ -56,7 +56,7 @@ function SideMenus() {
             value: 'user',
             disabled: true,
             onChange: async (value: any) => {
-              router.push(`/manage-claim/${value}/` + '?' + remainQueryString());
+              router.push(`/manage-cycle/${value}/` + '?' + remainQueryString());
             },
           },
         ]

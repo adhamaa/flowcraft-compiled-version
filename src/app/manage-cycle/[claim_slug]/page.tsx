@@ -1,9 +1,9 @@
 import * as React from 'react'
-import ManageClaim from './_components/manage-claim'
+import ManageCycle from './_components/manage-cycle'
 
 function ClaimSlugPage() {
   return (
-    <ManageClaim />
+    <ManageCycle />
   )
 }
 

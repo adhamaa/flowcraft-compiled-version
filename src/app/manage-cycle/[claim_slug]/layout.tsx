@@ -5,7 +5,7 @@ import SideMenus from "./_components/SideMenus/menus";
 
 export const metadata: Metadata = {
   title: "Manage claim",
-  description: "Claim management",
+  description: "cycle management",
 };
 
 export default async function Layout({

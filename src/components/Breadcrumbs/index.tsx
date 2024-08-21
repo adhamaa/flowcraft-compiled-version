@@ -14,7 +14,7 @@ function Breadcrumbs({ items, className, route }: {
 }) {
   const pathname = usePathname();
   const excludePaths = (
-    pathname !== "/manage-claim" &&
+    pathname !== "/manage-cycle" &&
     pathname !== "/cycle" &&
     !pathname.includes("/auth") &&
     !pathname.includes("/cycle/restructure")

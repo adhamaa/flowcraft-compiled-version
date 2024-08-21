@@ -1,7 +1,7 @@
 
 'use server';
 
-import { ActionType } from "@/app/manage-claim/[claim_slug]/_components/manage-claim/pending-claims";
+import { ActionType } from "@/app/manage-cycle/[claim_slug]/_components/manage-cycle/pending-claims";
 import { decryptPassword } from "../crypt";
 import { clientRevalidateTag } from "./helper";
 import { datasource_mapping } from "@/constant/datasource";
@@ -727,7 +727,7 @@ export const restructureBizProcess = async ({
   }
 };
 
-// ----------------- Claim management ----------------- //
+// ----------------- cycle management ----------------- //
 export const getAllClaim = async ({
   claim_id,
   per_page,

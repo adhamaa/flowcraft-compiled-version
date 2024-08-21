@@ -4,7 +4,7 @@ import { BASE_PATH, auth } from "@/auth";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Claim Management",
+  title: "cycle management",
   description: "Manage Claims",
 };
 

@@ -55,7 +55,7 @@ const useBreadcrumbs = ({
 
     return [
       ...DEFAULT_BREADCRUMBS, // add home|cycle to the list
-      ...(!pathname.includes("cycle") && !pathname.includes("manage-claim") && !pathname.includes("manage-account") ? [{
+      ...(!pathname.includes("cycle") && !pathname.includes("manage-cycle") && !pathname.includes("manage-account") ? [{
         title: pathTitles as string,
         href: "",
         disabled: true
@@ -69,7 +69,7 @@ const useBreadcrumbs = ({
         href: "",
         disabled: true
       }] : []),
-      ...(pathname.includes("manage-claim") ? segments.map((segment, index) => {
+      ...(pathname.includes("manage-cycle") ? segments.map((segment, index) => {
         let href = segments.slice(0, index + 1).join('/');
         return {
           title: getTitles(segment),

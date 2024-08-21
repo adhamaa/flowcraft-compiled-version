@@ -253,7 +253,7 @@ const TableClaims = (props?: PendingClaimProps) => {
       setAuditTrail({
         action: `${action}_pending_claims`,
         location_url: pageUrl,
-        object: 'src/app/manage-claim/[claim_slug]/_components/manage-claim/pending-claims.tsx',
+        object: 'src/app/manage-cycle/[claim_slug]/_components/manage-cycle/pending-claims.tsx',
         process_state: 'TRIGGERAPI',
         sysfunc: '"handleAction" func',
         userid: userId as string,

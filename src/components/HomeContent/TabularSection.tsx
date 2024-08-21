@@ -46,7 +46,7 @@ const TabularSection = ({ opened,
   const { createQueryString } = useQueryString();
   const router = useRouter();
   const pathname = usePathname();
-  const isManageClaim = pathname === '/manage-claim';
+  const isManageCycle = pathname === '/manage-cycle';
   const isCycle = pathname === '/cycle';
 
   const searchParams = useSearchParams();
@@ -58,7 +58,7 @@ const TabularSection = ({ opened,
 
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 10, //customize the default page size
+    pageSize: 25, //customize the default page size
   });
 
   const { data: cycleData } = useQuery({
@@ -83,7 +83,7 @@ const TabularSection = ({ opened,
   const pendingsLog = useQuery({
     queryKey: ['pending-claim', allClaimOptions],
     queryFn: () => getRestructurePendingsLog(allClaimOptions),
-    enabled: !!(isManageClaim && status),
+    enabled: !!(isManageCycle && status),
     placeholderData: keepPreviousData,
   });
 
@@ -269,11 +269,11 @@ const TabularSection = ({ opened,
   }
 
   const table = useMantineReactTable({
-    columns: isCycle ? columnsCycle : isManageClaim ? columnsPendingsLog : [] as any,
+    columns: isCycle ? columnsCycle : isManageCycle ? columnsPendingsLog : [] as any,
     data: React.useMemo(() => tableData, [tableData]) as any,
     // enableRowSelection: true,
     onPaginationChange: setPagination, //hoist pagination state to your state when it changes internally
-    manualPagination: isManageClaim,
+    manualPagination: isManageCycle,
     rowCount: total_items,
     state: { pagination }, //pass the pagination state to the table
     initialState: {
@@ -359,8 +359,8 @@ const TabularSection = ({ opened,
   }, [cycleData, isCycle]);
 
   React.useEffect(() => {
-    if (isManageClaim) setTableData(pendingsLogData ?? []);
-  }, [pendingsLogData, isManageClaim]);
+    if (isManageCycle) setTableData(pendingsLogData ?? []);
+  }, [pendingsLogData, isManageCycle]);
 
   React.useEffect(() => {
     if (selected_app && isCycle && !data_source) {
@@ -369,7 +369,7 @@ const TabularSection = ({ opened,
   }, [activeTab, createQueryString, data_source, pathname, router, selected_app])
 
   React.useEffect(() => {
-    if (selected_app && isManageClaim && !status) {
+    if (selected_app && isManageCycle && !status) {
       router.push(pathname + '?' + createQueryString('status', activeTab as string))
     }
   }, [activeTab, createQueryString, data_source, pathname, router, selected_app])
@@ -417,7 +417,7 @@ const TabularSection = ({ opened,
         });
       },
     },
-    ...(isManageClaim ? [] : [{
+    ...(isManageCycle ? [] : [{
       tooltip: "Filter",
       icon: "heroicons-outline:adjustments",
       disabled: true,
@@ -442,8 +442,8 @@ const TabularSection = ({ opened,
     //   label: 'Manage Claim',
     //   type: 'button' as React.ButtonHTMLAttributes<HTMLButtonElement>["type"],
     //   disabled: false,
-    //   canShow: isManageClaim,
-    //   onClick: () => router.push('/manage-claim/pending-claim'),
+    //   canShow: isManageCycle,
+    //   onClick: () => router.push('/manage-cycle/pending-claim'),
     //   variant: "filled",
     //   color: "var(--fc-neutral-100)",
     //   c: "var(--fc-neutral-900)",
@@ -489,7 +489,7 @@ const TabularSection = ({ opened,
                 <Button key={label + i} leftSection={icon} {...button} >{label}</Button>
               ))}
 
-              {isManageClaim && <>
+              {isManageCycle && <>
                 <Select
                   name='cycle_id'
                   // label='Choose Cycle Name'
@@ -592,7 +592,7 @@ const TabularSection = ({ opened,
               </div>
               <MRT_ToolbarAlertBanner stackAlertBanner table={table} />
             </>}
-            {isManageClaim && <>
+            {isManageCycle && <>
               <Tabs
                 color='var(--fc-brand-700)'
                 variant='default'
@@ -636,7 +636,7 @@ const TabularSection = ({ opened,
             // 'transition-all duration-300 ease-in-out'
           )} alt='process illustration' />
           {isCycle && <span>Explore business process cycles by clicking on the application</span>}
-          {isManageClaim && <span>Manage your claims by clicking on the application </span>}
+          {isManageCycle && <span>Manage your cycles by clicking on the application </span>}
         </div>
       )}
     </section >

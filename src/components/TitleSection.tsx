@@ -9,10 +9,10 @@ import { usePathname, useRouter } from "next/navigation";
 const TitleSection = ({ title, multiple = false, className }: { title: string | string[]; multiple?: boolean; className?: string; }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const isManageClaim = pathname === '/manage-claim';
+  const isManageCycle = pathname === '/manage-cycle';
   const isCycle = pathname === '/cycle';
 
-  const initialTitle = multiple ? isManageClaim ? 'Claim Management' : isCycle ? 'Business Process' : undefined : title;
+  const initialTitle = multiple ? isManageCycle ? 'Cycle Management' : isCycle ? 'Business Process' : undefined : title;
 
   const [opened, setOpened] = React.useState(false);
   // handle selected item in dropdown menu 
@@ -61,7 +61,7 @@ const TitleSection = ({ title, multiple = false, className }: { title: string | 
             <MenuItem
               key={i}
               onClick={() => router.push(
-                t === 'Claim Management' ? '/manage-claim' : '/cycle'
+                t === 'Cycle Management' ? '/manage-cycle' : '/cycle'
               )}
             >
               {t}
