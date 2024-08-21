@@ -11,6 +11,7 @@ import { modals } from '@mantine/modals';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { MantineReactTable, MRT_ColumnDef, MRT_GlobalFilterTextInput, MRT_RowSelectionState, MRT_TablePagination, useMantineReactTable } from 'mantine-react-table';
+import { useSession } from 'next-auth/react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import * as React from 'react'
 import { Control, Form, useForm } from 'react-hook-form';
@@ -117,6 +118,8 @@ function PendingClaim() {
 export default PendingClaim
 
 const TableClaims = (props?: PendingClaimProps) => {
+  const { data: session } = useSession();
+  const userId = session?.user?.user_id;
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const pageUrl = `${pathname}?${searchParams}`;
@@ -253,7 +256,7 @@ const TableClaims = (props?: PendingClaimProps) => {
         object: 'src/app/manage-claim/[claim_slug]/_components/manage-claim/pending-claims.tsx',
         process_state: 'TRIGGERAPI',
         sysfunc: '"handleAction" func',
-        userid: user_id as string,
+        userid: userId as string,
         sysapp: 'FLOWCRAFTBUSINESSPROCESS',
         notes: `Update pending claims`,
         json_object: { ...sendData, ...res },
