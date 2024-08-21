@@ -273,7 +273,7 @@ const TabularSection = ({ opened,
     data: React.useMemo(() => tableData, [tableData]) as any,
     // enableRowSelection: true,
     onPaginationChange: setPagination, //hoist pagination state to your state when it changes internally
-    manualPagination: true,
+    manualPagination: isManageClaim,
     rowCount: total_items,
     state: { pagination }, //pass the pagination state to the table
     initialState: {
