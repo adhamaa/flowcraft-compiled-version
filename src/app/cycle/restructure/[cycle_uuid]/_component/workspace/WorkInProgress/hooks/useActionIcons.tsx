@@ -4,7 +4,7 @@ import useEditableState from "@/hooks/useEditableState";
 type ActionType = "add" | "move" | "duplicate" | "delete" | "restore" | "disjoint";
 export type EditableType = { [key in ActionType]: boolean };
 interface EditableContextType {
-  isEditable: EditableType;
+  isEditable: { [key: string]: boolean; };
   toggleIsEditable: (id: string) => void;
   reset: () => void;
 };
