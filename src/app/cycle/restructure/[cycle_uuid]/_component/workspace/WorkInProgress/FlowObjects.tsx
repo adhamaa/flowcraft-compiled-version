@@ -12,7 +12,7 @@ import { MultiSelect, Select, TextInput } from 'react-hook-form-mantine';
 import { FormProvider, useForm } from 'react-hook-form';
 import clsx from 'clsx';
 import { Icon } from '@iconify-icon/react';
-import { ActionType, useActionIcons } from './hooks/useActionIcons';
+import { ActionType, EditableType, useActionIcons } from './hooks/useActionIcons';
 import { useParams, useSearchParams } from 'next/navigation';
 import { Apps_label, getRestructureLog } from '@/lib/service';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -50,14 +50,14 @@ function FlowObjects() {
 
   const { getSelectedNodeId, getInputOptions, getPreviousInputOptions, getNextInputOptions, toggleSelectedByNodeId, fetchDeletedNodes } = useWorkInProgressDiagram();
   const { isEditable: isEditData, getAction, getIsEditable, getIsAnyEditable } = useActionIcons();
-  const action = getAction(isEditData as { [key in ActionType]: boolean });
-  const isAdd = getIsEditable(isEditData as { [key in ActionType]: boolean }, 'add');
-  const isMove = getIsEditable(isEditData as { [key in ActionType]: boolean }, 'move');
-  const isDuplicate = getIsEditable(isEditData as { [key in ActionType]: boolean }, 'duplicate');
-  const isDelete = getIsEditable(isEditData as { [key in ActionType]: boolean }, 'delete');
-  const isRestore = getIsEditable(isEditData as { [key in ActionType]: boolean }, 'restore');
-  const isDisjoint = getIsEditable(isEditData as { [key in ActionType]: boolean }, 'disjoint');
-  const isEditable = getIsAnyEditable(isEditData as { [key in ActionType]: boolean });
+  const action = getAction(isEditData as EditableType);
+  const isAdd = getIsEditable(isEditData as EditableType, 'add');
+  const isMove = getIsEditable(isEditData as EditableType, 'move');
+  const isDuplicate = getIsEditable(isEditData as EditableType, 'duplicate');
+  const isDelete = getIsEditable(isEditData as EditableType, 'delete');
+  const isRestore = getIsEditable(isEditData as EditableType, 'restore');
+  const isDisjoint = getIsEditable(isEditData as EditableType, 'disjoint');
+  const isEditable = getIsAnyEditable(isEditData as EditableType);
   const selectedNodeId = getSelectedNodeId();
 
   const inputOptions = getInputOptions();
@@ -184,7 +184,7 @@ function FlowObjects() {
       <div className='h-full space-y-6'>
         <h1 className='text-xl font-semibold'>The Flow Objects</h1>
         <div className='flex flex-col h-full space-y-6'>
-          <ActionIcons />
+          <ActionIcons type='action' />
           {/* ---------- input section ----------- */}
           <>
             {action && <h1 className='text-xl font-semibold'><span className="capitalize">{action}</span> stage</h1>}
@@ -306,7 +306,8 @@ function FlowObjects() {
 
             <h1 className='text-xl font-semibold'>Restructure History</h1>
             <ScrollAreaAutosize>
-              <div className='border border-black rounded-xl pb-2 h-96'>
+              <div className='flex border border-black rounded-xl pb-2 h-96'>
+                <ActionIcons type='history' className='p-4 ml-auto' />
                 {/* <Timeline bulletSize={24} lineWidth={2}>
                   {restructureLogsData?.pages.map((page) => {
                     return (
