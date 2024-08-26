@@ -38,7 +38,7 @@ function SideMenus() {
           {
             name: 'Security',
             value: 'security',
-            disabled: true,
+            disabled: false,
             onChange: async (value: any) => {
               router.push(`/manage-account/${value}/` + '?' + remainQueryString());
             },
@@ -46,7 +46,7 @@ function SideMenus() {
           {
             name: 'Activities',
             value: 'activities',
-            disabled: true,
+            disabled: false,
             onChange: async (value: any) => {
               router.push(`/manage-account/${value}/` + '?' + remainQueryString());
             },

@@ -373,4 +373,4 @@ const Profile = ({ data = {} }: { data?: any; }) => {
   )
 }
 
-export default Profile
+export default Profile;

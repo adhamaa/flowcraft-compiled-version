@@ -1014,4 +1014,36 @@ export const removeProfilePicture = async ({ email }: { email: string }) => {
   }
   clientRevalidateTag('profilepicture');
   return await response.json();
+};
+
+export const getActivityLog = async ({
+  user_id,
+  page,
+  per_page,
+}: {
+  user_id: string;
+  page?: number;
+  per_page?: number;
+}) => {
+  const url = new URL(`/businessProcess/activityLog`, baseUrl);
+  url.searchParams.set('user_id', user_id);
+  url.searchParams.set('page', page?.toString() || '');
+  url.searchParams.set('per_page', per_page?.toString() || '');
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    next: { tags: ['activitylog'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to get activity log.');
+  }
+  const data = await response.json();
+  return data;
 }

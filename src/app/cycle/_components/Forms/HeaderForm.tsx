@@ -2,7 +2,7 @@ import { DatasourceType } from '@/constant/datasource';
 import { Icon } from '@iconify-icon/react';
 import { Button, ButtonFactory, ButtonProps } from '@mantine/core';
 import clsx from 'clsx';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
 export type CustomButtonProps = ButtonProps & {
@@ -21,6 +21,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
   isFullscreen?: boolean;
 }) => {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const datasource_type = searchParams.get('data_source') as DatasourceType;
   const isDatabase = datasource_type === 'database';
   const isProfile = type === 'profile';
@@ -70,7 +71,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       label: 'Edit',
       type: 'button',
       disabled: false,
-      canShow: (isDatabase || isProfile) && !isEdit,
+      canShow: !!toggleEdit && (isDatabase || isProfile) && !isEdit,
       onClick: toggleEdit as () => void,
 
       variant: "filled",
@@ -144,7 +145,7 @@ const HeaderForm = ({ toggleEdit, isEdit, toggleExpand, type, isFullscreen }: {
       'flex px-14 py-6 items-center border-b',
       isDatabase && isGeneral && 'justify-end'
     )}>
-      {isProfile && <h1 className="text-2xl font-semibold mr-auto">Profile Details</h1>}
+      {isProfile ? pathname.includes("/profile") ? <h1 className="text-2xl font-semibold mr-auto">Profile Details</h1> : pathname.includes("/security") ? <h1 className="text-2xl font-semibold mr-auto">Change Password</h1> : pathname.includes("/activities") ? <h1 className="text-2xl font-semibold mr-auto">Activity Timeline</h1> : null : null}
       {(isDatabase || isProfile) && (
         <>
           {isGeneral || isProfile ? (
