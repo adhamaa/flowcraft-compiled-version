@@ -69,9 +69,7 @@ const Activities = ({ data = {} }: { data?: any; }) => {
           className="flex">
           <ScrollAreaAutosize className='flex-1 h-[calc(100vh-341.5px)]'>
             <div className="mx-auto space-y-8 p-14">
-              <Timeline bulletSize={24} lineWidth={2} classNames={{
-                itemBullet: 'border-[#FFF] border-4 bg-fc-status-teal-400',
-              }}>
+              <Timeline bulletSize={24} lineWidth={2}>
                 {timelineData?.pages.map((page) => {
                   return (
                     <React.Fragment key={page.page}>
@@ -80,7 +78,10 @@ const Activities = ({ data = {} }: { data?: any; }) => {
                         notes: string;
                         updated_datetime: string;
                       }, index: React.Key) => (
-                        <TimelineItem key={index} bullet title={item.action}>
+                        <TimelineItem key={index} bullet title={item.action} classNames={{
+                          itemBullet: clsx('border-[#FFF] border-4', getRandomColor()),
+                          item: 'h-40',
+                        }}>
                           <Flex align="center">
                             <Text c="dimmed" size="sm">{item.notes}</Text>
                             <Text size="xs" mt={4} ml="auto">{getTimeAgo(item.updated_datetime)}</Text>
@@ -108,3 +109,9 @@ const Activities = ({ data = {} }: { data?: any; }) => {
 }
 
 export default Activities;
+
+function getRandomColor(): string {
+  const colors: string[] = ['bg-fc-status-teal-400', 'bg-fc-status-amber-400', 'bg-fc-status-rose-400'];
+  const randomIndex: number = Math.floor(Math.random() * colors.length);
+  return colors[randomIndex];
+}
