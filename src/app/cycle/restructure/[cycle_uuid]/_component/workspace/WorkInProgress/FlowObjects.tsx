@@ -6,15 +6,18 @@ import ActionIcons from '../ActionIcons';
 import ActionButtons from '../ActionButtons';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
-import { Button, ComboboxItem, InputWrapper } from '@mantine/core';
+import { Flex, InputWrapper, ScrollAreaAutosize, Text, Timeline, TimelineItem } from '@mantine/core';
 import { useElementSize } from '@mantine/hooks';
 import { MultiSelect, Select, TextInput } from 'react-hook-form-mantine';
 import { FormProvider, useForm } from 'react-hook-form';
 import clsx from 'clsx';
 import { Icon } from '@iconify-icon/react';
 import { ActionType, useActionIcons } from './hooks/useActionIcons';
-import { useSearchParams } from 'next/navigation';
-import { Apps_label } from '@/lib/service';
+import { useParams, useSearchParams } from 'next/navigation';
+import { Apps_label, getRestructureLog } from '@/lib/service';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { getTimeAgo } from '@/lib/helper';
+import { getRandomColor } from '@/app/manage-account/_components/Activities';
 
 type InputType = {
   type?: string;
@@ -40,6 +43,8 @@ export type FormValues = {
 
 function FlowObjects() {
   const searchParams = useSearchParams();
+  const params = useParams();
+  const cycle_uuid = params.cycle_uuid;
   const cycle_id = searchParams.get('cycle_id');
   const selected_app = searchParams.get('selected_app');
 
@@ -149,6 +154,31 @@ function FlowObjects() {
     }
   }, [isRestore])
 
+
+  const infiniteRestructureLogsQuery = useInfiniteQuery({
+    initialPageParam: 1,
+    queryKey: ['restructureLog', cycle_uuid],
+    queryFn: ({ pageParam }) => getRestructureLog({
+      cycle_uuid: cycle_uuid as string,
+      per_page: 10,
+      page: pageParam
+    }),
+    enabled: !!cycle_uuid,
+    getNextPageParam: (lastPage, _, lastPageParam) => {
+      if (lastPage.page === lastPage.total_pages) {
+        return undefined
+      }
+      return lastPageParam + 1
+    },
+    getPreviousPageParam: (firstPage, _, firstPageParam) => {
+      if (firstPage.page <= 0) {
+        return undefined
+      }
+      return firstPageParam - 1
+    },
+  });
+  const { data: restructureLogsData } = infiniteRestructureLogsQuery || {};
+
   return (
     <FormProvider {...methods}>
       <div className='h-full space-y-6'>
@@ -162,7 +192,6 @@ function FlowObjects() {
               {<form
                 className={clsx('space-y-4 p-4')}
               >
-
                 {InputList.map((input, index) => {
                   return (
                     <div key={index}>
@@ -274,6 +303,35 @@ function FlowObjects() {
               </form>}
             </div>
             <ActionButtons />
+
+            <h1 className='text-xl font-semibold'>Restructure History</h1>
+            <ScrollAreaAutosize>
+              <div className='border border-black rounded-xl pb-2 h-96'>
+                {/* <Timeline bulletSize={24} lineWidth={2}>
+                  {restructureLogsData?.pages.map((page) => {
+                    return (
+                      <React.Fragment key={page.page}>
+                        {page.data.map((item: {
+                          action: string;
+                          notes: string;
+                          updated_datetime: string;
+                        }, index: React.Key) => (
+                          <TimelineItem key={index} bullet title={item.action} classNames={{
+                            itemBullet: clsx('border-[#FFF] border-4', getRandomColor()),
+                            item: 'h-40',
+                          }}>
+                            <Flex align="center">
+                              <Text c="dimmed" size="sm">{item.notes}</Text>
+                              <Text size="xs" mt={4} ml="auto">{getTimeAgo(item.updated_datetime)}</Text>
+                            </Flex>
+                          </TimelineItem>
+                        ))}
+                      </React.Fragment>
+                    )
+                  })}
+                </Timeline> */}
+              </div>
+            </ScrollAreaAutosize >
           </>
         </div>
       </div >
