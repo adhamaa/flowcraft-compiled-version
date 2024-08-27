@@ -19,10 +19,6 @@ function Header() {
   const cycle_uuid = params.cycle_uuid;
   const cycle_id = searchParams.get('cycle_id');
 
-  const { removeQueryString } = useQueryString();
-
-  const backUrl = `/cycle/${cycle_id}/stage/${cycle_uuid}?${removeQueryString('cycle_id')}`;
-
   const { currentCycleInfo } = useWorkInProgressDiagram();
 
   const cycle_name = currentCycleInfo?.cycle_name;
@@ -39,7 +35,7 @@ function Header() {
         size="2.5rem"
         radius="md"
         aria-label="Back"
-        onClick={() => sameUrl ? history.back() : router.push(prevUrl)}
+        onClick={() => (sameUrl || !prevUrl) ? history.back() : router.push(prevUrl)}
       >
         <Icon
           icon='heroicons-solid:arrow-circle-left'
