@@ -563,7 +563,7 @@ const TabularSection = ({ opened,
                 // defaultValue="database"
                 value={activeTab as string}
                 onChange={(value) => {
-                  router.push(pathname + '?' + createQueryString('data_source', value as string))
+                  router.push(pathname + '?' + createQueryString('data_source', value as string), { scroll: false })
                   setActiveTab(value)
                 }}
                 classNames={{
@@ -599,7 +599,7 @@ const TabularSection = ({ opened,
                 // defaultValue="database"
                 value={activeTab as string}
                 onChange={(value) => {
-                  router.push(pathname + '?' + createQueryString('status', value as string))
+                  router.push(pathname + '?' + createQueryString('status', value as string), { scroll: false })
                   setActiveTab(value)
                 }}
                 classNames={{

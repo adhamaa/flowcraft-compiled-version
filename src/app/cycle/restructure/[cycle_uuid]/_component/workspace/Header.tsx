@@ -5,8 +5,11 @@ import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Tooltip } from '@mantine/core';
 import { useParams, useRouter } from 'next/navigation';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
+import { useGlobalState } from '@/hooks/useGlobalState';
 
 function Header() {
+  const { url, setUrl } = useGlobalState();
+
   const router = useRouter();
   const params = useParams();
   const cycle_uuid = params.cycle_uuid;
@@ -27,7 +30,7 @@ function Header() {
         size="2.5rem"
         radius="md"
         aria-label="Back"
-        onClick={() => router.back()}
+        onClick={() => history.back()}
       >
         <Icon
           icon='heroicons-solid:arrow-circle-left'

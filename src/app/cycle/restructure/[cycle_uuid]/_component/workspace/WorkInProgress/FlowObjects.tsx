@@ -182,10 +182,10 @@ function FlowObjects() {
   return (
     <FormProvider {...methods}>
       <div className='h-full space-y-6'>
+        {/* ----------------- flow objects ------------------ */}
         <h1 className='text-xl font-semibold'>The Flow Objects</h1>
         <div className='flex flex-col h-full space-y-6'>
           <ActionIcons type='action' />
-          {/* ---------- input section ----------- */}
           <>
             {action && <h1 className='text-xl font-semibold'><span className="capitalize">{action}</span> stage</h1>}
             <div className='border border-black rounded-xl pb-2'>
@@ -304,11 +304,12 @@ function FlowObjects() {
             </div>
             <ActionButtons />
 
-            <h1 className='text-xl font-semibold'>Restructure History</h1>
+            {/* ---------------- restructure history --------------- */}
+            {/* <h1 className='text-xl font-semibold'>Restructure History</h1>
             <ScrollAreaAutosize>
               <div className='flex border border-black rounded-xl pb-2 h-96'>
                 <ActionIcons type='history' className='p-4 ml-auto' />
-                {/* <Timeline bulletSize={24} lineWidth={2}>
+                <Timeline bulletSize={24} lineWidth={2}>
                   {restructureLogsData?.pages.map((page) => {
                     return (
                       <React.Fragment key={page.page}>
@@ -330,9 +331,9 @@ function FlowObjects() {
                       </React.Fragment>
                     )
                   })}
-                </Timeline> */}
+                </Timeline>
               </div>
-            </ScrollAreaAutosize >
+            </ScrollAreaAutosize > */}
           </>
         </div>
       </div >
