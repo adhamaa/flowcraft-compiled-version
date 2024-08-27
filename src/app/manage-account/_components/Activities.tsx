@@ -33,10 +33,14 @@ const Activities = ({ data = {} }: { data?: any; }) => {
 
 
   const infiniteTimelineQuery = useInfiniteQuery({
-    queryKey: ['activityLogs', user_id],
-    queryFn: ({ pageParam }) => getActivityLog({ user_id: user_id as string, page: pageParam, per_page: 10 }),
-    enabled: !!user_id,
     initialPageParam: 1,
+    queryKey: ['activityLogs', user_id],
+    queryFn: ({ pageParam }) => getActivityLog({
+      user_id: user_id as string,
+      per_page: 10,
+      page: pageParam
+    }),
+    enabled: !!user_id,
     getNextPageParam: (lastPage, _, lastPageParam) => {
       if (lastPage.page === lastPage.total_pages) {
         return undefined
@@ -110,7 +114,7 @@ const Activities = ({ data = {} }: { data?: any; }) => {
 
 export default Activities;
 
-function getRandomColor(): string {
+export function getRandomColor(): string {
   const colors: string[] = ['bg-fc-status-teal-400', 'bg-fc-status-amber-400', 'bg-fc-status-rose-400'];
   const randomIndex: number = Math.floor(Math.random() * colors.length);
   return colors[randomIndex];

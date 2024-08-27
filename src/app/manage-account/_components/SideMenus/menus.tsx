@@ -10,7 +10,7 @@ import useQueryString from '@/hooks/useQueryString';
 
 function SideMenus() {
   const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
-  const { createQueryString, remainQueryString } = useQueryString();
+  const { remainQueryString } = useQueryString();
   const searchParams = useSearchParams();
   const params = useParams();
   const router = useRouter();

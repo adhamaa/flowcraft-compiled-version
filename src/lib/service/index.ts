@@ -1046,4 +1046,36 @@ export const getActivityLog = async ({
   }
   const data = await response.json();
   return data;
+};
+
+export const getRestructureLog = async ({
+  cycle_uuid,
+  page,
+  per_page,
+}: {
+  cycle_uuid: string;
+  page?: number;
+  per_page?: number;
+}) => {
+  const url = new URL(`/businessProcess/restructureLogs`, baseUrl);
+  url.searchParams.set('cycle_uuid', cycle_uuid);
+  url.searchParams.set('page', page?.toString() || '');
+  url.searchParams.set('per_page', per_page?.toString() || '');
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${Buffer.from(process.env.NEXT_PUBLIC_API_USERNAME + ':' + apiPassword).toString('base64')}`
+    },
+    next: { tags: ['restructurelog'] }
+  });
+  if (response.status === 404) {
+    return [];
+  }
+  if (!response.ok) {
+    throw new Error('Failed to get restructure log.');
+  }
+  const data = await response.json();
+  return data;
 }

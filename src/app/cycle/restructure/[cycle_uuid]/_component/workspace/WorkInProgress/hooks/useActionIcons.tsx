@@ -2,7 +2,7 @@ import * as React from "react";
 import useEditableState from "@/hooks/useEditableState";
 
 type ActionType = "add" | "move" | "duplicate" | "delete" | "restore" | "disjoint";
-
+export type EditableType = { [key in ActionType]: boolean };
 interface EditableContextType {
   isEditable: { [key: string]: boolean; };
   toggleIsEditable: (id: string) => void;

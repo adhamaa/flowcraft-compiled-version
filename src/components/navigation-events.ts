@@ -4,8 +4,10 @@ import * as React from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { setAuditTrail } from '@/lib/service';
 import { useSession } from 'next-auth/react';
+import { useGlobalState } from '@/hooks/useGlobalState';
 
 export function NavigationEvents() {
+  const { setUrl } = useGlobalState();
   const { data: session } = useSession();
   const user_id = session?.user?.user_id;
   const pathname = usePathname();
@@ -14,7 +16,7 @@ export function NavigationEvents() {
   const prevUrlRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
-    const currentUrl = `${pathname}`
+    const currentUrl = `${pathname}?${searchParams}`
     if (prevUrlRef.current && prevUrlRef.current !== currentUrl) {
       setAuditTrail({
         action: `page_routing`,
@@ -32,6 +34,7 @@ export function NavigationEvents() {
       });
     }
 
+    setUrl({ prev: prevUrlRef.current!, curr: currentUrl });
     prevUrlRef.current = currentUrl;
   }, [pathname, searchParams])
   return null;

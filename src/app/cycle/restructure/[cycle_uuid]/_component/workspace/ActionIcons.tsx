@@ -6,6 +6,7 @@ import { ActionIcon, Tooltip } from '@mantine/core';
 import { useActionIcons } from './WorkInProgress/hooks/useActionIcons';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import { useFormContext } from 'react-hook-form';
+import clsx from 'clsx';
 
 interface Action {
   id: string;
@@ -19,8 +20,9 @@ interface Action {
   onClick?: () => void;
 }
 
+type ActionList = Action[];
 
-const ActionIcons = () => {
+const ActionIcons = ({ type = "action", className }: { type: "action" | "history"; className?: string; }) => {
   const method = useFormContext();
   const { reset, setFocus } = method;
 
@@ -32,25 +34,104 @@ const ActionIcons = () => {
     reset();
   };
 
-  const actionList: Action[] = [
-    {
-      id: "add", label: "Add", icon: { name: "heroicons:plus-circle", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.add ? "var(--fc-brand-700)" : "var(--fc-neutral-100)", c: isEditable.add ? "white" : "black"
+  const actionList: ActionList & any = [
+    ...(type === "action" ? [{
+      id: "add",
+      label: "Add",
+      icon: { name: "heroicons:plus-circle", width: "1.75rem" },
+      component: 'button',
+      type: 'submit',
+      disabled: false,
+      onClick: handleToggle as never,
+      color: isEditable.add ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      c: isEditable.add ? "white" : "black"
     },
     {
-      id: "move", label: "Move", icon: { name: "heroicons:arrows-pointing-in", width: "1.75rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.move ? "var(--fc-brand-700)" : "var(--fc-neutral-100)", c: isEditable.move ? "white" : "black"
+      id: "move",
+      label: "Move",
+      icon: { name: "heroicons:arrows-pointing-in", width: "1.75rem" },
+      component: 'button',
+      type: 'submit',
+      disabled: false,
+      onClick: handleToggle as never,
+      color: isEditable.move ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      c: isEditable.move ? "white" : "black"
     },
     {
-      id: "duplicate", label: "Duplicate", icon: { name: "heroicons-outline:document-duplicate", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.duplicate ? "var(--fc-brand-700)" : "var(--fc-neutral-100)", c: isEditable.duplicate ? "white" : "black"
+      id: "duplicate",
+      label: "Duplicate",
+      icon: { name: "heroicons-outline:document-duplicate", width: "1.5rem" },
+      component: 'button',
+      type: 'submit',
+      disabled: false,
+      onClick: handleToggle as never,
+      color: isEditable.duplicate ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      c: isEditable.duplicate ? "white" : "black"
     },
     {
-      id: "delete", label: "Delete", icon: { name: "heroicons-outline:trash", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.delete ? "var(--fc-brand-700)" : "var(--fc-neutral-100)", c: isEditable.delete ? "white" : "black"
+      id: "delete",
+      label: "Delete",
+      icon: { name: "heroicons-outline:trash", width: "1.5rem" },
+      component: 'button',
+      type: 'submit',
+      disabled: false,
+      onClick: handleToggle as never,
+      color: isEditable.delete ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      c: isEditable.delete ? "white" : "black"
     },
     {
-      id: "restore", label: "Restore", icon: { name: "heroicons-outline:refresh", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.restore ? "var(--fc-brand-700)" : "var(--fc-neutral-100)", c: isEditable.restore ? "white" : "black"
+      id: "restore",
+      label: "Restore",
+      icon: { name: "heroicons-outline:refresh", width: "1.5rem" },
+      component: 'button',
+      type: 'submit',
+      disabled: false,
+      onClick: handleToggle as never,
+      color: isEditable.restore ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      c: isEditable.restore ? "white" : "black"
     },
     {
-      id: "disjoint", label: "Disjoint", icon: { name: "heroicons-outline:scissors", width: "1.5rem" }, component: 'button', type: 'submit', disabled: false, onClick: handleToggle as never, color: isEditable.disjoint ? "var(--fc-brand-700)" : "var(--fc-neutral-100)", c: isEditable.disjoint ? "white" : "black"
-    }
+      id: "disjoint",
+      label: "Disjoint",
+      icon: { name: "heroicons-outline:scissors", width: "1.5rem" },
+      component: 'button',
+      type: 'submit',
+      disabled: false,
+      onClick: handleToggle as never,
+      color: isEditable.disjoint ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      c: isEditable.disjoint ? "white" : "black"
+    }] : []),
+    ...(type === "history" ? [{
+      id: "refresh",
+      label: "Refresh",
+      icon: { name: "heroicons-outline:refresh", width: "1.5rem" },
+      component: 'button',
+      type: 'submit',
+      disabled: true,
+      // onClick: handleToggle as never,
+      // color: isEditable.refresh ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      // c: isEditable.refresh ? "white" : "black"
+    }, {
+      id: "filter",
+      label: "Filter",
+      icon: { name: "heroicons:adjustments-vertical", width: "1.5rem" },
+      component: 'button',
+      type: 'submit',
+      disabled: true,
+      // onClick: handleToggle as never,
+      // color: isEditable.filter ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      // c: isEditable.filter ? "white" : "black"
+    }, {
+      id: "sort",
+      label: "Sort",
+      icon: { name: "heroicons:arrows-up-down-solid", width: "1.5rem" },
+      component: 'button',
+      type: 'submit',
+      disabled: true,
+      // onClick: handleToggle as never,
+      // color: isEditable.sort ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      // c: isEditable.sort ? "white" : "black"
+    }] : []),
   ];
 
   React.useEffect(() => {
@@ -64,8 +145,8 @@ const ActionIcons = () => {
 
 
   return (
-    <div className='flex gap-3'>
-      {actionList.map(action => (
+    <div className={clsx('flex gap-3', className)}>
+      {actionList.map((action: Action) => (
         <Tooltip key={action.id} label={action.label}>
           <ActionIcon
             id={action.id}
