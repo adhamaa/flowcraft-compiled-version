@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useParams, usePathname, useSelectedLayoutSegments } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSelectedLayoutSegments } from 'next/navigation';
 import useQueryString from './useQueryString';
 
 export type Breadcrumb = {
@@ -39,6 +39,7 @@ const useBreadcrumbs = ({
 }: {
   route?: string;
 }): { breadcrumbs: Breadcrumb[]; } => {
+  const router = useRouter();
   const segments = useSelectedLayoutSegments();
   const pathname = usePathname();
   const params = useParams();
@@ -64,7 +65,7 @@ const useBreadcrumbs = ({
       },] : []),
       ...(pathname.includes("/cycle") ? [{ // add cycle to the list
         title: 'Cycle',
-        href: "",
+        href: `/cycle?${remainQueryString()}`,
         disabled: false
       }, {
         title: cycleCrumbsTitle as string,
