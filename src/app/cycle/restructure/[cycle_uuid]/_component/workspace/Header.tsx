@@ -3,16 +3,25 @@
 import * as React from 'react'
 import { Icon } from '@iconify-icon/react';
 import { ActionIcon, Tooltip } from '@mantine/core';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import { useGlobalState } from '@/hooks/useGlobalState';
+import useQueryString from '@/hooks/useQueryString';
 
 function Header() {
-  const { url, setUrl } = useGlobalState();
-
+  const { url } = useGlobalState();
+  const prevUrl = url.prev;
+  const currUrl = url.curr;
+  const sameUrl = prevUrl === currUrl;
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const cycle_uuid = params.cycle_uuid;
+  const cycle_id = searchParams.get('cycle_id');
+
+  const { removeQueryString } = useQueryString();
+
+  const backUrl = `/cycle/${cycle_id}/stage/${cycle_uuid}?${removeQueryString('cycle_id')}`;
 
   const { currentCycleInfo } = useWorkInProgressDiagram();
 
@@ -30,7 +39,7 @@ function Header() {
         size="2.5rem"
         radius="md"
         aria-label="Back"
-        onClick={() => history.back()}
+        onClick={() => sameUrl ? history.back() : router.push(prevUrl)}
       >
         <Icon
           icon='heroicons-solid:arrow-circle-left'
