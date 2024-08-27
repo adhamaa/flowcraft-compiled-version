@@ -63,11 +63,14 @@ const useBreadcrumbs = ({
         href: "",
         disabled: true
       },] : []),
-      ...(pathname.includes("/cycle") ? [{ // add cycle to the list
-        title: 'Cycle',
-        href: `/cycle?${remainQueryString()}`,
-        disabled: false
-      }, {
+      ...(pathname.includes("/cycle") ? [...segments.slice(0, 1).map((segment, index) => {
+        let href = segments.slice(0, index + 1).join('/');
+        return {
+          title: getTitles(segment),
+          href: `/${href}?${remainQueryString()}`,
+          disabled: false
+        }
+      }), {
         title: cycleCrumbsTitle as string,
         href: "",
         disabled: true
