@@ -118,14 +118,62 @@ const GeneralFormContent = ({
   const datasource_type = searchParams.get('datasource_type') as Datasource_type;
 
   const InputList = [
-    { name: 'cycle_name', label: 'Cycle name', type: 'text', value: data?.cycle_name, disabled: true },
-    { name: "cycle_id", label: 'Cycle id', type: 'text', value: data?.cycle_id, disabled: true },
-    { name: "app_name", label: 'Applications', type: 'text', value: data?.app_name, disabled: true },
-    { name: "cycle_created", label: 'Date Created', type: 'text', value: data?.cycle_created, disabled: true },
-    { name: "cycle_updated", label: 'Last edited date', type: 'text', value: data?.cycle_updated, disabled: true },
-    { name: "no_of_stages", label: 'No of stage', type: 'text', value: data?.no_of_stages, disabled: true },
-    { name: "cycle_active", label: 'Status', type: 'radio', value: data?.cycle_active, disabled: !isEdit },
-    { name: "cycle_description", label: 'Description', type: 'text', value: data?.cycle_description, disabled: !isEdit },
+    {
+      name: 'cycle_name',
+      label: 'Cycle name',
+      type: 'text',
+      value: data?.cycle_name,
+      disabled: true
+    },
+    {
+      name: "cycle_id",
+      label: 'Cycle id',
+      type: 'text',
+      value: data?.cycle_id,
+      disabled: true
+    },
+    {
+      name: "app_name",
+      label: 'Applications',
+      type: 'text',
+      value: data?.app_name,
+      disabled: true
+    },
+    {
+      name: "cycle_created",
+      label: 'Date Created',
+      type: 'text',
+      value: data?.cycle_created,
+      disabled: true
+    },
+    {
+      name: "cycle_updated",
+      label: 'Last edited date',
+      type: 'text',
+      value: data?.cycle_updated,
+      disabled: true
+    },
+    {
+      name: "no_of_stages",
+      label: 'No of stage',
+      type: 'text',
+      value: data?.no_of_stages,
+      disabled: true
+    },
+    {
+      name: "cycle_active",
+      label: 'Status',
+      type: 'radio',
+      value: data?.cycle_active,
+      disabled: !isEdit
+    },
+    {
+      name: "cycle_description",
+      label: 'Description',
+      type: 'text',
+      value: data?.cycle_description,
+      disabled: !isEdit
+    },
   ];
 
   const [statusRefList, setStatusRefList] = React.useState<StatusRef[]>([]);
@@ -166,92 +214,65 @@ const GeneralFormContent = ({
             </Button>
             <Button onClick={
               async () => {
-
                 if (!hasStatusChange && !hasDescriptionChange) {
                   toast.error('No changes detected');
                   modals.closeAll();
                   toggleEdit();
-                } else if (hasStatusChange || hasDescriptionChange) {
-                  try {
-                    const response = await Promise.all([
-                      updateStatusCycle({
-                        cycle_id: data?.cycle_id.toString() as string,
-                        status_code: formdata.cycle_active
-                      }),
-                      updateCycle({
-                        cycle_uuid: data?.cycle_uuid as unknown as string,
-                        body: {
-                          cycle_description: formdata.cycle_description
-                        }
-                      })
-                    ]);
-
-                    const statusResponseOk = !response[0].error;
-                    const descriptionResponseOk = !response[1].error;
-                    const statusMessage = response[0].message;
-                    const descriptionMessage = response[1].message;
-                    if (statusResponseOk && descriptionResponseOk) {
-
-                      toast.success(message`${statusMessage} ${descriptionMessage}`);
-                      modals.closeAll();
-                      toggleEdit();
-                      await setAuditTrail({
-                        action: 'update_cycle_info',
-                        location_url: pageUrl,
-                        object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
-                        process_state: 'TRIGGERAPI',
-                        sysfunc: '"onSubmit" func ',
-                        userid: user_id as string,
-                        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-                        notes: `Cycle and description updated successfully`,
-                        json_object: formdata,
-                      });
-                      window.location.reload();
-                    } else if (statusResponseOk) {
-                      toast.success(statusMessage);
-                      modals.closeAll();
-                      toggleEdit();
-                      await setAuditTrail({
-                        action: 'update_cycle_info',
-                        location_url: pageUrl,
-                        object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
-                        process_state: 'TRIGGERAPI',
-                        sysfunc: '"onSubmit" func ',
-                        userid: user_id as string,
-                        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-                        notes: `Cycle and description updated successfully`,
-                        json_object: formdata,
-                      });
-                      window.location.reload();
-                    } else if (descriptionResponseOk) {
-                      toast.success(descriptionMessage);
-                      modals.closeAll();
-                      toggleEdit();
-                      await setAuditTrail({
-                        action: 'update_cycle_info',
-                        location_url: pageUrl,
-                        object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
-                        process_state: 'TRIGGERAPI',
-                        sysfunc: '"onSubmit" func ',
-                        userid: user_id as string,
-                        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-                        notes: `Cycle and description updated successfully`,
-                        json_object: formdata,
-                      });
-                      window.location.reload();
-                    } else {
-                      toast.error('Failed to update cycle and description');
-                      modals.closeAll();
-                      toggleEdit();
-                    }
-                  } catch (error) {
-                    toast.error('Failed to update cycle and description' + "\n" + error);
-                  }
-                } else {
-                  toast.error('Failed to update cycle and description');
-                  modals.closeAll();
-                  toggleEdit();
+                  return;
                 }
+
+                try {
+                  const [statusResponse, descriptionResponse] = await Promise.all([
+                    updateStatusCycle({
+                      cycle_id: data?.cycle_id.toString() as string,
+                      status_code: formdata.cycle_active,
+                    }),
+                    updateCycle({
+                      cycle_uuid: data?.cycle_uuid as unknown as string,
+                      body: {
+                        cycle_description: formdata.cycle_description,
+                      },
+                    }),
+                  ]);
+
+                  const statusResponseOk = !statusResponse.error;
+                  const descriptionResponseOk = !descriptionResponse.error;
+
+
+                  if (statusResponseOk || descriptionResponseOk) {
+                    const successMessages = [
+                      statusResponseOk && statusResponse.message,
+                      descriptionResponseOk && descriptionResponse.message,
+                    ].filter(Boolean).join(' ');
+
+                    toast.success(successMessages);
+                    await setAuditTrail({
+                      action: 'update_cycle_info',
+                      location_url: pageUrl,
+                      object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
+                      process_state: 'TRIGGERAPI',
+                      sysfunc: '"onSubmit" func',
+                      userid: user_id as string,
+                      sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+                      notes: 'Cycle status and description updated successfully',
+                      json_object: formdata,
+                    });
+                    modals.closeAll();
+                    toggleEdit();
+                  }
+                  if (!statusResponseOk) {
+                    throw new Error(statusResponse.error_message);
+                  }
+                  if (!descriptionResponseOk) {
+                    throw new Error(descriptionResponse.error_message);
+                  }
+                } catch (error: any & {
+                  message: string;
+                }) {
+                  toast.error(`${error.message}`);
+                }
+                modals.closeAll();
+                toggleEdit();
               }
             } color='var(--fc-brand-700)' radius='md'>
               Yes
