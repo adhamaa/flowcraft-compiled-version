@@ -4,16 +4,19 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import React from 'react'
 import { Apps_label, Datasource_type, getCycleInfo, getDeletedStageList, getStageList } from '@/lib/service';
 import { useDisclosure } from '@mantine/hooks';
-import { ScrollAreaAutosize, Tabs, TabsList, TabsPanel, TabsTab, Tooltip } from '@mantine/core';
+import { Button, Flex, ScrollAreaAutosize, Tabs, TabsList, TabsPanel, TabsTab, Text, Tooltip } from '@mantine/core';
 import FooterButton from './footer';
 import clsx from 'clsx';
 import useQueryString from '@/hooks/useQueryString';
+import { modals } from '@mantine/modals';
+import { useQuery } from '@tanstack/react-query';
 
 function SideMenus() {
   const [isSideMenuCollapse, { toggle: toggleSideMenuCollapse }] = useDisclosure(false);
   const [stageData, setStageData] = React.useState<any[]>();
-  const [cycleUuid, setCycleUuid] = React.useState<string>();
   const [deletedStageData, setDeletedStageData] = React.useState<any[]>();
+  const [cycleUuid, setCycleUuid] = React.useState<string>();
+  const [cycleStatus, setCycleStatus] = React.useState<string>();
   const { createQueryString, remainQueryString } = useQueryString();
   const searchParams = useSearchParams();
   const params = useParams();
@@ -25,14 +28,18 @@ function SideMenus() {
   const cycle_id = params.cycle_id;
   const stage_uuid = params.stage_uuid;
 
-  const renderStageData = deleted_stage_route ? deletedStageData : stageData;
+  const cycleActive = cycleStatus === "active";
+  const cycleInactive = cycleStatus === "inactive";
+  const cycleDeleted = cycleStatus === "deleted";
+  const cycleWIP = cycleStatus === "WIP";
+  const canRestructure = cycleInactive || cycleDeleted;
 
   const defaultValues = pathname.includes('/stage/deleted/') ? 'deleted_stage' : pathname.includes('/stage/') ? 'stages' : pathname.includes('/cycle/') ? 'general' : '';
 
 
   /**
    * Fetch stage list data
-   */
+  */
   React.useEffect(() => {
     async function getStageListData() {
       const stageListDeletedDataRes = await getDeletedStageList({
@@ -53,11 +60,11 @@ function SideMenus() {
     if (cycle_id && selected_app && datasource_type) {
       getStageListData()
     }
-  }, [cycle_id, datasource_type, selected_app])
+  }, [cycle_id, datasource_type, selected_app]);
 
   /**
-   * Fetch cycle info data
-   */
+ * Fetch cycle status from info data
+ */
   React.useEffect(() => {
     async function getCycleInfoData() {
       const cycleInfoDataRes = await getCycleInfo({
@@ -65,14 +72,39 @@ function SideMenus() {
         cycle_id: cycle_id as string,
         datasource_type: datasource_type as Datasource_type
       });
-      setCycleUuid(cycleInfoDataRes.cycle_uuid)
+      setCycleStatus(cycleInfoDataRes.cycle_status);
+      setCycleUuid(cycleInfoDataRes.cycle_uuid);
     }
 
     if (cycle_id && selected_app && datasource_type) {
       getCycleInfoData()
     }
-  }, [cycle_id, datasource_type, selected_app])
+  }, [cycle_id, datasource_type, selected_app]);
 
+
+  // const { data: stageListData } = useQuery({
+  //   queryKey: ['stageList', cycle_id, selected_app, datasource_type],
+  //   queryFn: async () => await getStageList({
+  //     cycle_id: cycle_id as string,
+  //     apps_label: selected_app as Apps_label,
+  //     datasource_type: datasource_type as Datasource_type
+  //   }),
+  //   enabled: !!cycle_id && !!selected_app && !!datasource_type
+  // });
+
+  // const { data: deletedStageListData } = useQuery({
+  //   queryKey: ['deletedStageList', cycle_id, selected_app, datasource_type],
+  //   queryFn: async () => await getDeletedStageList({
+  //     cycle_id: cycle_id as string,
+  //     apps_label: selected_app as Apps_label,
+  //     datasource_type: datasource_type as Datasource_type
+  //   }),
+  //   enabled: !!cycle_id && !!selected_app && !!datasource_type
+  // });
+
+
+
+  const renderStageData = deleted_stage_route ? deletedStageData : stageData;
 
   const sideMenuList = [
     {
@@ -238,7 +270,28 @@ function SideMenus() {
                                   {<FooterButton
                                     {...{ isSideMenuCollapse }}
                                     isRestructure
-                                    onClick={() => router.push(`/cycle/restructure/${cycleUuid}?` + createQueryString('cycle_id', cycle_id as string))}
+                                    onClick={() => {
+                                      if (!canRestructure) modals.open({
+                                        title: 'Restructure Cycle',
+                                        children: (
+                                          <>
+                                            <Text size="sm">The restructuring process is only possible during an <strong>inactive</strong> status cycle.</Text>
+                                            <Flex gap={16} justify={'end'} mt="md">
+                                              <Button
+                                                onClick={() => modals.closeAll()} color='var(--fc-brand-700)' radius='md'>
+                                                Close
+                                              </Button>
+                                            </Flex>
+                                          </>
+                                        ),
+                                        overlayProps: {
+                                          backgroundOpacity: 0.55,
+                                          blur: 10,
+                                        },
+                                        radius: 'md',
+                                      });
+                                      else router.push(`/cycle/restructure/${cycleUuid}?` + createQueryString('cycle_id', cycle_id as string))
+                                    }}
                                   />}
                                 </TabsList>)}
                           </Tabs>

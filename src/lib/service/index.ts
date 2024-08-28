@@ -127,19 +127,20 @@ export const getCycleInfo = async ({
   const data = await response.json();
 
   const stringifyObjectValues =
-    data.result?.reduce((acc: any, item: {
+    data.result?.reduce(async (acc: any, item: {
       app_label: Apps_label;
       app_name: string;
       app_sys_code: string;
       app_uuid: string;
       cycle_active: number,
+      cycle_status: string;
       cycle_created: string;
       cycle_description: string;
       cycle_id: number,
       cycle_name: string;
       cycle_updated: string;
       cycle_uuid: string;
-      no_of_stages: number
+      no_of_stages: number;
     }) => ({
       ...acc,
       cycle_created: new Date(item.cycle_created).toDateString(),
@@ -149,6 +150,7 @@ export const getCycleInfo = async ({
       cycle_name: item.cycle_name ?? 'N/A',
       no_of_stages: (item.no_of_stages).toString() ?? 'N/A',
       cycle_active: item.cycle_active.toString(),
+      cycle_status: await getStatusRef(item.cycle_active),
       cycle_id: typeof (item.cycle_id) === 'number' ? (item.cycle_id).toString() : item.cycle_id,
       cycle_uuid: item.cycle_uuid ?? 'N/A',
       cycle_description: item.cycle_description ?? 'N/A',
@@ -646,7 +648,6 @@ export const duplicateCycle = async ({
   // }
   clientRevalidateTag('cyclelist');
   const result = await response.json();
-  console.log('result:', result)
   return result;
 };
 
