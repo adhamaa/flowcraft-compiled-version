@@ -75,11 +75,6 @@ const TabularSection = ({ opened,
     per_page: pagination.pageSize,
     status: status as "success" | "failed" | "wip",
   };
-  // const listAllClaim = useQuery({
-  //   queryKey: ["allclaim", allClaimOptions],
-  //   queryFn: () => getAllClaim(allClaimOptions),
-  //   placeholderData: keepPreviousData // keep previous data while loading new data
-  // });
   const pendingsLog = useQuery({
     queryKey: ['pending-claim', allClaimOptions],
     queryFn: () => getRestructurePendingsLog(allClaimOptions),
@@ -103,34 +98,39 @@ const TabularSection = ({ opened,
             original: {
               cycle_id,
               app_label,
-              app_name
+              app_name,
+              cycle_active
             } }: {
               original: CycleData;
             }) => {
+            const status = await cycle_active;
+            const WIP = status.toString() === 'WIP';
             modals.open({
               title: 'Duplicate Cycle',
               children: (
                 <>
-                  <Text size="sm">Are you sure you want to duplicate <strong>{app_name} - cycle id: {cycle_id}</strong>?</Text>
+                  {WIP ? <Text size="sm">The process cycle can be duplicated at a status cycle that is either <strong>active, inactive, or deleted</strong>.</Text> : <Text size="sm">Are you sure you want to duplicate <strong>{app_name} - cycle id: {cycle_id}</strong>?</Text>}
                   <Flex gap={16} justify={'end'} mt="md">
-                    <Button onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
+                    <Button
+                      onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
                       Cancel
                     </Button>
-                    <Button onClick={async () => {
-                      await duplicateCycle({
-                        cycle_id: cycle_id.toString(),
-                        apps_label: app_label as Apps_label,
-                      })
-                        .then((response) => {
-                          if (response) {
-                            toast.success(response.message)
-                          }
-                        }).catch((err) => {
-                          toast.error(err.message)
-                        }).finally(() => {
-                          modals.closeAll()
-                        });
-                    }} color='var(--fc-brand-700)' radius='md'>
+                    <Button
+                      disabled={WIP}
+                      onClick={async () => {
+                        await duplicateCycle({
+                          cycle_id: cycle_id.toString(),
+                          apps_label: app_label as Apps_label,
+                        })
+                          .then((response) => {
+                            if (response.error) toast.error(response.error_message);
+                            else toast.success(response.message);
+                          }).catch((err) => {
+                            toast.error(err.message);
+                          }).finally(() => {
+                            modals.closeAll();
+                          });
+                      }} color='var(--fc-brand-700)' radius='md'>
                       Yes
                     </Button>
                   </Flex>

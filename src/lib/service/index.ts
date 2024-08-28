@@ -12,8 +12,8 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 const apiPassword = decryptPassword(process.env.NEXT_PUBLIC_API_PASSWORD);
 
 export const getApplicationList = async () => {
-  const endpoint = '/businessProcess/listAppsBizProcess';
-  const url = `${baseUrl}${endpoint}`;
+  const url = new URL('/businessProcess/listAppsBizProcess', baseUrl);
+
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -43,9 +43,9 @@ export const getCycleList = async ({
   if (!apps_label) return [];
   if (!datasource_type) return [];
 
+  const url = new URL(`${datasource_mapping[datasource_type]}/listCycleProcess`, baseUrl);
+  url.searchParams.set('apps_label', apps_label);
 
-  const endpoint = `${datasource_mapping[datasource_type]}/listCycleProcess?apps_label=${apps_label}`;
-  const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
 
     method: 'GET',
@@ -70,10 +70,10 @@ export const getCycleList = async ({
       app_name: string;
       app_sys_code: string;
       app_uuid: string;
-      cycle_active: number,
+      cycle_active: number | string;
       cycle_created: string;
       cycle_description: string;
-      cycle_id: number,
+      cycle_id: number;
       cycle_name: string;
       cycle_updated: string;
       cycle_uuid: string;
@@ -86,7 +86,7 @@ export const getCycleList = async ({
       app_name: item.app_name ?? 'N/A',
       cycle_name: item.cycle_name ?? 'N/A',
       no_of_stages: (item.no_of_stages).toString() ?? 'N/A',
-      cycle_active: getStatusRef(item.cycle_active),
+      cycle_active: getStatusRef(item.cycle_active as number),
       cycle_id: typeof (item.cycle_id) === 'number' ? (item.cycle_id).toString() : item.cycle_id,
       cycle_uuid: item.cycle_uuid ?? 'N/A',
       cycle_description: item.cycle_description ?? 'N/A',
@@ -106,13 +106,10 @@ export const getCycleInfo = async ({
   cycle_id: string;
   datasource_type?: Datasource_type;
 }) => {
-  // if (!apps_label) return {};
-  // if (!cycle_id) return {};
-  // if (!datasource_type) return {};
+  const url = new URL(`${datasource_mapping[datasource_type]}/listCycleProcess`, baseUrl);
+  url.searchParams.set('apps_label', apps_label);
+  url.searchParams.set('cycle_id', cycle_id);
 
-
-  const endpoint = `${datasource_mapping[datasource_type]}/listCycleProcess?apps_label=${apps_label}&cycle_id=${cycle_id}`;
-  const url = `${baseUrl}${endpoint}`;
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -629,8 +626,10 @@ export const duplicateCycle = async ({
     cycle_id: string;
     apps_label: Apps_label;
   }) => {
-  const endpoint = `/businessProcessTmp/duplicateCycle?cycle_id=${cycle_id}&app_type=${apps_label}`;
-  const url = `${baseUrl}${endpoint}`;
+  const url = new URL(`/businessProcessTmp/duplicateCycle`, baseUrl);
+  url.searchParams.set('cycle_id', cycle_id);
+  url.searchParams.set('app_type', apps_label);
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -646,7 +645,9 @@ export const duplicateCycle = async ({
   //   throw new Error('Failed to duplicate cycle.');
   // }
   clientRevalidateTag('cyclelist');
-  return await response.json();
+  const result = await response.json();
+  console.log('result:', result)
+  return result;
 };
 
 export const setAuditTrail = async ({
