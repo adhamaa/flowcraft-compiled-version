@@ -256,7 +256,10 @@ const GeneralFormContent = ({
                       sysapp: 'FLOWCRAFTBUSINESSPROCESS',
                       notes: 'Cycle status and description updated successfully',
                       json_object: formdata,
+                    }).then(() => {
+                      window.location.reload();
                     });
+
                     modals.closeAll();
                     toggleEdit();
                   }
