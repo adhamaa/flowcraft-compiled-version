@@ -38,36 +38,43 @@ const ActionButtons = () => {
 
   const { isEditable: isEditData, reset: resetIsEditable, getAction, getIsAnyEditable } = useActionIcons();
 
-  const { onApply, onReset, onSave, onDraft, deselectAllNodes, fetchNodesEdges: fetchWipNodesEdges } = useWorkInProgressDiagram();
-  const { fetchNodesEdges: fetchCurrentNodesEdges } = useCurrentDiagram();
+  const { onApply, onReset, onSave, generateNodeId } = useWorkInProgressDiagram();
 
   const isEditable = getIsAnyEditable(isEditData as { [key in ActionType]: boolean });
-  const { remainQueryString } = useQueryString();
   const method = useFormContext();
   const { handleSubmit, reset } = method;
 
   const action = getAction(isEditData as { [key in ActionType]: boolean });
 
-  const [logUuid, setLogUuid] = React.useState<string>(() => crypto.randomUUID());
+  const [logUuid] = React.useState<string>(() => crypto.randomUUID());
   const [applyData, setApplyData] = React.useReducer((state: any, action: any) => ([...state, { action: action.type, stage_uuid: action.data.curr_stage_uuid }]), []);
 
-  const onApplySubmit = (data: any, e: any) => onApply({
-    action: action as ActionType, data, callback: () => {
-      setApplyData({ type: action, data });
-      reset();
-      setAuditTrail({
-        action: 'apply_' + (action as string) + '_restructure_cycle',
-        notes: `Apply ${action} on restructuring cycle`,
-        object: 'src/app/cycle/restructure/[cycle_uuid]/_component/workspace/ActionButtons.tsx',
-        process_state: 'RESTRUCTURE_CYCLE',
-        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-        sysfunc: '"onApplySubmit" func',
-        userid: userId as string,
-        json_object: { ...data, uuid: `log_${logUuid}` },
-        location_url: pageUrl,
-      });
-    }
-  });
+  const onApplySubmit = (data: any, e: any) => {
+    const sentData = {
+      ...data,
+      curr_stage_uuid: data.curr_stage_uuid ?? generateNodeId(),
+    };
+
+    onApply({
+      action: action as ActionType,
+      data: sentData,
+      callback: () => {
+        setApplyData({ type: action, data: sentData });
+        reset();
+        setAuditTrail({
+          action: 'apply_' + (action as string) + '_restructure_cycle',
+          notes: `Apply ${action} on restructuring cycle`,
+          object: 'src/app/cycle/restructure/[cycle_uuid]/_component/workspace/ActionButtons.tsx',
+          process_state: 'RESTRUCTURE_CYCLE',
+          sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+          sysfunc: '"onApplySubmit" func',
+          userid: userId as string,
+          json_object: { ...sentData, uuid: `log_${logUuid}` },
+          location_url: pageUrl,
+        });
+      }
+    })
+  };
 
   const onSaveSubmit = () => onSave({
     cycle_uuid, callback: ({ data, ...response }) => {

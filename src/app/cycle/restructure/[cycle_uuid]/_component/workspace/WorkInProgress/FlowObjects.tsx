@@ -305,39 +305,47 @@ function FlowObjects() {
             <ActionButtons />
 
             {/* ---------------- restructure history --------------- */}
-            {/* <h1 className='text-xl font-semibold'>Restructure History</h1>
-            <ScrollAreaAutosize>
-              <div className='flex border border-black rounded-xl pb-2 h-96'>
-                <ActionIcons type='history' className='p-4 ml-auto' />
-                <Timeline bulletSize={24} lineWidth={2}>
+            <h1 className='text-xl font-semibold'>Restructure History</h1>
+            <div className='relative flex flex-col border border-black rounded-xl pb-2 h-fu overflow-auto'>
+              <ScrollAreaAutosize>
+                <ActionIcons type='history' className='p-4 ml-auto sticky top-0 w-full justify-end bg-gradient-to-b from-white from-70% z-10' />
+                <>
                   {restructureLogsData?.pages.map((page) => {
                     return (
-                      <React.Fragment key={page.page}>
+                      <div
+                        key={page.page}
+                        className='relative space-y-4 p-4'
+                      >
                         {page.data.map((item: {
                           action: string;
                           notes: string;
                           updated_datetime: string;
+                          user_name: string;
+                          stage_name: string;
                         }, index: React.Key) => (
-                          <TimelineItem key={index} bullet title={item.action} classNames={{
-                            itemBullet: clsx('border-[#FFF] border-4', getRandomColor()),
-                            item: 'h-40',
-                          }}>
-                            <Flex align="center">
-                              <Text c="dimmed" size="sm">{item.notes}</Text>
+                          <Flex
+                            key={index}
+                            justify="center"
+                            direction="column"
+
+                          >
+                            <Flex align="start" justify="space-between" w="100%">
+                              <Text><span className='capitalize'>{item.action}</span> by "{item.user_name}"</Text>
                               <Text size="xs" mt={4} ml="auto">{getTimeAgo(item.updated_datetime)}</Text>
                             </Flex>
-                          </TimelineItem>
+                            <Text c="dimmed" size="sm">{item.stage_name}</Text>
+                          </Flex>
                         ))}
-                      </React.Fragment>
+                      </div>
                     )
                   })}
-                </Timeline>
-              </div>
-            </ScrollAreaAutosize > */}
+                </>
+              </ScrollAreaAutosize >
+            </div>
           </>
         </div>
       </div >
-    </FormProvider>
+    </FormProvider >
   );
 };
 
