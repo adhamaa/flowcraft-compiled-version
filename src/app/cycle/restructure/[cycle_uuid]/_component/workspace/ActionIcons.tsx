@@ -7,6 +7,8 @@ import { useActionIcons } from './WorkInProgress/hooks/useActionIcons';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import { useFormContext } from 'react-hook-form';
 import clsx from 'clsx';
+import { useClickOutside, useDisclosure } from '@mantine/hooks';
+import { Select } from 'react-hook-form-mantine';
 
 interface Action {
   id: string;
@@ -18,6 +20,7 @@ interface Action {
   type: "button" | "submit" | "reset";
   disabled: boolean;
   onClick?: () => void;
+  input?: React.HTMLInputTypeAttribute;
 }
 
 type ActionList = Action[];
@@ -106,31 +109,32 @@ const ActionIcons = ({ type = "action", className }: { type: "action" | "history
       label: "Refresh",
       icon: { name: "heroicons-outline:refresh", width: "1.5rem" },
       component: 'button',
-      type: 'submit',
-      disabled: true,
+      type: 'button',
+      disabled: false,
       // onClick: handleToggle as never,
-      // color: isEditable.refresh ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
-      // c: isEditable.refresh ? "white" : "black"
+      color: isEditable.refresh ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      c: isEditable.refresh ? "white" : "black"
     }, {
       id: "filter",
       label: "Filter",
       icon: { name: "heroicons:adjustments-vertical", width: "1.5rem" },
       component: 'button',
-      type: 'submit',
-      disabled: true,
+      type: 'button',
+      input: 'select',
+      disabled: false,
       // onClick: handleToggle as never,
-      // color: isEditable.filter ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
-      // c: isEditable.filter ? "white" : "black"
+      color: isEditable.filter ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      c: isEditable.filter ? "white" : "black"
     }, {
       id: "sort",
       label: "Sort",
       icon: { name: "heroicons:arrows-up-down-solid", width: "1.5rem" },
       component: 'button',
-      type: 'submit',
-      disabled: true,
+      type: 'button',
+      disabled: false,
       // onClick: handleToggle as never,
-      // color: isEditable.sort ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
-      // c: isEditable.sort ? "white" : "black"
+      color: isEditable.sort ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
+      c: isEditable.sort ? "white" : "black"
     }] : []),
   ];
 
@@ -146,7 +150,7 @@ const ActionIcons = ({ type = "action", className }: { type: "action" | "history
 
   return (
     <div className={clsx('flex gap-3', className)}>
-      {actionList.map((action: Action) => (
+      {actionList.map((action: Action) => !action.input ? (
         <Tooltip key={action.id} label={action.label}>
           <ActionIcon
             id={action.id}
@@ -171,9 +175,60 @@ const ActionIcons = ({ type = "action", className }: { type: "action" | "history
             />
           </ActionIcon>
         </Tooltip>
+      ) : (
+        <SelectInputWrapper key={action.id}>
+          {({ ref, toggle }) => (
+            <Tooltip label={action.label}>
+              <ActionIcon
+                ref={ref}
+                id={action.id}
+                component={action.component as "button"}
+                type={action.type}
+                disabled={action.disabled}
+                variant="filled"
+                color={action.color}
+                c={action.c}
+                size="2.5rem"
+                radius="md"
+                aria-label={action.label}
+                autoContrast
+                classNames={{
+                  root: 'text-black/70 hover:text-black disabled:!bg-[#f1f3f5] disabled:!text-[#adb5bd]',
+                }}
+                onClick={toggle}
+              >
+                <Icon
+                  icon={action.icon.name}
+                  width={action.icon.width}
+                />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </SelectInputWrapper>
       ))}
     </div>
   )
 };
 
-export default ActionIcons
+export default ActionIcons;
+
+function SelectInputWrapper({ children }: { children?: React.ReactNode | ((props: { ref: React.RefObject<HTMLButtonElement>, toggle: () => void }) => React.ReactNode) }) {
+  const [dropdownOpened, { toggle, close }] = useDisclosure();
+  const ref = useClickOutside(() => close(), ['mouseup', 'touchend']);
+  return (
+    <div className="relative inline-block">
+      <Select
+        name='library'
+        rightSection={<></>} // disable right section
+        data={['React', 'Angular', 'Vue', 'Svelte']}
+        classNames={{
+          input: 'absolute inset-0 opacity-0 w-full h-full cursor-default',
+          dropdown: '!w-40',
+        }}
+        dropdownOpened={dropdownOpened}
+        checkIconPosition='left'
+      />
+      {typeof children === 'function' ? children({ ref, toggle }) : children}
+    </div>
+  );
+};

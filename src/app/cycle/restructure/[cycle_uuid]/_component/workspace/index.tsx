@@ -8,7 +8,7 @@ function Workspace() {
   return (
     <div className='flex flex-col w-full'>
       <Header />
-      <div className='grid grid-cols-3 gap-6 p-8 mb-36 h-screen w-full mx-auto'>
+      <div className='grid grid-cols-3 gap-6 p-8 mb-10 h-full w-full mx-auto'>
         <CurrentProgress />
         <WorkInProgress />
       </div>

@@ -499,6 +499,7 @@ const TabularSection = ({ opened,
                   data={manageClaimOptions}
                   disabled={false}
                   allowDeselect
+                  searchable
                   nothingFoundMessage="No stage found"
                   classNames={{
                     root: 'space-y-2 w-96 mr-auto',

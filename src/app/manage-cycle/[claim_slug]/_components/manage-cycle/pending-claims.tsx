@@ -817,6 +817,7 @@ const CustomSelect = ({ name, label, placeholder, data, control, required }: Sel
       data={data}
       disabled={false}
       allowDeselect
+      searchable
       nothingFoundMessage="No data found"
       classNames={selectInputStyles}
       control={control}
@@ -837,6 +838,7 @@ const CustomMultiSelect = ({ name, label, placeholder, data, control, required }
       rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
       data={data}
       disabled={false}
+      searchable
       nothingFoundMessage="No data found"
       classNames={multiSelectInputStyles}
       control={control}
