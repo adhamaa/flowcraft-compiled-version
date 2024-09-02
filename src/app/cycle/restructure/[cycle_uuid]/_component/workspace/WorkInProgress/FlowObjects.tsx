@@ -6,8 +6,8 @@ import ActionIcons from '../ActionIcons';
 import ActionButtons from '../ActionButtons';
 import useWorkInProgressDiagram from '@/store/WorkInProgressDiagram';
 import { LabelTooltip } from '@/app/cycle/_components/Forms/LabelTooltip';
-import { Flex, InputWrapper, ScrollAreaAutosize, Text, Timeline, TimelineItem } from '@mantine/core';
-import { useElementSize } from '@mantine/hooks';
+import { Anchor, Button, Flex, FloatingIndicator, InputWrapper, LoadingOverlay, ScrollAreaAutosize, Text, Timeline, TimelineItem, UnstyledButton } from '@mantine/core';
+import { useClickOutside, useDisclosure, useElementSize } from '@mantine/hooks';
 import { MultiSelect, Select, TextInput } from 'react-hook-form-mantine';
 import { FormProvider, useForm } from 'react-hook-form';
 import clsx from 'clsx';
@@ -39,6 +39,8 @@ export type FormValues = {
   curr_stage_name: string;
   previous_stage: string[];
   next_stage: string[];
+  action: ActionType;
+  sort: 'asc' | 'desc';
 };
 
 function FlowObjects() {
@@ -80,6 +82,8 @@ function FlowObjects() {
   const { control, watch, setValue } = methods;
   const watchCurrentStageUuid = watch('curr_stage_uuid');
   const watchCurrentStageName = watch('curr_stage_name');
+  const filter = watch('action');
+  const sort = watch('sort');
 
   const InputList = [
     {
@@ -154,15 +158,21 @@ function FlowObjects() {
     }
   }, [isRestore])
 
-
+  const [pagination] = React.useState({
+    pageSize: 5,
+    pageIndex: 1,
+  });
+  const infiniteRestructureLogsQueryOptions = {
+    cycle_uuid: cycle_uuid as string,
+    per_page: pagination.pageSize,
+    page: pagination.pageIndex,
+    sort: sort,
+    action: filter
+  };
   const infiniteRestructureLogsQuery = useInfiniteQuery({
-    initialPageParam: 1,
-    queryKey: ['restructureLog', cycle_uuid],
-    queryFn: ({ pageParam }) => getRestructureLog({
-      cycle_uuid: cycle_uuid as string,
-      per_page: 10,
-      page: pageParam
-    }),
+    initialPageParam: pagination.pageIndex,
+    queryKey: ['restructureLog', infiniteRestructureLogsQueryOptions],
+    queryFn: ({ pageParam }) => getRestructureLog(infiniteRestructureLogsQueryOptions),
     enabled: !!cycle_uuid,
     getNextPageParam: (lastPage, _, lastPageParam) => {
       if (lastPage.page === lastPage.total_pages) {
@@ -177,7 +187,9 @@ function FlowObjects() {
       return firstPageParam - 1
     },
   });
-  const { data: restructureLogsData } = infiniteRestructureLogsQuery || {};
+  const { data: restructureLogsData, isFetchingNextPage, fetchNextPage, hasNextPage, isFetching, refetch } = infiniteRestructureLogsQuery || {};
+
+  const totalLogs = restructureLogsData?.pages[0].total_items;
 
   return (
     <FormProvider {...methods}>
@@ -236,6 +248,7 @@ function FlowObjects() {
                             data={input.data}
                             disabled={input.disabled}
                             allowDeselect
+                            searchable
                             nothingFoundMessage="No stage found"
                             classNames={{
                               input: '!rounded-lg py-6 pr-6 w-full focus:outline-none focus:ring-2 focus:ring-[var(--fc-brand-700)] focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] disabled:border-transparent disabled:text-black',
@@ -269,6 +282,7 @@ function FlowObjects() {
                               disabled={input.disabled}
                               rightSection={<Icon icon="tabler:chevron-down" width="1rem" height="1rem" />}
                               checkIconPosition='right'
+                              searchable
                               classNames={{
                                 input: '!rounded-lg py-3 pr-3 w-full !focus:outline-none !focus:ring-2 !focus:ring-[var(--fc-brand-700)] !focus:border-transparent transition-all duration-300 ease-in-out disabled:!bg-[#F1F4F5] !disabled:border-transparent !disabled:text-black',
                               }}
@@ -305,40 +319,62 @@ function FlowObjects() {
             <ActionButtons />
 
             {/* ---------------- restructure history --------------- */}
-            {/* <h1 className='text-xl font-semibold'>Restructure History</h1>
-            <ScrollAreaAutosize>
-              <div className='flex border border-black rounded-xl pb-2 h-96'>
-                <ActionIcons type='history' className='p-4 ml-auto' />
-                <Timeline bulletSize={24} lineWidth={2}>
+            <h1 className='text-xl font-semibold'>Restructure History</h1>
+            <div className='h-96 relative flex flex-col border border-black rounded-xl pb-2 overflow-hidden'>
+              <ScrollAreaAutosize>
+                <ActionIcons type='history' className='p-4 ml-auto sticky top-0 w-full justify-end bg-gradient-to-b from-white from-70% z-10' {...{ history: { refetch } }} />
+                <div className='flex flex-col p-4 space-y-3'>
                   {restructureLogsData?.pages.map((page) => {
+                    if (!page.data.length) {
+                      return (
+                        <div key={page.page} className='flex justify-center'>
+                          <Text c='dimmed'>No data</Text>
+                        </div>
+                      )
+                    };
                     return (
-                      <React.Fragment key={page.page}>
+                      <div
+                        key={page.page}
+                        className='relative space-y-4'
+                      >
                         {page.data.map((item: {
                           action: string;
                           notes: string;
                           updated_datetime: string;
+                          user_name: string;
+                          stage_name: string;
                         }, index: React.Key) => (
-                          <TimelineItem key={index} bullet title={item.action} classNames={{
-                            itemBullet: clsx('border-[#FFF] border-4', getRandomColor()),
-                            item: 'h-40',
-                          }}>
-                            <Flex align="center">
-                              <Text c="dimmed" size="sm">{item.notes}</Text>
+                          <Flex
+                            key={index}
+                            justify="center"
+                            direction="column"
+                          >
+                            <Flex align="start" justify="space-between" w="100%">
+                              <Text><span className='capitalize'>{item.action}</span> by "{item.user_name}"</Text>
                               <Text size="xs" mt={4} ml="auto">{getTimeAgo(item.updated_datetime)}</Text>
                             </Flex>
-                          </TimelineItem>
+                            <Text c="dimmed" size="sm">{item.stage_name}</Text>
+                          </Flex>
                         ))}
-                      </React.Fragment>
+                      </div>
                     )
                   })}
-                </Timeline>
-              </div>
-            </ScrollAreaAutosize > */}
+                  {(!!totalLogs && !(!hasNextPage)) && <Anchor
+                    onClick={() => fetchNextPage()}
+                    className='font-light'
+                  >
+                    {(isFetchingNextPage || (isFetching && !isFetchingNextPage)) && <LoadingOverlay visible zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} loaderProps={{ color: 'var(--fc-brand-700)', type: 'oval' }} />}
+                    Load more
+                  </Anchor>}
+                </div>
+              </ScrollAreaAutosize >
+            </div>
           </>
         </div>
       </div >
-    </FormProvider>
+    </FormProvider >
   );
 };
 
-export default FlowObjects
+export default FlowObjects;
+

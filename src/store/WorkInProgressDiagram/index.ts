@@ -261,18 +261,19 @@ const useDiagramStore = create<RFState>()(
               const ApiFormat = convertToCycleStages(get().nodes, get().edges);
 
               setToDraft();
-              await restructureBizProcess({ cycle_uuid: cycle_uuid, body: ApiFormat }).then((res) => {
-                if (res.error) throw new Error(res.error_message);
+              await restructureBizProcess({ cycle_uuid: cycle_uuid, body: ApiFormat })
+                .then((res) => {
+                  if (res.error) throw new Error(res.error_message);
 
-                toast.success(res.message);
-                callback?.({
-                  success: true,
-                  message: res.message,
-                  data: { cycle_uuid, ...ApiFormat },
+                  toast.success(res.message);
+                  callback?.({
+                    success: true,
+                    message: res.message,
+                    data: { cycle_uuid, ...ApiFormat },
+                  });
+
+                  return; // return to pass the success callback
                 });
-
-                return; // return to pass the success callback
-              });
 
             } catch (error: any) {
               toast.error(error.message ?? 'An error occurred while saving the cycle.');
@@ -375,14 +376,14 @@ const useDiagramStore = create<RFState>()(
         });
       },
       onAdd: (data) => {
-        const { curr_stage_name: stage_name = 'New Node', previous_stage, next_stage } = data;
+        const { curr_stage_name: stage_name = 'New Node', curr_stage_uuid: stage_uuid, previous_stage, next_stage } = data;
         const updateEdges = get().updateEdges;
         try {
           if (!stage_name) throw new Error('Stage name is required.');
 
-          const uuid = get().generateNodeId();
+          // const uuid = get().generateNodeId();
           const node = {
-            id: uuid,
+            id: stage_uuid as string,
             type: 'Standard', // 'Standard' | 'Start' | 'WithEntryAndExit' | 'WithEntry'| 'WithExit' | 'End'  
             data: { label: stage_name },
             position: {
@@ -394,7 +395,7 @@ const useDiagramStore = create<RFState>()(
           set({ nodes: [...get().nodes, node] });
 
           if (previous_stage || next_stage) {
-            updateEdges({ ...data, curr_stage_uuid: uuid });
+            updateEdges({ ...data, curr_stage_uuid: stage_uuid });
           }
 
         } catch (error: any) {
@@ -712,6 +713,7 @@ const useWorkInProgressDiagram = () => useDiagramStore(
     currentCycleInfo: state.currentCycleInfo,
     nodes: state.nodes,
     edges: state.edges,
+    generateNodeId: state.generateNodeId,
     getSelectedNodeId: state.getSelectedNodeId,
     getPreviousNodesId: state.getPreviousNodesId,
     getNextNodesId: state.getNextNodesId,

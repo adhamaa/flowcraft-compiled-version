@@ -1054,15 +1054,21 @@ export const getRestructureLog = async ({
   cycle_uuid,
   page,
   per_page,
+  sort,
+  action,
 }: {
   cycle_uuid: string;
   page?: number;
   per_page?: number;
+  sort?: string;
+  action?: string;
 }) => {
   const url = new URL(`/businessProcess/restructureLogs`, baseUrl);
   url.searchParams.set('cycle_uuid', cycle_uuid);
   url.searchParams.set('page', page?.toString() || '');
   url.searchParams.set('per_page', per_page?.toString() || '');
+  url.searchParams.set('sort', sort || 'desc');
+  url.searchParams.set('action', action || '');
 
   const response = await fetch(url, {
     method: 'GET',
