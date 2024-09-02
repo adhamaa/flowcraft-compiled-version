@@ -25,9 +25,18 @@ interface Action {
 
 type ActionList = Action[];
 
-const ActionIcons = ({ type = "action", className }: { type: "action" | "history"; className?: string; }) => {
+const ActionIcons = ({
+  type = "action",
+  className,
+  ...props
+}: {
+  type: "action" | "history";
+  className?: string;
+  [key: string]: any;
+}) => {
+  const refetch = props.history?.refetch;
   const method = useFormContext();
-  const { reset, setFocus } = method;
+  const { reset, setFocus, setValue } = method;
 
   const { isEditable, toggleIsEditable } = useActionIcons();
 
@@ -35,6 +44,12 @@ const ActionIcons = ({ type = "action", className }: { type: "action" | "history
     const action_id = (e.target as HTMLElement).offsetParent?.id;
     toggleIsEditable(action_id as string);
     reset();
+  };
+
+  const toggleSort = <E extends Event>(e: E): void => {
+    const currentValue = method.getValues('sort');
+    const newValue = currentValue === 'asc' ? 'desc' : 'asc';
+    setValue('sort', newValue);
   };
 
   const actionList: ActionList & any = [
@@ -111,7 +126,7 @@ const ActionIcons = ({ type = "action", className }: { type: "action" | "history
       component: 'button',
       type: 'button',
       disabled: false,
-      // onClick: handleToggle as never,
+      onClick: refetch,
       color: isEditable.refresh ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
       c: isEditable.refresh ? "white" : "black"
     }, {
@@ -132,7 +147,7 @@ const ActionIcons = ({ type = "action", className }: { type: "action" | "history
       component: 'button',
       type: 'button',
       disabled: false,
-      // onClick: handleToggle as never,
+      onClick: toggleSort,
       color: isEditable.sort ? "var(--fc-brand-700)" : "var(--fc-neutral-100)",
       c: isEditable.sort ? "white" : "black"
     }] : []),
@@ -218,9 +233,9 @@ function SelectInputWrapper({ children }: { children?: React.ReactNode | ((props
   return (
     <div className="relative inline-block">
       <Select
-        name='library'
+        name='action'
         rightSection={<></>} // disable right section
-        data={['React', 'Angular', 'Vue', 'Svelte']}
+        data={['add', 'move', 'duplicate', 'delete', 'restore', 'disjoint']}
         classNames={{
           input: 'absolute inset-0 opacity-0 w-full h-full cursor-default',
           dropdown: '!w-40',

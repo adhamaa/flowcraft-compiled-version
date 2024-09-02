@@ -39,6 +39,8 @@ export type FormValues = {
   curr_stage_name: string;
   previous_stage: string[];
   next_stage: string[];
+  action: ActionType;
+  sort: 'asc' | 'desc';
 };
 
 function FlowObjects() {
@@ -80,6 +82,8 @@ function FlowObjects() {
   const { control, watch, setValue } = methods;
   const watchCurrentStageUuid = watch('curr_stage_uuid');
   const watchCurrentStageName = watch('curr_stage_name');
+  const filter = watch('action');
+  const sort = watch('sort');
 
   const InputList = [
     {
@@ -154,15 +158,21 @@ function FlowObjects() {
     }
   }, [isRestore])
 
-
+  const [pagination] = React.useState({
+    pageSize: 5,
+    pageIndex: 1,
+  });
+  const infiniteRestructureLogsQueryOptions = {
+    cycle_uuid: cycle_uuid as string,
+    per_page: pagination.pageSize,
+    page: pagination.pageIndex,
+    sort: sort,
+    action: filter
+  };
   const infiniteRestructureLogsQuery = useInfiniteQuery({
-    initialPageParam: 1,
-    queryKey: ['restructureLog', cycle_uuid],
-    queryFn: ({ pageParam }) => getRestructureLog({
-      cycle_uuid: cycle_uuid as string,
-      per_page: 5,
-      page: pageParam
-    }),
+    initialPageParam: pagination.pageIndex,
+    queryKey: ['restructureLog', infiniteRestructureLogsQueryOptions],
+    queryFn: ({ pageParam }) => getRestructureLog(infiniteRestructureLogsQueryOptions),
     enabled: !!cycle_uuid,
     getNextPageParam: (lastPage, _, lastPageParam) => {
       if (lastPage.page === lastPage.total_pages) {
@@ -177,7 +187,9 @@ function FlowObjects() {
       return firstPageParam - 1
     },
   });
-  const { data: restructureLogsData, isFetchingNextPage, fetchNextPage, hasNextPage, isFetching } = infiniteRestructureLogsQuery || {};
+  const { data: restructureLogsData, isFetchingNextPage, fetchNextPage, hasNextPage, isFetching, refetch } = infiniteRestructureLogsQuery || {};
+
+  const totalLogs = restructureLogsData?.pages[0].total_items;
 
   return (
     <FormProvider {...methods}>
@@ -310,9 +322,16 @@ function FlowObjects() {
             <h1 className='text-xl font-semibold'>Restructure History</h1>
             <div className='h-96 relative flex flex-col border border-black rounded-xl pb-2 overflow-hidden'>
               <ScrollAreaAutosize>
-                <ActionIcons type='history' className='p-4 ml-auto sticky top-0 w-full justify-end bg-gradient-to-b from-white from-70% z-10' />
+                <ActionIcons type='history' className='p-4 ml-auto sticky top-0 w-full justify-end bg-gradient-to-b from-white from-70% z-10' {...{ history: { refetch } }} />
                 <div className='flex flex-col p-4 space-y-3'>
                   {restructureLogsData?.pages.map((page) => {
+                    if (!page.data.length) {
+                      return (
+                        <div key={page.page} className='flex justify-center'>
+                          <Text c='dimmed'>No data</Text>
+                        </div>
+                      )
+                    };
                     return (
                       <div
                         key={page.page}
@@ -340,7 +359,7 @@ function FlowObjects() {
                       </div>
                     )
                   })}
-                  {!(!hasNextPage) && <Anchor
+                  {(!!totalLogs && !(!hasNextPage)) && <Anchor
                     onClick={() => fetchNextPage()}
                     className='font-light'
                   >
