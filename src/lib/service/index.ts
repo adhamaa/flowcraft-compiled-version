@@ -343,8 +343,10 @@ export const updateCycle = async ({
   cycle_uuid: string;
   body: { cycle_active?: number; cycle_description: string };
 }) => {
-  const endpoint = `/businessProcessTmp/updateCycle?cycle_uuid=${cycle_uuid}`;
-  const url = `${baseUrl}${endpoint}`;
+  const url = new URL(`/businessProcessTmp/updateCycle`, baseUrl);
+
+  url.searchParams.set('cycle_uuid', cycle_uuid);
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -371,8 +373,11 @@ export const updateStatusCycle = async ({
   cycle_id: string;
   status_code: string;
 }) => {
-  const endpoint = `/businessProcessTmp/updateStatusCycle?cycle_id=${cycle_id}&status_code=${status_code}`;
-  const url = `${baseUrl}${endpoint}`;
+  const url = new URL(`/businessProcessTmp/updateStatusCycle`, baseUrl);
+
+  url.searchParams.set('cycle_id', cycle_id);
+  url.searchParams.set('status_code', status_code);
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
