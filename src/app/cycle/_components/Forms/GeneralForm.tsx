@@ -212,114 +212,49 @@ const GeneralFormContent = ({
             <Button onClick={() => modals.closeAll()} color='var(--fc-neutral-100)' c='var(--fc-neutral-900)' radius='md'>
               Cancel
             </Button>
-            <Button onClick={
-              // async () => {
-              //   if (!hasStatusChange && !hasDescriptionChange) {
-              //     toast.error('No changes detected');
-              //     modals.closeAll();
-              //     toggleEdit();
-              //     return;
-              //   }
-
-              //   try {
-              //     const [statusResponse, descriptionResponse] = await Promise.all([
-              //       updateStatusCycle({
-              //         cycle_id: data?.cycle_id.toString() as string,
-              //         status_code: formdata.cycle_active,
-              //       }),
-              //       updateCycle({
-              //         cycle_uuid: data?.cycle_uuid as unknown as string,
-              //         body: {
-              //           cycle_description: formdata.cycle_description,
-              //         },
-              //       }),
-              //     ]);
-
-              //     const statusResponseOk = !statusResponse.error;
-              //     const descriptionResponseOk = !descriptionResponse.error;
-
-
-              //     if (statusResponseOk || descriptionResponseOk) {
-              //       const successMessages = [
-              //         statusResponseOk && statusResponse.message,
-              //         descriptionResponseOk && descriptionResponse.message,
-              //       ].filter(Boolean).join(' ');
-
-              //       toast.success(successMessages);
-              //       await setAuditTrail({
-              //         action: 'update_cycle_info',
-              //         location_url: pageUrl,
-              //         object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
-              //         process_state: 'TRIGGERAPI',
-              //         sysfunc: '"onSubmit" func',
-              //         userid: user_id as string,
-              //         sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-              //         notes: 'Cycle status and description updated successfully',
-              //         json_object: formdata,
-              //       }).then(() => {
-              //         window.location.reload();
-              //       });
-
-              //       modals.closeAll();
-              //       toggleEdit();
-              //     }
-              //     if (!statusResponseOk) {
-              //       throw new Error(statusResponse.error_message);
-              //     }
-              //     if (!descriptionResponseOk) {
-              //       throw new Error(descriptionResponse.error_message);
-              //     }
-              //   } catch (error: any & {
-              //     message: string;
-              //   }) {
-              //     toast.error(`${error.message}`);
-              //   }
-              //   modals.closeAll();
-              //   toggleEdit();
-              // }
-              async () => {
-                if (!hasStatusChange && !hasDescriptionChange) {
-                  toast.error('No changes detected');
-                  modals.closeAll();
-                  toggleEdit();
-                  return;
-                }
-
-                try {
-                  await updateCycle({
-                    cycle_uuid: data?.cycle_uuid as unknown as string,
-                    body: {
-                      cycle_description: formdata.cycle_description,
-                      cycle_active: formdata.cycle_active,
-                    },
-                  }).then(async (response) => {
-                    if (!response.error) {
-                      toast.success(response.message);
-                      await setAuditTrail({
-                        action: 'update_cycle_info',
-                        location_url: pageUrl,
-                        object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
-                        process_state: 'TRIGGERAPI',
-                        sysfunc: '"onSubmit" func',
-                        userid: user_id as string,
-                        sysapp: 'FLOWCRAFTBUSINESSPROCESS',
-                        notes: 'Cycle status and description updated successfully',
-                        json_object: formdata,
-                      }).then(() => {
-                        window.location.reload();
-                      });
-                    } else {
-                      throw new Error(response.error_message);
-                    }
-                  });
-                } catch (error: any & {
-                  message: string;
-                }) {
-                  toast.error(`${error.message}`);
-                }
+            <Button onClick={async () => {
+              if (!hasStatusChange && !hasDescriptionChange) {
+                toast.error('No changes detected');
                 modals.closeAll();
                 toggleEdit();
+                return;
               }
+
+              try {
+                await updateCycle({
+                  cycle_uuid: data?.cycle_uuid as unknown as string,
+                  body: {
+                    cycle_description: formdata.cycle_description,
+                    cycle_active: formdata.cycle_active,
+                  },
+                }).then(async (response) => {
+                  if (!response.error) {
+                    toast.success(response.message);
+                    await setAuditTrail({
+                      action: 'update_cycle_info',
+                      location_url: pageUrl,
+                      object: 'src/app/cycle/_components/Forms/GeneralForm.tsx',
+                      process_state: 'TRIGGERAPI',
+                      sysfunc: '"onSubmit" func',
+                      userid: user_id as string,
+                      sysapp: 'FLOWCRAFTBUSINESSPROCESS',
+                      notes: 'Cycle status and description updated successfully',
+                      json_object: formdata,
+                    }).then(() => {
+                      window.location.reload();
+                    });
+                  } else {
+                    throw new Error(response.error_message);
+                  }
+                });
+              } catch (error: any & {
+                message: string;
+              }) {
+                toast.error(`${error.message}`);
+              }
+              modals.closeAll();
+              toggleEdit();
+            }
             } color='var(--fc-brand-700)' radius='md'>
               Yes
             </Button>

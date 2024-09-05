@@ -371,7 +371,7 @@ export const updateStatusCycle = async ({
   status_code
 }: {
   cycle_id: string;
-  status_code: string;
+  status_code: "0" | "1" | "2"; // 0: Inactive, 1: Active, 2: WIP
 }) => {
   const url = new URL(`/businessProcessTmp/updateStatusCycle`, baseUrl);
 

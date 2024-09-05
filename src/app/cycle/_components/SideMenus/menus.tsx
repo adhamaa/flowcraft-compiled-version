@@ -2,7 +2,7 @@
 
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React from 'react'
-import { Apps_label, Datasource_type, getCycleInfo, getDeletedStageList, getStageList } from '@/lib/service';
+import { Apps_label, Datasource_type, getCycleInfo, getDeletedStageList, getStageList, updateStatusCycle } from '@/lib/service';
 import { useDisclosure } from '@mantine/hooks';
 import { Button, Flex, ScrollAreaAutosize, Tabs, TabsList, TabsPanel, TabsTab, Text, Tooltip } from '@mantine/core';
 import FooterButton from './footer';
@@ -271,26 +271,34 @@ function SideMenus() {
                                     {...{ isSideMenuCollapse }}
                                     isRestructure
                                     onClick={() => {
-                                      if (!canRestructure) modals.open({
-                                        title: 'Restructure Cycle',
-                                        children: (
-                                          <>
-                                            <Text size="sm">The restructuring process is only possible during an <strong>inactive</strong> status cycle.</Text>
-                                            <Flex gap={16} justify={'end'} mt="md">
-                                              <Button
-                                                onClick={() => modals.closeAll()} color='var(--fc-brand-700)' radius='md'>
-                                                Close
-                                              </Button>
-                                            </Flex>
-                                          </>
-                                        ),
-                                        overlayProps: {
-                                          backgroundOpacity: 0.55,
-                                          blur: 10,
-                                        },
-                                        radius: 'md',
-                                      });
-                                      else router.push(`/cycle/restructure/${cycleUuid}?` + createQueryString('cycle_id', cycle_id as string))
+                                      if (!canRestructure) {
+                                        modals.open({
+                                          title: 'Restructure Cycle',
+                                          children: (
+                                            <>
+                                              <Text size="sm">The restructuring process is only possible during an <strong>inactive</strong> status cycle.</Text>
+                                              <Flex gap={16} justify={'end'} mt="md">
+                                                <Button
+                                                  onClick={() => modals.closeAll()} color='var(--fc-brand-700)' radius='md'>
+                                                  Close
+                                                </Button>
+                                              </Flex>
+                                            </>
+                                          ),
+                                          overlayProps: {
+                                            backgroundOpacity: 0.55,
+                                            blur: 10,
+                                          },
+                                          radius: 'md',
+                                        });
+                                      } else {
+                                        updateStatusCycle({
+                                          cycle_id: cycle_id as string,
+                                          status_code: "2"
+                                        }).then(() => {
+                                          router.push(`/cycle/restructure/${cycleUuid}?` + createQueryString('cycle_id', cycle_id as string))
+                                        })
+                                      }
                                     }}
                                   />}
                                 </TabsList>)}
