@@ -73,8 +73,8 @@ export function getEdgeParams(source: any, target: any) {
 }
 
 export function createNodesAndEdges() {
-  const nodes = [];
-  const edges = [];
+  const nodes = [] as any;
+  const edges = [] as any;
   const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
   nodes.push({ id: 'target', data: { label: 'Target' }, position: center });
