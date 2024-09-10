@@ -6,6 +6,9 @@
     "dev": "next dev -p 3030",
     "build": "next build",
     "start": "next start -p 3030",
+    "dev:server": "nodemon",
+    "build:server": "next build && tsc --project tsconfig.server.json",
+    "start:server": "cross-env NODE_ENV=production node dist/server.js",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
@@ -38,6 +41,7 @@
     "canvas": "^2.11.2",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.0",
+    "cross-env": "^7.0.3",
     "dayjs": "^1.11.10",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.30.9",
@@ -73,10 +77,12 @@
     "eslint-config-next": "14.2.3",
     "fluid-tailwind": "^0.1.6",
     "husky": "^9.1.4",
+    "nodemon": "^3.1.4",
     "postcss": "^8.4.41",
     "postcss-preset-mantine": "^1.13.0",
     "postcss-simple-vars": "^7.0.1",
     "tailwindcss": "^3.4.10",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.4"
   }
 }
