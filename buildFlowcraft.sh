@@ -13,6 +13,7 @@ rm -rfv !(.env|package.json|dist|public|.next)
 rm -rf .env.example.prod
 rm -rf .env.example.qa
 rm -rf .eslintrc.json
+rm -rf .gitignore
 rm -rf .husky
 rm -rf .vscode
 
