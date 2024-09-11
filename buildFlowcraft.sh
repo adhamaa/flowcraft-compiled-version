@@ -23,9 +23,6 @@ rm -rf .gitignore
 rm -rf .husky
 rm -rf .vscode
 
-# Install dependencies after cleanup
-pnpm i
-
 # Check if the 'compiled' remote already exists; if not, add it
 if git remote get-url compiled > /dev/null 2>&1; then
     echo "Remote 'compiled' already exists."
