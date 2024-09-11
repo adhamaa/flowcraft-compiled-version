@@ -39,7 +39,7 @@ git commit -m "Build: push compiled code"
 git push -u compiled $TEMP_BRANCH --force
 
 # Delete the temporary branch locally and remotely
-git checkout main
+git checkout compiled/adham10092024
 git branch -D $TEMP_BRANCH
 git push origin --delete $TEMP_BRANCH
 
