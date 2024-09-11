@@ -13,6 +13,21 @@ read -p "Enter the name for the temporary branch: " TEMP_BRANCH
 # Define the compiled remote URL as a variable
 COMPILED_REMOTE_URL="https://github.com/adhamaa/flowcraft-compiled-version.git"
 
+# Install Git LFS if not already installed
+if ! command -v git-lfs &> /dev/null
+then
+    echo "Git LFS not found, installing..."
+    git lfs install
+fi
+
+# Track large files with Git LFS
+git lfs track "*.pack"
+git lfs track ".next/cache/**/*"
+
+# Add and commit the .gitattributes file
+git add .gitattributes
+git commit -m "Track large files with Git LFS"
+
 # Create and switch to the temporary branch
 git checkout -b $TEMP_BRANCH
 
@@ -29,6 +44,13 @@ rm -rf .gitignore
 rm -rf .husky
 rm -rf .vscode
 
+# Ensure that large cache files are handled by Git LFS
+rm -rf .next/cache
+
+# Add, commit, and push changes on the temporary branch
+git add .
+git commit -m "Build: push compiled code"
+
 # Check if the 'compiled' remote already exists; if not, add it
 if git remote get-url compiled > /dev/null 2>&1; then
     echo "Remote 'compiled' already exists."
@@ -37,11 +59,7 @@ else
     echo "Remote 'compiled' added."
 fi
 
-# Add and commit changes on the temporary branch
-git add .
-git commit -m "Build: push compiled code"
-
-# Push compiled code to the 'compiled' remote repository
+# Push compiled code to the 'compiled' remote repository with --no-verify
 git push -u compiled $TEMP_BRANCH --force
 
 # Switch back to the original branch
