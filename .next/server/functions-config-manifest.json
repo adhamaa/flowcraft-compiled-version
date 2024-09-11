@@ -1,1 +1,1 @@
-{"version":1,"functions":{"/api/auth/[...nextauth]":{},"/cycle/[cycle_id]/stage/deleted/[stage_uuid]":{},"/cycle/[cycle_id]/stage/[stage_uuid]":{},"/cycle/restructure/[cycle_uuid]":{}}}
+{"version":1,"functions":{"/api/auth/[...nextauth]":{},"/cycle/restructure/[cycle_uuid]":{},"/cycle/[cycle_id]/stage/deleted/[stage_uuid]":{},"/cycle/[cycle_id]/stage/[stage_uuid]":{}}}
