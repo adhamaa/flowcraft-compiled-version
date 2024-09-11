@@ -4,8 +4,14 @@
 # Enable extended globbing
 shopt -s extglob
 
-# Define the temporary branch name
-TEMP_BRANCH="temp-build-branch"
+# Get the current branch name and store it in a variable
+CURRENT_BRANCH=$(git symbolic-ref --short HEAD)
+
+# Prompt for the temporary branch name
+read -p "Enter the name for the temporary branch: " TEMP_BRANCH
+
+# Define the compiled remote URL as a variable
+COMPILED_REMOTE_URL="https://github.com/adhamaa/flowcraft-compiled-version.git"
 
 # Create and switch to the temporary branch
 git checkout -b $TEMP_BRANCH
@@ -27,7 +33,7 @@ rm -rf .vscode
 if git remote get-url compiled > /dev/null 2>&1; then
     echo "Remote 'compiled' already exists."
 else
-    git remote add compiled https://github.com/adhamaa/flowcraft-compiled-version.git
+    git remote add compiled $COMPILED_REMOTE_URL
     echo "Remote 'compiled' added."
 fi
 
@@ -38,9 +44,12 @@ git commit -m "Build: push compiled code"
 # Push compiled code to the 'compiled' remote repository
 git push -u compiled $TEMP_BRANCH --force
 
-# Delete the temporary branch locally and remotely
-git checkout compiled/adham10092024
-git branch -D $TEMP_BRANCH
-git push origin --delete $TEMP_BRANCH
+# Switch back to the original branch
+git checkout $CURRENT_BRANCH
 
-echo "Compiled code pushed to 'compiled' remote: https://github.com/adhamaa/flowcraft-compiled-version.git"
+# Delete the temporary branch locally and remotely
+git branch -D $TEMP_BRANCH
+# Uncomment the line below if you also want to delete the branch remotely
+# git push origin --delete $TEMP_BRANCH
+
+echo "Compiled code pushed to 'compiled' remote: $COMPILED_REMOTE_URL"
