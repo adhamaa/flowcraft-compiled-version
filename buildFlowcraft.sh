@@ -12,7 +12,7 @@ if [ "$select" != "skipenv" ]; then
 fi
 
 pnpm clean
-pnpm i
+# pnpm i
 pnpm build:server
 rm -rfv !(.env|package.json|dist|public|.next)
 rm -rf .env.example.prod

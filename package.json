@@ -12,7 +12,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "clean": "rm -rf .next node_modules pnpm-lock.yaml yarn.lock package-lock.json && pnpm install",
+    "clean": "rm -rf .next dist node_modules pnpm-lock.yaml yarn.lock package-lock.json && pnpm install",
     "migration:generate": "drizzle-kit generate:mysql",
     "migration:drop": "drizzle-kit drop",
     "db:pull": "drizzle-kit introspect:mysql",
