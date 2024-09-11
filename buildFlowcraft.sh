@@ -31,6 +31,9 @@ git commit -m "Track large files with Git LFS"
 # Create and switch to the temporary branch
 git checkout -b $TEMP_BRANCH
 
+# copy the .env file to the root directory
+cp .env.example.qa .env
+
 # Clean and build the project
 pnpm clean
 pnpm build:server
