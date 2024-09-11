@@ -16,12 +16,12 @@ pnpm build:server
 
 # Remove all unnecessary and hidden files, but keep necessary build files and configs
 rm -rfv !(.env|package.json|dist|public|.next)
-# rm -rf .env.example.prod
-# rm -rf .env.example.qa
-# rm -rf .eslintrc.json
-# rm -rf .gitignore
-# rm -rf .husky
-# rm -rf .vscode
+rm -rf .env.example.prod
+rm -rf .env.example.qa
+rm -rf .eslintrc.json
+rm -rf .gitignore
+rm -rf .husky
+rm -rf .vscode
 
 # Install dependencies after cleanup
 pnpm i
